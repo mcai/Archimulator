@@ -20,7 +20,6 @@ package archimulator.uncore.helperThread.hotspot;
 
 import archimulator.analysis.BasicBlock;
 import archimulator.analysis.Function;
-import archimulator.analysis.Instruction;
 import archimulator.common.Simulation;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;

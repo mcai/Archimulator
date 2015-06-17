@@ -83,10 +83,6 @@ public class ThrashingSensitiveHelperThreadAwareLRUPolicy<StateT extends Seriali
         }
     }
 
-    @Override
-    public void dumpStats(ReportNode reportNode) {
-    }
-
     /**
      * Get a value indicating whether the specified PC address in the specified thread is delinquent or not.
      *

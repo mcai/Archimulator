@@ -79,5 +79,5 @@ public interface EvictableCache<StateT extends Serializable> extends Cache<State
      *
      * @return the replacement policy
      */
-    public CacheReplacementPolicy<StateT> getReplacementPolicy();
+    CacheReplacementPolicy<StateT> getReplacementPolicy();
 }

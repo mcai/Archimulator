@@ -37,7 +37,7 @@ public class BasicNode implements Node {
      */
     public BasicNode(Object value) {
         this.value = value;
-        this.children = new ArrayList<Node>();
+        this.children = new ArrayList<>();
     }
 
     /**

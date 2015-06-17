@@ -68,10 +68,7 @@ public class MinMissCachePartitioningHelper extends CachePartitioningHelper {
     @Override
     protected void newInterval() {
         this.setPartition(this.getMinMissSumAndPartition().getSecond());
-
-        for (StackDistanceProfile stackDistanceProfile : this.stackDistanceProfiles.values()) {
-            stackDistanceProfile.newInterval();
-        }
+        this.stackDistanceProfiles.values().forEach(StackDistanceProfile::newInterval);
     }
 
     /**

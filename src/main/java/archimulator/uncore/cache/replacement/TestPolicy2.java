@@ -105,10 +105,6 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         this.handleLineReference(set, way, access.getThread().getId());
     }
 
-    @Override
-    public void dumpStats(ReportNode reportNode) {
-    }
-
     /**
      * Handle line reference.
      *

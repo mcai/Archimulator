@@ -101,18 +101,14 @@ public interface Core extends SimulationObject, Reportable {
      * Do fast forward for one cycle.
      */
     default void doFastForwardOneCycle() {
-        for (Thread thread : this.getThreads()) {
-            thread.fastForwardOneCycle();
-        }
+        this.getThreads().forEach(Thread::fastForwardOneCycle);
     }
 
     /**
      * Do cache warmup for one cycle.
      */
     default void doCacheWarmupOneCycle() {
-        for (Thread thread : this.getThreads()) {
-            thread.warmupCacheOneCycle();
-        }
+        this.getThreads().forEach(Thread::warmupCacheOneCycle);
     }
 
     /**
@@ -124,9 +120,7 @@ public interface Core extends SimulationObject, Reportable {
      * Update the statistics per cycle.
      */
     default void updatePerCycleStats() {
-        for (Thread thread : this.getThreads()) {
-            thread.updatePerCycleStats();
-        }
+        this.getThreads().forEach(Thread::updatePerCycleStats);
 
         this.getFunctionalUnitPool().updatePerCycleStats();
     }

@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Memory level parallelism (MLP) aware cache partitioning helper.
@@ -125,9 +126,8 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
 
         cache.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {
             if (pendingL2Hits.containsKey(getThreadIdentifier(event.getDynamicInstruction().getThread()))) {
-                for (PendingL2Hit pendingL2Hit : pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()) {
-                    pendingL2Hit.incrementNumCommittedInstructionsSinceAccess();
-                }
+                pendingL2Hits.get(getThreadIdentifier(event.getDynamicInstruction().getThread())).values()
+                        .forEach(PendingL2Hit::incrementNumCommittedInstructionsSinceAccess);
             }
         });
     }
@@ -139,9 +139,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
     protected void newInterval() {
         this.setPartition(this.getOptimalMlpCostSumAndPartition().getSecond());
 
-        for(MLPAwareStackDistanceProfile mlpAwareStackDistanceProfile : this.mlpAwareStackDistanceProfiles.values()) {
-            mlpAwareStackDistanceProfile.newInterval();
-        }
+        this.mlpAwareStackDistanceProfiles.values().forEach(MLPAwareStackDistanceProfile::newInterval);
     }
 
     /**
@@ -164,9 +162,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
      */
     private void updateL2HitElapsedCyclesPerCycle() {
         for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
-            for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                pendingL2Hit.incrementNumCyclesElapsedSinceAccess();
-            }
+            pendingL2HitsPerThread.values().forEach(PendingL2Hit::incrementNumCyclesElapsedSinceAccess);
         }
     }
 
@@ -175,14 +171,10 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
      */
     private void freeInvalidL2HitsPerCycle() {
         for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
-            List<Integer> tagsToFree = new ArrayList<>();
-
-            for (PendingL2Hit pendingL2Hit : pendingL2HitsPerThread.values()) {
-                if (pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getReorderBufferCapacity()
-                        || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency()) {
-                    tagsToFree.add(pendingL2Hit.getAccess().getPhysicalTag());
-                }
-            }
+            List<Integer> tagsToFree = pendingL2HitsPerThread.values().stream()
+                    .filter(pendingL2Hit -> pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getReorderBufferCapacity()
+                    || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency())
+                    .map(pendingL2Hit -> pendingL2Hit.getAccess().getPhysicalTag()).collect(Collectors.toList());
 
             for (int tag : tagsToFree) {
                 profileEndServicingL2Hit(pendingL2HitsPerThread.get(tag).getAccess());

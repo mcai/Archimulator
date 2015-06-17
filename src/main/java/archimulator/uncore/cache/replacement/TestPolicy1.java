@@ -79,10 +79,6 @@ public class TestPolicy1<StateT extends Serializable> extends LRUPolicy<StateT> 
         }
     }
 
-    @Override
-    public void dumpStats(ReportNode reportNode) {
-    }
-
     /**
      * Get a value indicating whether the specified program counter (PC) is delinquent or not for the specified thread.
      *

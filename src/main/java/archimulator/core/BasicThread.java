@@ -106,9 +106,7 @@ public class BasicThread extends AbstractBasicThread {
             int cacheLineToFetch = aligned(pc, this.lineSizeOfICache);
             if (cacheLineToFetch != this.lastFetchedCacheLine) {
                 if (this.core.canIfetch(this, pc)) {
-                    this.core.ifetch(this, pc, pc, () -> {
-                        fetchStalled = false;
-                    });
+                    this.core.ifetch(this, pc, pc, () -> fetchStalled = false);
 
                     this.fetchStalled = true;
                     this.lastFetchedCacheLine = cacheLineToFetch;
@@ -275,21 +273,17 @@ public class BasicThread extends AbstractBasicThread {
             reorderBufferEntry.getSourcePhysicalRegisters().put(inputDependency, this.renameTable.get(inputDependency));
         }
 
-        for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
-            if (outputDependency != 0) {
-                reorderBufferEntry.getOldPhysicalRegisters().put(outputDependency, this.renameTable.get(outputDependency));
-                PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(outputDependency)).allocate(outputDependency);
-                this.renameTable.put(outputDependency, physReg);
-                reorderBufferEntry.getTargetPhysicalRegisters().put(outputDependency, physReg);
-            }
-        }
+        reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies().stream().filter(outputDependency -> outputDependency != 0).forEach(outputDependency -> {
+            reorderBufferEntry.getOldPhysicalRegisters().put(outputDependency, this.renameTable.get(outputDependency));
+            PhysicalRegister physReg = this.getPhysicalRegisterFile(RegisterDependencyType.getType(outputDependency)).allocate(outputDependency);
+            this.renameTable.put(outputDependency, physReg);
+            reorderBufferEntry.getTargetPhysicalRegisters().put(outputDependency, physReg);
+        });
 
-        for (PhysicalRegister physicalRegister : reorderBufferEntry.getSourcePhysicalRegisters().values()) {
-            if (!physicalRegister.isReady()) {
-                reorderBufferEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands() + 1);
-                physicalRegister.getDependents().add(reorderBufferEntry);
-            }
-        }
+        reorderBufferEntry.getSourcePhysicalRegisters().values().stream().filter(physicalRegister -> !physicalRegister.isReady()).forEach(physicalRegister -> {
+            reorderBufferEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands() + 1);
+            physicalRegister.getDependents().add(reorderBufferEntry);
+        });
 
         if (reorderBufferEntry.isEffectiveAddressComputation()) {
             PhysicalRegister physicalRegister = reorderBufferEntry.getSourcePhysicalRegisters().get(reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getInputDependencies().get(0));
@@ -307,11 +301,9 @@ public class BasicThread extends AbstractBasicThread {
             loadStoreQueueEntry.setSourcePhysicalRegisters(reorderBufferEntry.getSourcePhysicalRegisters());
             loadStoreQueueEntry.setTargetPhysicalRegisters(reorderBufferEntry.getTargetPhysicalRegisters());
 
-            for (PhysicalRegister physicalRegister : loadStoreQueueEntry.getSourcePhysicalRegisters().values()) {
-                if (!physicalRegister.isReady()) {
-                    physicalRegister.getDependents().add(loadStoreQueueEntry);
-                }
-            }
+            loadStoreQueueEntry.getSourcePhysicalRegisters().values().stream().filter(physicalRegister -> !physicalRegister.isReady()).forEach(physicalRegister -> {
+                physicalRegister.getDependents().add(loadStoreQueueEntry);
+            });
 
             loadStoreQueueEntry.setNumNotReadyOperands(reorderBufferEntry.getNumNotReadyOperands());
 
@@ -445,12 +437,10 @@ public class BasicThread extends AbstractBasicThread {
                 this.loadStoreQueue.getEntries().remove(loadStoreQueueEntry);
             }
 
-            for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
-                if (outputDependency != 0) {
-                    reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency).reclaim();
-                    reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).commit();
-                }
-            }
+            reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies().stream().filter(outputDependency -> outputDependency != 0).forEach(outputDependency -> {
+                reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency).reclaim();
+                reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).commit();
+            });
 
             if (reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().isControl()) {
                 this.branchPredictor.update(
@@ -501,12 +491,10 @@ public class BasicThread extends AbstractBasicThread {
 
             this.core.removeFromQueues(reorderBufferEntry);
 
-            for (int outputDependency : reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies()) {
-                if (outputDependency != 0) {
-                    reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).recover();
-                    this.renameTable.put(outputDependency, reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency));
-                }
-            }
+            reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getOutputDependencies().stream().filter(outputDependency -> outputDependency != 0).forEach(outputDependency -> {
+                reorderBufferEntry.getTargetPhysicalRegisters().get(outputDependency).recover();
+                this.renameTable.put(outputDependency, reorderBufferEntry.getOldPhysicalRegisters().get(outputDependency));
+            });
 
             reorderBufferEntry.getTargetPhysicalRegisters().clear();
 

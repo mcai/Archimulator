@@ -21,6 +21,7 @@ package archimulator.util.buffer;
 import java.nio.ByteBuffer;
 
 /**
+ * Circular byte buffer.
  *
  * @author Min Cai
  */
@@ -30,15 +31,16 @@ public class CircularByteBuffer {
     private int writeIndex = 0;
 
     /**
+     * Create a circular byte buffer.
      *
-     * @param capacity
+     * @param capacity the capacity
      */
     public CircularByteBuffer(int capacity) {
         buffer = ByteBuffer.allocate(capacity);
     }
 
     /**
-     *
+     * Reset the circular byte buffer.
      */
     public void reset() {
         readIndex = 0;
@@ -46,11 +48,12 @@ public class CircularByteBuffer {
     }
 
     /**
+     * Read data from the circular byte buffer into the specified destination byte array.
      *
-     * @param dest
-     * @param offset
-     * @param length
-     * @return
+     * @param dest the destination byte array
+     * @param offset the offset
+     * @param length the length
+     * @return the number of data read from the circular byte buffer
      */
     public int read(byte[] dest, int offset, int length) {
         assert length < buffer.capacity() : "The requested read is bigger than the buffer";
@@ -98,11 +101,12 @@ public class CircularByteBuffer {
     }
 
     /**
+     * Write data from the specified byte array into the specified circular byte buffer.
      *
-     * @param src
-     * @param offset
-     * @param length
-     * @return
+     * @param src the source byte array
+     * @param offset the offset
+     * @param length the length of the data written
+     * @return a boolean value indicating whether the specified number of bytes has been written successfully or not
      */
     public boolean write(byte[] src, int offset, int length) {
         assert length < buffer.capacity() : "The requested write is bigger than the buffer";
@@ -144,40 +148,45 @@ public class CircularByteBuffer {
     }
 
     /**
+     * Get a boolean value indicating whether the circular byte buffer is empty or not.
      *
-     * @return
+     * @return a boolean value indicating whether the circular byte buffer is empty or not
      */
     public boolean isEmpty() {
         return writeIndex == readIndex;
     }
 
     /**
+     * Get a boolean value indicating whether the circular byte buffer is full or not
      *
-     * @return
+     * @return a boolean value indicating whether the circular byte buffer is full or not
      */
     public boolean isFull() {
         return writeIndex + 1 <= buffer.capacity() && writeIndex + 1 == readIndex || writeIndex == buffer.capacity() - 1 && readIndex == 0;
     }
 
     /**
+     * Get the supporting byte buffer.
      *
-     * @return
+     * @return the supporting byte buffer
      */
     public ByteBuffer getBuffer() {
         return buffer;
     }
 
     /**
+     * Get the read index.
      *
-     * @return
+     * @return the read index
      */
     public int getReadIndex() {
         return readIndex;
     }
 
     /**
+     * Get the write index.
      *
-     * @return
+     * @return the write index
      */
     public int getWriteIndex() {
         return writeIndex;

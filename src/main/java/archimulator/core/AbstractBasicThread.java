@@ -40,7 +40,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      * The number of the thread.
      */
-    protected int num;
+    private int num;
 
     /**
      * The context.
@@ -55,7 +55,7 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      * The name of the thread.
      */
-    protected String name;
+    private String name;
 
     /**
      * The parent core.
@@ -113,32 +113,32 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      * The number of decode buffer full stalls.
      */
-    protected long numDecodeBufferFullStalls;
+    private long numDecodeBufferFullStalls;
 
     /**
      * The number of reorder buffer full stalls.
      */
-    protected long numReorderBufferFullStalls;
+    private long numReorderBufferFullStalls;
 
     /**
      * The number of load/store queue full stalls.
      */
-    protected long numLoadStoreQueueFullStalls;
+    private long numLoadStoreQueueFullStalls;
 
     /**
      * The number of integer physical register file full stalls.
      */
-    protected long numIntPhysicalRegisterFileFullStalls;
+    private long numIntPhysicalRegisterFileFullStalls;
 
     /**
      * The number of floating point physical register file full stalls.
      */
-    protected long numFpPhysicalRegisterFileFullStalls;
+    private long numFpPhysicalRegisterFileFullStalls;
 
     /**
      * The number of miscellaneous physical register file full stalls.
      */
-    protected long numMiscPhysicalRegisterFileFullStalls;
+    private long numMiscPhysicalRegisterFileFullStalls;
 
     /**
      * The number of fetch stalls when the decode buffer is full.
@@ -148,12 +148,12 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      * The number of register rename stalls when the decode buffer is empty.
      */
-    protected long numRegisterRenameStallsOnDecodeBufferIsEmpty;
+    private long numRegisterRenameStallsOnDecodeBufferIsEmpty;
 
     /**
      * The number of register rename stalls when the reorder buffer is full.
      */
-    protected long numRegisterRenameStallsOnReorderBufferIsFull;
+    private long numRegisterRenameStallsOnReorderBufferIsFull;
 
     /**
      * The number of register rename stalls when the load/store queue is full.
@@ -163,17 +163,17 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     /**
      * The number of selection stalls when loads can not be issued.
      */
-    protected long numSelectionStallsOnCanNotLoad;
+    private long numSelectionStallsOnCanNotLoad;
 
     /**
      * The number of selection stalls when stores can not be issued.
      */
-    protected long numSelectionStallsOnCanNotStore;
+    private long numSelectionStallsOnCanNotStore;
 
     /**
      * The number of selection stalls when there is no free functional unit for a specific functional unit type.
      */
-    protected long numSelectionStallsOnNoFreeFunctionalUnit;
+    private long numSelectionStallsOnNoFreeFunctionalUnit;
 
     private Map<Mnemonic, Long> executedMnemonics;
     private Map<String, Long> executedSystemCalls;

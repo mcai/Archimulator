@@ -217,11 +217,7 @@ public class Context extends BasicSimulationObject implements SimulationObject, 
 
         this.state = ContextState.FINISHED;
 
-        for (Context context : this.kernel.getContexts()) {
-            if (context.getState() != ContextState.FINISHED && context.getParent() == this) {
-                context.finish();
-            }
-        }
+        this.kernel.getContexts().stream().filter(context -> context.getState() != ContextState.FINISHED && context.getParent() == this).forEach(Context::finish);
 
         if (this.signalFinish != 0 && this.parent != null) {
             this.parent.getSignalMasks().getPending().set(this.signalFinish);

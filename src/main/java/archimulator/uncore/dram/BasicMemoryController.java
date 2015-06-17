@@ -288,15 +288,13 @@ public class BasicMemoryController extends MemoryController {
             size -= this.getBusWidth();
 
             final int currentAddress = address + offset;
-            this.getCycleAccurateEventQueue().schedule(this, () -> {
-                accessDram(currentAddress, () -> {
-                    counterPending.decrement();
+            this.getCycleAccurateEventQueue().schedule(this, () -> accessDram(currentAddress, () -> {
+                counterPending.decrement();
 
-                    if (counterPending.getValue() == 0) {
-                        onCompletedCallback.apply();
-                    }
-                });
-            }, this.getToDramLatency());
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            }), this.getToDramLatency());
 
             counterPending.increment();
 

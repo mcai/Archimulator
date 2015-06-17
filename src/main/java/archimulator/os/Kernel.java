@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Kernel.
@@ -375,13 +376,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
      * @return the list of memories
      */
     public List<Memory> getMemories() {
-        List<Memory> memories = new ArrayList<>();
-
-        for (Process process : processes) {
-            memories.add(process.getMemory());
-        }
-
-        return memories;
+        return processes.stream().map(Process::getMemory).collect(Collectors.toList());
     }
 
     /**

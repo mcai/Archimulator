@@ -18,12 +18,11 @@
  ******************************************************************************/
 package archimulator.util.event;
 
-import archimulator.util.action.Action2;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -36,12 +35,12 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
     /**
      * Map of event listeners.
      */
-    protected final Map<Class<? extends BlockingEventT>, List<Action2<?, ? extends BlockingEventT>>> listeners;
+    protected final Map<Class<? extends BlockingEventT>, List<BiConsumer<?, ? extends BlockingEventT>>> listeners;
 
     /**
      * Map of any event listeners.
      */
-    protected final List<Action2<Object, BlockingEventT>> anyListeners;
+    protected final List<BiConsumer<Object, BlockingEventT>> anyListeners;
 
     /**
      * Create a blocking event dispatcher.
@@ -73,13 +72,13 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
         Class<? extends BlockingEventT> eventClass = (Class<? extends BlockingEventT>) event.getClass();
 
         if (this.listeners.containsKey(eventClass)) {
-            for (Action2<?, ? extends BlockingEventT> listener : this.listeners.get(eventClass)) {
-                ((Action2<Object, BlockingEventK>) listener).apply(sender, event);
+            for (BiConsumer<?, ? extends BlockingEventT> listener : this.listeners.get(eventClass)) {
+                ((BiConsumer<Object, BlockingEventK>) listener).accept(sender, event);
             }
         }
 
-        for (Action2<Object, BlockingEventT> anyListener : this.anyListeners) {
-            anyListener.apply(sender, event);
+        for (BiConsumer<Object, BlockingEventT> anyListener : this.anyListeners) {
+            anyListener.accept(sender, event);
         }
     }
 
@@ -101,7 +100,7 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      * @param eventClass       the event class
      * @param listener         the listener that is to be added
      */
-    public synchronized <BlockingEventK extends BlockingEventT> void addListener(Class<BlockingEventK> eventClass, Action2<?, BlockingEventK> listener) {
+    public synchronized <BlockingEventK extends BlockingEventT> void addListener(Class<BlockingEventK> eventClass, BiConsumer<?, BlockingEventK> listener) {
         if (!this.listeners.containsKey(eventClass)) {
             this.listeners.put(eventClass, new ArrayList<>());
         }
@@ -116,7 +115,7 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      *
      * @param listener the listener that is to be added
      */
-    public synchronized void addAnyListener(Action2<Object, BlockingEventT> listener) {
+    public synchronized void addAnyListener(BiConsumer<Object, BlockingEventT> listener) {
         if (!this.anyListeners.contains(listener)) {
             this.anyListeners.add(listener);
         }
@@ -131,9 +130,9 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      */
     public synchronized <BlockingEventK extends BlockingEventT> void removeListener(Class<BlockingEventK> eventClass, Consumer<BlockingEventK> listener) {
         if (this.listeners.containsKey(eventClass)) {
-            List<Action2<?, ? extends BlockingEventT>> listenersInTheEventClass = this.listeners.get(eventClass);
+            List<BiConsumer<?, ? extends BlockingEventT>> listenersInTheEventClass = this.listeners.get(eventClass);
 
-            for (Action2<?, ? extends BlockingEventT> listenerFound : listenersInTheEventClass) {
+            for (BiConsumer<?, ? extends BlockingEventT> listenerFound : listenersInTheEventClass) {
                 if (listenerFound instanceof ProxyAction2) {
                     if (((ProxyAction2) listenerFound).listener == listener) {
                         this.listeners.get(eventClass).remove(listenerFound);
@@ -149,7 +148,7 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      *
      * @param listener         the listener that is to be removed
      */
-    public synchronized void removeAnyListener(Action2<Object, BlockingEventT> listener) {
+    public synchronized void removeAnyListener(BiConsumer<Object, BlockingEventT> listener) {
         if (this.anyListeners.contains(listener)) {
             this.anyListeners.remove(listener);
         }
@@ -162,7 +161,7 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      * @param eventClass       the event class
      * @param listener         the listener that is to be removed
      */
-    public synchronized <BlockingEventK extends BlockingEventT> void removeListener(Class<BlockingEventK> eventClass, Action2<?, BlockingEventK> listener) {
+    public synchronized <BlockingEventK extends BlockingEventT> void removeListener(Class<BlockingEventK> eventClass, BiConsumer<?, BlockingEventK> listener) {
         if (this.listeners.containsKey(eventClass)) {
             this.listeners.get(eventClass).remove(listener);
         }
@@ -189,7 +188,7 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
      *
      * @param <BlockingEventK> the type of the event
      */
-    protected static class ProxyAction2<BlockingEventK> implements Action2<Object, BlockingEventK> {
+    protected static class ProxyAction2<BlockingEventK> implements BiConsumer<Object, BlockingEventK> {
         private Consumer<BlockingEventK> listener;
 
         /**
@@ -207,7 +206,8 @@ public class BlockingEventDispatcher<BlockingEventT extends BlockingEvent> {
          * @param param1 the first parameter
          * @param param2 the second parameter
          */
-        public void apply(Object param1, BlockingEventK param2) {
+        @Override
+        public void accept(Object param1, BlockingEventK param2) {
             this.listener.accept(param2);
         }
     }

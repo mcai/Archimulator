@@ -72,9 +72,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
         this.way = way;
         this.cacheController = cacheController;
 
-        this.addListener(ExitStateEvent.class, exitStateEvent -> {
-            previousState = getState();
-        });
+        this.addListener(ExitStateEvent.class, exitStateEvent -> previousState = getState());
     }
 
     /**

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * ELF file.
@@ -176,49 +177,42 @@ public class ElfFile {
      * Load local functions.
      */
     public void loadLocalFunctions() {
-        for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getType() == Symbol.STT_FUNC) {
-                int idx = symbol.getSectionHeaderTableIndex();
-                if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
-                    if (symbol.getName().length() > 0) {
-                        this.localFunctionSymbols.put((int) symbol.getValue(), symbol);
-                    }
-                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+        this.symbols.values().stream().filter(symbol -> symbol.getType() == Symbol.STT_FUNC).forEach(symbol -> {
+            int idx = symbol.getSectionHeaderTableIndex();
+            if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
+                if (symbol.getName().length() > 0) {
                     this.localFunctionSymbols.put((int) symbol.getValue(), symbol);
                 }
+            } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+                this.localFunctionSymbols.put((int) symbol.getValue(), symbol);
             }
-        }
+        });
     }
 
     /**
      * Load local objects.
      */
     public void loadLocalObjects() {
-        for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getType() == Symbol.STT_OBJECT) {
-                int idx = symbol.getSectionHeaderTableIndex();
-                if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
-                    if (symbol.getName().length() > 0) {
-                        this.localObjectSymbols.put((int) symbol.getValue(), symbol);
-                    }
-                } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+        this.symbols.values().stream().filter(symbol -> symbol.getType() == Symbol.STT_OBJECT).forEach(symbol -> {
+            int idx = symbol.getSectionHeaderTableIndex();
+            if (idx > Symbol.SHN_LOPROC && idx < Symbol.SHN_HIPROC) {
+                if (symbol.getName().length() > 0) {
                     this.localObjectSymbols.put((int) symbol.getValue(), symbol);
                 }
+            } else if (idx >= 0 && this.getSectionHeaders().get(idx).getType() != ElfSectionHeader.SHT_NULL) {
+                this.localObjectSymbols.put((int) symbol.getValue(), symbol);
             }
-        }
+        });
     }
 
     /**
      * Load common objects.
      */
     public void loadCommonObjects() {
-        for (Symbol symbol : this.symbols.values()) {
-            if (symbol.getBind() == Symbol.STB_GLOBAL && symbol.getType() == Symbol.STT_OBJECT) {
-                if (symbol.getSectionHeaderTableIndex() == Symbol.SHN_COMMON) {
-                    this.commonObjectSymbols.put((int) symbol.getValue(), symbol);
-                }
-            }
-        }
+        this.symbols.values().stream()
+                .filter(symbol -> symbol.getBind() == Symbol.STB_GLOBAL && symbol.getType() == Symbol.STT_OBJECT)
+                .filter(symbol -> symbol.getSectionHeaderTableIndex() == Symbol.SHN_COMMON)
+                .forEach(symbol -> this.commonObjectSymbols.put((int) symbol.getValue(), symbol));
     }
 
     /**
@@ -228,16 +222,7 @@ public class ElfFile {
      * @return the list of section headers matching the specified type
      */
     public List<ElfSectionHeader> getSectionHeaders(int type) {
-        List<ElfSectionHeader> sectionHeaders = new ArrayList<>();
-
-        for (ElfSectionHeader sectionHeader : this.getSectionHeaders()) {
-            if (sectionHeader.getType() == type) {
-                sectionHeaders.add(sectionHeader);
-
-            }
-        }
-
-        return sectionHeaders;
+        return this.getSectionHeaders().stream().filter(sectionHeader -> sectionHeader.getType() == type).collect(Collectors.toList());
     }
 
     /**

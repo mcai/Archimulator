@@ -32,10 +32,10 @@ import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.uncore.dram.MemoryController;
 import archimulator.uncore.net.common.Net;
 import archimulator.util.action.Action;
-import archimulator.util.action.Action2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 /**
  * Directory controller.
@@ -236,7 +236,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param onReplacementCompletedCallback the callback action performed when the replacement is completed
      * @param onReplacementStalledCallback   the callback action performed when the replacement is stalled
      */
-    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
         for (CacheLine<DirectoryControllerState> line : this.cache.getLines(set)) {
@@ -249,7 +249,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
 
         final CacheAccess<DirectoryControllerState> cacheAccess = this.cache.newAccess(access, tag);
         if (cacheAccess.isHitInCache()) {
-            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+            onReplacementCompletedCallback.accept(set, cacheAccess.getWay());
         } else {
             if (cacheAccess.isReplacement()) {
                 CacheLine<DirectoryControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
@@ -259,11 +259,11 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
                         req,
                         tag,
                         cacheAccess,
-                        () -> onReplacementCompletedCallback.apply(set, cacheAccess.getWay()),
+                        () -> onReplacementCompletedCallback.accept(set, cacheAccess.getWay()),
                         () -> getCycleAccurateEventQueue().schedule(DirectoryController.this, onReplacementStalledCallback, 1)
                 );
             } else {
-                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+                onReplacementCompletedCallback.accept(set, cacheAccess.getWay());
             }
         }
     }

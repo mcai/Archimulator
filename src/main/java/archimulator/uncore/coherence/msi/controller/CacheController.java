@@ -39,11 +39,11 @@ import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.uncore.net.common.Net;
 import archimulator.util.action.Action;
-import archimulator.util.action.Action2;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Cache controller.
@@ -402,24 +402,22 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onReplacementCompletedCallback the callback action performed when the line replacement is completed
      * @param onReplacementStalledCallback   the callback action performed when the line replacement is stalled
      */
-    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final Action2<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
         final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(access, tag);
         if (cacheAccess.isHitInCache()) {
-            onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+            onReplacementCompletedCallback.accept(set, cacheAccess.getWay());
         } else {
             if (cacheAccess.isReplacement()) {
                 CacheLine<CacheControllerState> line = this.getCache().getLine(set, cacheAccess.getWay());
                 CacheControllerFiniteStateMachine fsm = (CacheControllerFiniteStateMachine) line.getStateProvider();
                 fsm.onEventReplacement(producerFlow, tag, cacheAccess,
-                        () -> onReplacementCompletedCallback.apply(set, cacheAccess.getWay()),
-                        () -> {
-                            getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1);
-                        }
+                        () -> onReplacementCompletedCallback.accept(set, cacheAccess.getWay()),
+                        () -> getCycleAccurateEventQueue().schedule(CacheController.this, onReplacementStalledCallback, 1)
                 );
             } else {
-                onReplacementCompletedCallback.apply(set, cacheAccess.getWay());
+                onReplacementCompletedCallback.accept(set, cacheAccess.getWay());
             }
         }
     }

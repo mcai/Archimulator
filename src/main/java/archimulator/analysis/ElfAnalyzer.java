@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ELF file analyzer.
@@ -79,9 +80,7 @@ public class ElfAnalyzer {
             }
         });
 
-        this.instructions.forEach((sectionName, instructionsInSection) -> {
-            instructionsInSection.values().forEach(instruction -> instruction.setSectionName(sectionName));
-        });
+        this.instructions.forEach((sectionName, instructionsInSection) -> instructionsInSection.values().forEach(instruction -> instruction.setSectionName(sectionName)));
 
         this.program.getFunctions().forEach(this::createControlFlowGraph);
     }
@@ -127,44 +126,42 @@ public class ElfAnalyzer {
      * @param function the function
      */
     private void createControlFlowGraphEdges(Function function) {
-        for (BasicBlock basicBlock : function.getBasicBlocks()) {
-            if (basicBlock.getInstructions().size() >= 2) {
-                Instruction lastInstruction = basicBlock.getInstructions().get(basicBlock.getInstructions().size() - 2);
+        function.getBasicBlocks().stream().filter(basicBlock -> basicBlock.getInstructions().size() >= 2).forEach(basicBlock -> {
+            Instruction lastInstruction = basicBlock.getInstructions().get(basicBlock.getInstructions().size() - 2);
 
-                StaticInstructionType staticInstructionType = lastInstruction.getStaticInstruction().getMnemonic().getType();
+            StaticInstructionType staticInstructionType = lastInstruction.getStaticInstruction().getMnemonic().getType();
 
-                if (staticInstructionType == StaticInstructionType.CONDITIONAL) {
+            if (staticInstructionType == StaticInstructionType.CONDITIONAL) {
+                BasicBlock nextBasicBlock = function.getBasicBlocks().get(basicBlock.getNum() + 1);
+                this.createControlFlowGraphEdge(basicBlock, nextBasicBlock, ControlFlowGraphEdgeType.NOT_TAKEN);
+
+                Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
+
+                if (targetInstruction.getBasicBlock() != null) {
+                    this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
+                } else {
+                    System.out.print(String.format("[%s WARN] Cannot find parent basic block for instruction: %s in section %s\n", DateHelper.toString(new Date()), targetInstruction, targetInstruction.getSectionName()));
+                }
+                basicBlock.setType(BasicBlockType.CONDITIONAL);
+            } else if (staticInstructionType == StaticInstructionType.UNCONDITIONAL) {
+                Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
+                this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
+                basicBlock.setType(BasicBlockType.UNCONDITIONAL);
+            } else if (staticInstructionType == StaticInstructionType.FUNCTION_RETURN) {
+                basicBlock.setType(BasicBlockType.FUNCTION_RETURN);
+            } else {
+                if (basicBlock.getNum() < function.getBasicBlocks().size() - 1) {
                     BasicBlock nextBasicBlock = function.getBasicBlocks().get(basicBlock.getNum() + 1);
                     this.createControlFlowGraphEdge(basicBlock, nextBasicBlock, ControlFlowGraphEdgeType.NOT_TAKEN);
+                }
 
-                    Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
-
-                    if (targetInstruction.getBasicBlock() != null) {
-                        this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
-                    } else {
-                        System.out.print(String.format("[%s WARN] Cannot find parent basic block for instruction: %s in section %s\n", DateHelper.toString(new Date()), targetInstruction, targetInstruction.getSectionName()));
-                    }
-                    basicBlock.setType(BasicBlockType.CONDITIONAL);
-                } else if (staticInstructionType == StaticInstructionType.UNCONDITIONAL) {
-                    Instruction targetInstruction = this.getTargetInstruction(function, lastInstruction);
-                    this.createControlFlowGraphEdge(basicBlock, targetInstruction.getBasicBlock(), ControlFlowGraphEdgeType.TAKEN);
-                    basicBlock.setType(BasicBlockType.UNCONDITIONAL);
-                } else if (staticInstructionType == StaticInstructionType.FUNCTION_RETURN) {
-                    basicBlock.setType(BasicBlockType.FUNCTION_RETURN);
+                if (staticInstructionType == StaticInstructionType.FUNCTION_CALL) {
+                    basicBlock.setType(BasicBlockType.FUNCTION_CALL);
                 } else {
-                    if (basicBlock.getNum() < function.getBasicBlocks().size() - 1) {
-                        BasicBlock nextBasicBlock = function.getBasicBlocks().get(basicBlock.getNum() + 1);
-                        this.createControlFlowGraphEdge(basicBlock, nextBasicBlock, ControlFlowGraphEdgeType.NOT_TAKEN);
-                    }
-
-                    if (staticInstructionType == StaticInstructionType.FUNCTION_CALL) {
-                        basicBlock.setType(BasicBlockType.FUNCTION_CALL);
-                    } else {
-                        basicBlock.setType(BasicBlockType.SEQUENTIAL);
-                    }
+                    basicBlock.setType(BasicBlockType.SEQUENTIAL);
                 }
             }
-        }
+        });
     }
 
     /**
@@ -239,11 +236,7 @@ public class ElfAnalyzer {
                 pw.print("\tbb" + basicBlock.getNum() + ": \t; type = " + basicBlock.getType() + "; ");
                 pw.print("  preds = ");
 
-                List<String> preds = new ArrayList<>();
-
-                for (ControlFlowGraphEdge incomingEdge : basicBlock.getIncomingEdges()) {
-                    preds.add("bb" + incomingEdge.getFrom().getNum());
-                }
+                List<String> preds = basicBlock.getIncomingEdges().stream().map(incomingEdge -> "bb" + incomingEdge.getFrom().getNum()).collect(Collectors.toList());
 
                 pw.println(StringUtils.join(preds, ", "));
 

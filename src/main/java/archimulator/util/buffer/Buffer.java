@@ -26,20 +26,22 @@ import java.io.IOException;
  */
 public interface Buffer {
     /**
+     * Read from the specified buffer.
      *
-     * @param position
-     * @param buf
-     * @param len
+     * @param position the position
+     * @param buf the buffer
+     * @param len the length
      * @throws IOException
      */
-    public void read(long position, byte[] buf, int len) throws IOException;
+    void read(long position, byte[] buf, int len) throws IOException;
 
     /**
+     * Write to the specified buffer.
      *
-     * @param position
-     * @param buf
-     * @param len
+     * @param position the position
+     * @param buf the buffer
+     * @param len the length
      * @throws IOException
      */
-    public void write(long position, byte[] buf, int len) throws IOException;
+    void write(long position, byte[] buf, int len) throws IOException;
 }

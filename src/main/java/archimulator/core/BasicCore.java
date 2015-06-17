@@ -219,19 +219,11 @@ public class BasicCore extends AbstractBasicCore {
 
     @Override
     protected void refreshLoadStoreQueue() {
-        for (Thread thread : this.threads) {
-            if (thread.getContext() != null) {
-                thread.refreshLoadStoreQueue();
-            }
-        }
+        this.threads.stream().filter(thread -> thread.getContext() != null).forEach(Thread::refreshLoadStoreQueue);
     }
 
     @Override
     protected void commit() {
-        for (Thread thread : this.threads) {
-            if (thread.getContext() != null) {
-                thread.commit();
-            }
-        }
+        this.threads.stream().filter(thread -> thread.getContext() != null).forEach(Thread::commit);
     }
 }

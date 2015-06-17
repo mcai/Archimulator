@@ -21,15 +21,17 @@ package archimulator.util.buffer;
 import java.io.IOException;
 
 /**
+ * Big endian buffer accessor.
  *
  * @author Min Cai
  */
 public class BigEndianBufferAccessor extends BufferAccessor {
     /**
+     * Get unsigned 4.
      *
-     * @param buffer
-     * @param position
-     * @return
+     * @param buffer the buffer
+     * @param position the position
+     * @return the unsigned 4
      * @throws IOException
      */
     public long getU4(Buffer buffer, long position) throws IOException {
@@ -46,10 +48,11 @@ public class BigEndianBufferAccessor extends BufferAccessor {
     }
 
     /**
+     * get unsigned 2.
      *
-     * @param buffer
-     * @param position
-     * @return
+     * @param buffer the buffer
+     * @param position the position
+     * @return the unsigned 2
      * @throws IOException
      */
     public int getU2(Buffer buffer, long position) throws IOException {

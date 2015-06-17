@@ -69,17 +69,15 @@ public class StaticInstruction {
             this.nonEffectiveAddressBaseDependency = mnemonic.getNonEffectiveAddressBaseDep(machineInstruction);
         }
 
-        for (int outputDependency : this.outputDependencies) {
-            if (outputDependency != 0) {
-                RegisterDependencyType outputDependencyType = RegisterDependencyType.getType(outputDependency);
+        this.outputDependencies.stream().filter(outputDependency -> outputDependency != 0).forEach(outputDependency -> {
+            RegisterDependencyType outputDependencyType = RegisterDependencyType.getType(outputDependency);
 
-                if (!this.numFreePhysicalRegistersToAllocate.containsKey(outputDependencyType)) {
-                    this.numFreePhysicalRegistersToAllocate.put(outputDependencyType, 0);
-                }
-
-                this.numFreePhysicalRegistersToAllocate.put(outputDependencyType, this.numFreePhysicalRegistersToAllocate.get(outputDependencyType) + 1);
+            if (!this.numFreePhysicalRegistersToAllocate.containsKey(outputDependencyType)) {
+                this.numFreePhysicalRegistersToAllocate.put(outputDependencyType, 0);
             }
-        }
+
+            this.numFreePhysicalRegistersToAllocate.put(outputDependencyType, this.numFreePhysicalRegistersToAllocate.get(outputDependencyType) + 1);
+        });
     }
 
     /**
@@ -151,7 +149,7 @@ public class StaticInstruction {
     /**
      * Dependency.
      */
-    public static enum Dependency {
+    public enum Dependency {
         /**
          * RS.
          */

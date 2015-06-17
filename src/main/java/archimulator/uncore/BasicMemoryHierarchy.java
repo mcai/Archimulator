@@ -35,6 +35,7 @@ import archimulator.util.fsm.BasicFiniteStateMachine;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Basic memory hierarchy.
@@ -97,11 +98,8 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
             this.l1DControllers.add(l1DController);
 
             for (int j = 0; j < getExperiment().getNumThreadsPerCore(); j++) {
-                TranslationLookasideBuffer itlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb");
-                this.itlbs.add(itlb);
-
-                TranslationLookasideBuffer dtlb = new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/dtlb");
-                this.dtlbs.add(dtlb);
+                this.itlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb"));
+                this.dtlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/dtlb"));
             }
         }
 
@@ -155,9 +153,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
 
         cacheController.getFsmFactory().dump(PREFIX_CC_FSM + cacheController.getName(), finiteStateMachines, statsMap);
 
-        for (Map.Entry<String, String> entry : statsMap.entrySet()) {
-            stats.add(new ExperimentStat(getSimulation().getPrefix(), entry.getKey(), entry.getValue()));
-        }
+        stats.addAll(statsMap.entrySet().stream().map(entry -> new ExperimentStat(getSimulation().getPrefix(), entry.getKey(), entry.getValue())).collect(Collectors.toList()));
     }
 
     /**

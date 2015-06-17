@@ -128,13 +128,11 @@ public class ACOHelper {
             }
 
             for (Node nodeFrom : acoHelper.getNodes()) {
-                for (Node nodeTo : acoHelper.getNodes()) {
-                    if (nodeFrom != nodeTo && acoHelper.getEdge(nodeFrom, nodeTo) == null) {
-                        Edge edge = new Edge(acoHelper, nodeFrom, nodeTo, 1, euclideanDistance.compute(new double[]{nodeFrom.getX(), nodeFrom.getY()}, new double[]{nodeTo.getX(), nodeTo.getY()}));
-                        acoHelper.getGraph().addEdge(nodeFrom, nodeTo, edge);
-                        acoHelper.getEdges().add(edge);
-                    }
-                }
+                acoHelper.getNodes().stream().filter(nodeTo -> nodeFrom != nodeTo && acoHelper.getEdge(nodeFrom, nodeTo) == null).forEach(nodeTo -> {
+                    Edge edge = new Edge(acoHelper, nodeFrom, nodeTo, 1, euclideanDistance.compute(new double[]{nodeFrom.getX(), nodeFrom.getY()}, new double[]{nodeTo.getX(), nodeTo.getY()}));
+                    acoHelper.getGraph().addEdge(nodeFrom, nodeTo, edge);
+                    acoHelper.getEdges().add(edge);
+                });
             }
 
             return acoHelper;

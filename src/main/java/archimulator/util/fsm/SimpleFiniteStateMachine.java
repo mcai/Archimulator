@@ -45,7 +45,7 @@ public class SimpleFiniteStateMachine<StateT, ConditionT> implements FiniteState
     public SimpleFiniteStateMachine(StateT state) {
         this.state = state;
 
-        this.numExecutions = new LinkedHashMap<StateT, Map<ConditionT, Long>>();
+        this.numExecutions = new LinkedHashMap<>();
     }
 
     @Override

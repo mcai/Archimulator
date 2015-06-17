@@ -34,7 +34,7 @@ public class Params implements Serializable {
      * Create a parameters map.
      */
     public Params() {
-        this.properties = new HashMap<Object, Object>();
+        this.properties = new HashMap<>();
     }
 
     /**

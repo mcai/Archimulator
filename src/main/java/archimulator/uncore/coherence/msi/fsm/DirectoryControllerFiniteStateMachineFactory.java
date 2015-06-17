@@ -25,7 +25,6 @@ import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.action.Action;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -69,14 +68,12 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     fsm.getDirectoryController().incrementNumPendingMemoryAccesses();
 
                     fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, () -> {
-                        fsm.getDirectoryController().getNext().memReadRequestReceive(fsm.getDirectoryController(), event.getTag(), () -> {
-                            fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), () -> {
-                                fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
+                        fsm.getDirectoryController().getNext().memReadRequestReceive(fsm.getDirectoryController(), event.getTag(), () -> fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), () -> {
+                            fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
 
-                                DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
-                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
-                            }, fsm.getDirectoryController().getHitLatency());
-                        });
+                            DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
+                            fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
+                        }, fsm.getDirectoryController().getHitLatency()));
                     });
                     fsm.fireServiceNonblockingRequestEvent(event.getAccess(), event.getTag(), false);
                     fsm.getLine().setAccess(event.getAccess());
@@ -88,14 +85,12 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     fsm.getDirectoryController().incrementNumPendingMemoryAccesses();
 
                     fsm.getDirectoryController().transfer(fsm.getDirectoryController().getNext(), 8, () -> {
-                        fsm.getDirectoryController().getNext().memReadRequestReceive(fsm.getDirectoryController(), event.getTag(), () -> {
-                            fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), () -> {
-                                fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
+                        fsm.getDirectoryController().getNext().memReadRequestReceive(fsm.getDirectoryController(), event.getTag(), () -> fsm.getDirectoryController().getCycleAccurateEventQueue().schedule(fsm.getDirectoryController(), () -> {
+                            fsm.getDirectoryController().decrementNumPendingMemoryAccesses();
 
-                                DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
-                                fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
-                            }, fsm.getDirectoryController().getHitLatency());
-                        });
+                            DataFromMemEvent dataFromMemEvent = new DataFromMemEvent(fsm.getDirectoryController(), event, event.getRequester(), event.getTag(), event.getAccess());
+                            fsm.fireTransition(fsm.getDirectoryController().getNext() + "." + String.format("0x%08x", event.getTag()), dataFromMemEvent);
+                        }, fsm.getDirectoryController().getHitLatency()));
                     });
                     fsm.fireServiceNonblockingRequestEvent(event.getAccess(), event.getTag(), false);
                     fsm.getLine().setAccess(event.getAccess());
@@ -320,9 +315,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     ReplacementEvent event = (ReplacementEvent) params;
                     fsm.stall(event.getOnStalledCallback());
                 }, DirectoryControllerState.MI_A)
-                .onCondition(DirectoryControllerEventType.RECALL_ACK, (fsm, sender, eventType, params) -> {
-                    fsm.decrementRecallAcks();
-                }, DirectoryControllerState.MI_A)
+                .onCondition(DirectoryControllerEventType.RECALL_ACK, (fsm, sender, eventType, params) -> fsm.decrementRecallAcks(), DirectoryControllerState.MI_A)
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, (fsm, sender, eventType, params) -> {
                     LastRecallAckEvent event = (LastRecallAckEvent) params;
                     fsm.copyDataToMem(event.getTag());
@@ -356,9 +349,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
                     ReplacementEvent event = (ReplacementEvent) params;
                     fsm.stall(event.getOnStalledCallback());
                 }, DirectoryControllerState.SI_A)
-                .onCondition(DirectoryControllerEventType.RECALL_ACK, (fsm, sender, eventType, params) -> {
-                    fsm.decrementRecallAcks();
-                }, DirectoryControllerState.SI_A)
+                .onCondition(DirectoryControllerEventType.RECALL_ACK, (fsm, sender, eventType, params) -> fsm.decrementRecallAcks(), DirectoryControllerState.SI_A)
                 .onCondition(DirectoryControllerEventType.LAST_RECALL_ACK, (fsm, sender, eventType, params) -> {
                     fsm.getLine().setAccess(null);
                     fsm.getLine().setTag(CacheLine.INVALID_TAG);

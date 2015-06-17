@@ -47,7 +47,6 @@ import archimulator.util.collection.tree.NodeHelper;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
-import archimulator.util.file.FileHelper;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
 import java.io.File;
@@ -153,7 +152,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
         this.type = type;
 
         File cwdFile = new File(this.getExperiment().getOutputDirectory());
-        if (cwdFile.exists() && !FileHelper.deleteDir(cwdFile) || !cwdFile.mkdirs()) {
+        if (!cwdFile.exists() && !cwdFile.mkdirs()) {
             throw new RuntimeException();
         }
 

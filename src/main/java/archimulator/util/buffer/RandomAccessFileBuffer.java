@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
+ * Random access file buffer.
  *
  * @author Min Cai
  */
@@ -29,18 +30,20 @@ public class RandomAccessFileBuffer implements Buffer {
     private RandomAccessFile file;
 
     /**
+     * Create a random access file buffer.
      *
-     * @param file
+     * @param file the random access file
      */
     public RandomAccessFileBuffer(RandomAccessFile file) {
         this.file = file;
     }
 
     /**
+     * Read data from the random access file buffer into the specified byte array.
      *
-     * @param position
-     * @param buf
-     * @param len
+     * @param position the position
+     * @param buf the destination byte array
+     * @param len the length
      * @throws IOException
      */
     public void read(long position, byte[] buf, int len)
@@ -50,10 +53,11 @@ public class RandomAccessFileBuffer implements Buffer {
     }
 
     /**
+     * Write the data from the specified source byte array into the random access file buffer.
      *
-     * @param position
-     * @param buf
-     * @param len
+     * @param position the position
+     * @param buf the source byte array
+     * @param len the length
      * @throws IOException
      */
     public void write(long position, byte[] buf, int len)
@@ -63,8 +67,9 @@ public class RandomAccessFileBuffer implements Buffer {
     }
 
     /**
+     * Get the supporting random access file.
      *
-     * @return
+     * @return the supporting random access file
      */
     public RandomAccessFile getFile() {
         return file;

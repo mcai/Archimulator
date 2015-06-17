@@ -32,82 +32,82 @@ public abstract class AbstractReorderBufferEntry {
     /**
      * The ID of the abstract reorder buffer entry.
      */
-    protected long id;
+    private long id;
 
     /**
      * The value of the next program counter (NPC).
      */
-    protected int npc;
+    private int npc;
 
     /**
      * The value of the next next program counter (NNPC).
      */
-    protected int nnpc;
+    private int nnpc;
 
     /**
      * The predicted value of the next next program counter (predicted NNPC).
      */
-    protected int predictedNnpc;
+    private int predictedNnpc;
 
     /**
      * The thread.
      */
-    protected Thread thread;
+    private Thread thread;
 
     /**
      * The dynamic instruction.
      */
-    protected DynamicInstruction dynamicInstruction;
+    private DynamicInstruction dynamicInstruction;
 
     /**
      * The map of the old physical registers.
      */
-    protected Map<Integer, PhysicalRegister> oldPhysicalRegisters;
+    private Map<Integer, PhysicalRegister> oldPhysicalRegisters;
 
     /**
      * The map of the target physical registers.
      */
-    protected Map<Integer, PhysicalRegister> targetPhysicalRegisters;
+    private Map<Integer, PhysicalRegister> targetPhysicalRegisters;
 
     /**
      * The map of the source physical registers.
      */
-    protected Map<Integer, PhysicalRegister> sourcePhysicalRegisters;
+    private Map<Integer, PhysicalRegister> sourcePhysicalRegisters;
 
     /**
      * A value indicating whether the reorder buffer entry is speculative or not.
      */
-    protected boolean speculative;
+    private boolean speculative;
 
     /**
      * The return address stack recover index.
      */
-    protected int returnAddressStackRecoverIndex;
+    private int returnAddressStackRecoverIndex;
 
     /**
      * Branch predictor update.
      */
-    protected BranchPredictorUpdate branchPredictorUpdate;
+    private BranchPredictorUpdate branchPredictorUpdate;
 
     /**
      * A value indicating whether the reorder buffer entry is dispatched or not.
      */
-    protected boolean dispatched;
+    private boolean dispatched;
 
     /**
      * A value indicating whether the reorder buffer entry is issued or not.
      */
-    protected boolean issued;
+    private boolean issued;
 
     /**
      * A value indicating whether the reorder buffer entry is completed or not.
      */
-    protected boolean completed;
+    private boolean completed;
 
     /**
      * A value indicating whether the reorder buffer entry is squashed or not.
      */
-    protected boolean squashed;
+    private boolean squashed;
 
     private int numNotReadyOperands;
 
@@ -162,11 +162,9 @@ public abstract class AbstractReorderBufferEntry {
      * Do the write back process.
      */
     private void doWriteBack() {
-        for (Map.Entry<Integer, PhysicalRegister> entry : this.targetPhysicalRegisters.entrySet()) {
-            if (entry.getKey() != 0) {
-                entry.getValue().writeback();
-            }
-        }
+        this.targetPhysicalRegisters.entrySet().stream().filter(entry -> entry.getKey() != 0).forEach(entry -> {
+            entry.getValue().writeback();
+        });
     }
 
     /**

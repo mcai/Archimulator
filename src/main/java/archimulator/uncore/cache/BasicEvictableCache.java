@@ -37,7 +37,7 @@ public class BasicEvictableCache<StateT extends Serializable> extends BasicCache
     /**
      * The replacement policy.
      */
-    protected CacheReplacementPolicy<StateT> replacementPolicy;
+    private CacheReplacementPolicy<StateT> replacementPolicy;
 
     /**
      * Create a basic evictable cache.

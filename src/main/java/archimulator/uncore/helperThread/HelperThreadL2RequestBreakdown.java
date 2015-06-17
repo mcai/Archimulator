@@ -29,77 +29,77 @@ public interface HelperThreadL2RequestBreakdown {
      *
      * @return the number of main thread L2 hits
      */
-    public long getNumMainThreadL2Hits();
+    long getNumMainThreadL2Hits();
 
     /**
      * Get the number of main thread L2 misses.
      *
      * @return the number of main thread l2 misses
      */
-    public long getNumMainThreadL2Misses();
+    long getNumMainThreadL2Misses();
 
     /**
      * Get the number of helper thread L2 hits.
      *
      * @return the number of helper thread l2 hits
      */
-    public long getNumHelperThreadL2Hits();
+    long getNumHelperThreadL2Hits();
 
     /**
      * Get the number of helper thread L2 misses.
      *
      * @return the number of helper thread L2 misses
      */
-    public long getNumHelperThreadL2Misses();
+    long getNumHelperThreadL2Misses();
 
     /**
      * Get the number of redundant hit-to-transient-tag helper thread L2 requests.
      *
      * @return the number of redundant hit-to-transient-tag helper thread L2 requests
      */
-    public long getNumRedundantHitToTransientTagHelperThreadL2Requests();
+    long getNumRedundantHitToTransientTagHelperThreadL2Requests();
 
     /**
      * Get the number of redundant hit-to-cache helper thread L2 requests.
      *
      * @return the number of redundant hit-to-cache helper thread L2 requests
      */
-    public long getNumRedundantHitToCacheHelperThreadL2Requests();
+    long getNumRedundantHitToCacheHelperThreadL2Requests();
 
     /**
      * Get the number of timely helper thread L2 requests.
      *
      * @return the number of timely helper thread l2 requests
      */
-    public long getNumTimelyHelperThreadL2Requests();
+    long getNumTimelyHelperThreadL2Requests();
 
     /**
      * Get the number of late helper thread L2 requests.
      *
      * @return the number of late helper thread L2 requests
      */
-    public long getNumLateHelperThreadL2Requests();
+    long getNumLateHelperThreadL2Requests();
 
     /**
      * Get the number of bad helper thread L2 requests.
      *
      * @return the number of bad helper thread L2 requests
      */
-    public long getNumBadHelperThreadL2Requests();
+    long getNumBadHelperThreadL2Requests();
 
     /**
      * Get the number of early helper thread L2 requests.
      *
      * @return the number of early helper thread L2 requests
      */
-    public long getNumEarlyHelperThreadL2Requests();
+    long getNumEarlyHelperThreadL2Requests();
 
     /**
      * Get the number of ugly helper thread L2 requests.
      *
      * @return the number of ugly helper thread L2 requests
      */
-    public long getNumUglyHelperThreadL2Requests();
+    long getNumUglyHelperThreadL2Requests();
 
     /**
      * Get the total number of helper thread L2 cache requests.

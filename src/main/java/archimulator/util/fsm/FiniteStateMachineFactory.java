@@ -39,7 +39,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT e
      * Create a finite state machine factory.
      */
     public FiniteStateMachineFactory() {
-        this.transitions = new LinkedHashMap<StateT, StateTransitions<StateT, ConditionT, FiniteStateMachineT>>();
+        this.transitions = new LinkedHashMap<>();
     }
 
     /**
@@ -50,7 +50,7 @@ public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT e
      */
     public StateTransitions<StateT, ConditionT, FiniteStateMachineT> inState(StateT state) {
         if (!this.transitions.containsKey(state)) {
-            this.transitions.put(state, new StateTransitions<StateT, ConditionT, FiniteStateMachineT>(this, state));
+            this.transitions.put(state, new StateTransitions<>(this, state));
         }
 
         return this.transitions.get(state);
@@ -122,8 +122,6 @@ public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT e
             StateTransitions<StateT, ConditionT, FiniteStateMachineT> stateTransitions = this.transitions.get(state);
             Map<ConditionT, StateTransitions<StateT, ConditionT, FiniteStateMachineT>.StateTransition> perStateTransitions = stateTransitions.getPerStateTransitions();
             for(ConditionT condition : perStateTransitions.keySet()) {
-                StateTransitions<StateT, ConditionT, FiniteStateMachineT>.StateTransition stateTransition = perStateTransitions.get(condition);
-
                 long numExecutions = 0;
                 for(FiniteStateMachine<StateT, ConditionT> fsm : fsms) {
                     numExecutions += fsm.getNumExecutionsByTransition(state, condition);

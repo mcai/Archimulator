@@ -51,7 +51,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
     StateTransitions(FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT> fsmFactory, StateT state) {
         this.fsmFactory = fsmFactory;
         this.state = state;
-        this.perStateTransitions = new LinkedHashMap<ConditionT, StateTransition>();
+        this.perStateTransitions = new LinkedHashMap<>();
     }
 
     /**
@@ -120,7 +120,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
             throw new IllegalArgumentException("Transition of condition " + condition + " in state " + this.state + " has already been registered");
         }
 
-        List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions = new ArrayList<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>>();
+        List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions = new ArrayList<>();
         actions.add(new FiniteStateMachineAction<FiniteStateMachineT, ConditionT, Params>(state + ": " + condition + " -> unamedAction/" + newState) {
             @Override
             @SuppressWarnings("unchecked")
@@ -160,10 +160,8 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
      * @return the state transitions
      */
     public StateTransitions<StateT, ConditionT, FiniteStateMachineT> ignoreCondition(ConditionT condition) {
-        return this.onCondition(condition, new Action4<FiniteStateMachineT, Object, ConditionT, Params>() {
-            public void apply(FiniteStateMachineT from, Object sender, ConditionT condition, Params params) {
-                from.getState();
-            }
+        return this.onCondition(condition, (from, sender, condition1, params) -> {
+            from.getState();
         }, null, null);
     }
 
@@ -250,7 +248,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
             }
 
             if(!fsm.getNumExecutions().containsKey(state)) {
-                fsm.getNumExecutions().put(state, new LinkedHashMap<ConditionT, Long>());
+                fsm.getNumExecutions().put(state, new LinkedHashMap<>());
             }
 
             if(!fsm.getNumExecutions().get(state).containsKey(condition)) {

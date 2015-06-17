@@ -58,5 +58,5 @@ public interface SetDuelingCacheReplacementPolicy<StateT extends Serializable> e
      *
      * @return the set dueling unit
      */
-    public AbstractSetDuelingUnit getSetDuelingUnit();
+    AbstractSetDuelingUnit getSetDuelingUnit();
 }

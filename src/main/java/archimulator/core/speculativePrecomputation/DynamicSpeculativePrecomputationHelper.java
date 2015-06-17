@@ -293,11 +293,9 @@ public class DynamicSpeculativePrecomputationHelper {
 
             slice.setTriggerPc(lastAnalyzedRetiredInstruction.pc);
 
-            for (RetiredInstruction retiredInstruction : this.retiredInstructions) {
-                if (retiredInstruction.marked) {
-                    slice.getPcs().add(retiredInstruction.pc);
-                }
-            }
+            this.retiredInstructions.stream().filter(retiredInstruction -> retiredInstruction.marked).forEach(retiredInstruction -> {
+                slice.getPcs().add(retiredInstruction.pc);
+            });
 
             this.dynamicSpeculativePrecomputationHelper.getSliceInformationTables().get(this.thread).storeSlice(slice);
 

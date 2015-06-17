@@ -65,10 +65,6 @@ public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends Par
     }
 
     @Override
-    public void dumpStats(ReportNode reportNode) {
-    }
-
-    @Override
     public List<Integer> getPartition() {
         return getPartition(0);
     }

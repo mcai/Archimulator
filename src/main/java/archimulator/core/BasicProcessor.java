@@ -132,11 +132,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
             throw new IllegalArgumentException();
         }
 
-        for (Context childContext : this.kernel.getContexts()) {
-            if (childContext.getParent() == context) {
-                this.kill(childContext);
-            }
-        }
+        this.kernel.getContexts().stream().filter(childContext -> childContext.getParent() == context).forEach(this::kill);
 
         if (context.getParent() == null) {
             context.getProcess().closeProgram();

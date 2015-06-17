@@ -138,20 +138,16 @@ public class FunctionalUnitPool implements Named {
      * Release all functional unit descriptors.
      */
     public void releaseAll() {
-        for (FunctionalUnitDescriptor fuDescriptor : this.descriptors.values()) {
-            fuDescriptor.releaseAll();
-        }
+        this.descriptors.values().forEach(FunctionalUnitDescriptor::releaseAll);
     }
 
     /**
      * Update statistics per cycle.
      */
     public void updatePerCycleStats() {
-        for (FunctionalUnitType fuType : FunctionalUnitPool.this.numStallsOnNoFreeFunctionalUnit.keySet()) {
-            if (this.descriptors.get(fuType).isFull()) {
-                this.numStallsOnNoFreeFunctionalUnit.put(fuType, this.numStallsOnNoFreeFunctionalUnit.get(fuType) + 1);
-            }
-        }
+        FunctionalUnitPool.this.numStallsOnNoFreeFunctionalUnit.keySet().stream().filter(fuType -> this.descriptors.get(fuType).isFull()).forEach(fuType -> {
+            this.numStallsOnNoFreeFunctionalUnit.put(fuType, this.numStallsOnNoFreeFunctionalUnit.get(fuType) + 1);
+        });
     }
 
     /**

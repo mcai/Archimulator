@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @author Min Cai
  */
 public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> extends LRUPolicy<StateT> {
-    protected Cache<Boolean> mirrorCache;
+    private Cache<Boolean> mirrorCache;
     private Predictor<Double> costPredictor;
 
     /**

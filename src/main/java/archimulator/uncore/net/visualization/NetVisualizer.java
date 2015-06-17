@@ -60,11 +60,9 @@ public class NetVisualizer {
             }
         });
 
-        nets.stream().flatMap(net -> net.getLinks().stream()).collect(Collectors.toList()).forEach(edge -> {
-            graph.addEdge(
-                    edge.getPortFrom().getNode().getName() + "-" + edge.getPortTo().getNode().getName(),
-                    edge.getPortFrom().getNode().getName(), edge.getPortTo().getNode().getName(), true);
-        });
+        nets.stream().flatMap(net -> net.getLinks().stream()).collect(Collectors.toList()).forEach(edge -> graph.addEdge(
+                edge.getPortFrom().getNode().getName() + "-" + edge.getPortTo().getNode().getName(),
+                edge.getPortFrom().getNode().getName(), edge.getPortTo().getNode().getName(), true));
 
         graph.addAttribute("ui.stylesheet", "url('/home/itecgo/Archimulator/src/main/java/archimulator/uncore/net/visualization/stylesheet')");
 

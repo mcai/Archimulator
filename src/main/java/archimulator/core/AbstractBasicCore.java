@@ -39,17 +39,17 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     /**
      * The number of the core.
      */
-    protected int num;
+    private int num;
 
     /**
      * The name of the core.
      */
-    protected String name;
+    private String name;
 
     /**
      * The processor.
      */
-    protected Processor processor;
+    private Processor processor;
 
     /**
      * The list of threads.
@@ -59,12 +59,12 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     /**
      * The L1I cache controller.
      */
-    protected CacheController l1IController;
+    private CacheController l1IController;
 
     /**
      * The L1D cache controller.
      */
-    protected CacheController l1DController;
+    private CacheController l1DController;
 
     /**
      * The functional unit pool.
