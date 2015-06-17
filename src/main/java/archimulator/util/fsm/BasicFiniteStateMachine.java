@@ -18,7 +18,6 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
-import archimulator.util.action.Action1;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.fsm.event.EnterStateEvent;
 import archimulator.util.fsm.event.ExitStateEvent;
@@ -27,6 +26,7 @@ import archimulator.util.Params;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Basic finite state machine.
@@ -55,9 +55,9 @@ public class BasicFiniteStateMachine<StateT, ConditionT> extends Params implemen
         this.name = name;
         this.state = state;
 
-        this.eventDispatcher = new BlockingEventDispatcher<FiniteStateMachineEvent>();
+        this.eventDispatcher = new BlockingEventDispatcher<>();
 
-        this.numExecutions = new LinkedHashMap<StateT, Map<ConditionT, Long>>();
+        this.numExecutions = new LinkedHashMap<>();
     }
 
     /**
@@ -67,7 +67,7 @@ public class BasicFiniteStateMachine<StateT, ConditionT> extends Params implemen
      * @param eventClass the event class
      * @param listener   the listener that is to be added for the specified event class
      */
-    public <EventT extends FiniteStateMachineEvent> void addListener(Class<EventT> eventClass, Action1<EventT> listener) {
+    public <EventT extends FiniteStateMachineEvent> void addListener(Class<EventT> eventClass, Consumer<EventT> listener) {
         this.eventDispatcher.addListener(eventClass, listener);
     }
 
@@ -78,7 +78,7 @@ public class BasicFiniteStateMachine<StateT, ConditionT> extends Params implemen
      * @param eventClass the event class
      * @param listener   the listener that is to removed for the specified event class
      */
-    public <EventT extends FiniteStateMachineEvent> void removeListener(Class<EventT> eventClass, Action1<EventT> listener) {
+    public <EventT extends FiniteStateMachineEvent> void removeListener(Class<EventT> eventClass, Consumer<EventT> listener) {
         this.eventDispatcher.removeListener(eventClass, listener);
     }
 

@@ -57,9 +57,7 @@ public class CycleAccurateEventQueue {
             this.events.remove(event);
         }
 
-        for (Action action : this.perCycleEvents) {
-            action.apply();
-        }
+        this.perCycleEvents.forEach(Action::apply);
 
         this.currentCycle++;
     }

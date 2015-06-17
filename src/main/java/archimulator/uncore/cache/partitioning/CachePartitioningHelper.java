@@ -23,13 +23,13 @@ import archimulator.common.SimulationType;
 import archimulator.core.Thread;
 import archimulator.uncore.cache.EvictableCache;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.util.action.Predicate;
 import org.paukov.combinatorics.Factory;
 import org.paukov.combinatorics.Generator;
 import org.paukov.combinatorics.ICombinatoricsVector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Cache partitioning helper.
@@ -190,7 +190,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
      * @return value indicating whether should include the specified set in this cache partitioning helper
      */
     protected boolean shouldInclude(int set) {
-        return shouldIncludePredicate.apply(set);
+        return shouldIncludePredicate.test(set);
     }
 
     /**

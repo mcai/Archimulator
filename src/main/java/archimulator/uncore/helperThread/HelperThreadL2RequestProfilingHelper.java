@@ -119,7 +119,7 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable, HelperT
         );
 
         this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(HelperThreadL2RequestProfilingHelper.this.l2Controller)) {
+            if (event.getCacheController() == HelperThreadL2RequestProfilingHelper.this.l2Controller) {
                 boolean requesterIsHelperThread = HelperThreadingHelper.isHelperThread(event.getAccess().getThread());
                 boolean lineFoundIsHelperThread = helperThreadL2RequestStates.get(event.getSet()).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
                 handleL2Request(event, requesterIsHelperThread, lineFoundIsHelperThread);
@@ -127,20 +127,20 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable, HelperT
         });
 
         this.l2Controller.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
-            if (event.getCacheController().equals(HelperThreadL2RequestProfilingHelper.this.l2Controller)) {
+            if (event.getCacheController() == HelperThreadL2RequestProfilingHelper.this.l2Controller) {
                 boolean lineFoundIsHelperThread = helperThreadL2RequestStates.get(event.getSet()).get(event.getWay()).getThreadId() == HelperThreadingHelper.getHelperThreadId();
                 handleL2LineInsert(event, lineFoundIsHelperThread);
             }
         });
 
         this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerLastPutSOrPutMAndDataFromOwnerEvent.class, event -> {
-            if (event.getCacheController().equals(HelperThreadL2RequestProfilingHelper.this.l2Controller)) {
+            if (event.getCacheController() == HelperThreadL2RequestProfilingHelper.this.l2Controller) {
                 markInvalid(event.getSet(), event.getWay());
             }
         });
 
         this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerNonblockingRequestHitToTransientTagEvent.class, event -> {
-            if (event.getCacheController().equals(HelperThreadL2RequestProfilingHelper.this.l2Controller)) {
+            if (event.getCacheController() == HelperThreadL2RequestProfilingHelper.this.l2Controller) {
                 int set = event.getSet();
 
                 int requesterThreadId = event.getAccess().getThread().getId();

@@ -22,11 +22,11 @@ import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
 import archimulator.uncore.dram.BasicMemoryController;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.util.action.Function1;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * DRAM Bank level parallelism (BLP) profiling helper.
@@ -71,7 +71,7 @@ public class BLPProfilingHelper {
 
     private MemoryController memoryController;
 
-    private Function1<Integer, Integer> blpCostQuantizer;
+    private Function<Integer, Integer> blpCostQuantizer;
 
     private Map<Integer, PendingDramBankAccess> pendingDRAMBankAccesses;
 
@@ -167,7 +167,7 @@ public class BLPProfilingHelper {
      *
      * @return the BLP-cost quantizer
      */
-    public Function1<Integer, Integer> getBlpCostQuantizer() {
+    public Function<Integer, Integer> getBlpCostQuantizer() {
         return blpCostQuantizer;
     }
 

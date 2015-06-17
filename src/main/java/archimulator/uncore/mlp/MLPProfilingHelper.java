@@ -124,13 +124,13 @@ public class MLPProfilingHelper implements Reportable {
         this.numCyclesPerMlp = new TreeMap<>();
 
         this.l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(MLPProfilingHelper.this.l2Controller) && !event.isHitInCache()) {
+            if (event.getCacheController() == MLPProfilingHelper.this.l2Controller && !event.isHitInCache()) {
                 profileBeginServicingL2Miss(event.getAccess());
             }
         });
 
         this.l2Controller.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
-            if (event.getCacheController().equals(MLPProfilingHelper.this.l2Controller)) {
+            if (event.getCacheController() == MLPProfilingHelper.this.l2Controller) {
                 profileEndServicingL2Miss(event.getSet(), event.getWay(), event.getAccess());
             }
         });

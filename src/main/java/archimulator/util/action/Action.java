@@ -29,5 +29,5 @@ public interface Action extends Serializable {
     /**
      * Apply.
      */
-    public void apply();
+    void apply();
 }

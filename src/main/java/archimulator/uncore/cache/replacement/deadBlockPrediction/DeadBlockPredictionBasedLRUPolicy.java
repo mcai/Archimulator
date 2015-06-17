@@ -80,6 +80,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      *
      * @param cache the parent evictable cache
      */
+    @SuppressWarnings("unchecked")
     public DeadBlockPredictionBasedLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -93,6 +94,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
         this.deadBlockPredictionSampler = new DeadBlockPredictionSampler(cache.getNumSets());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         for (int i = 0; i < this.getCache().getAssociativity(); i++) {
@@ -130,6 +132,7 @@ public class DeadBlockPredictionBasedLRUPolicy<StateT extends Serializable> exte
      * @param pc the virtual PC address
      * @param tag the tag
      */
+    @SuppressWarnings("unchecked")
     private void updateSampler(int set, int way, int threadId, int pc, int tag) {
         if (set % DeadBlockPredictionSampler.getModulus() == 0) {
             int samplerSet = set / DeadBlockPredictionSampler.getModulus();

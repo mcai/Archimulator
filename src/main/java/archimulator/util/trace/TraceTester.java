@@ -18,12 +18,12 @@
  ******************************************************************************/
 package archimulator.util.trace;
 
-import archimulator.util.action.Action1;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.function.Consumer;
 
 /**
+ * Trace tester.
  *
  * @author Min Cai
  * @param <TraceRecordT>
@@ -32,23 +32,25 @@ public abstract class TraceTester<TraceRecordT> {
     private String fileName;
 
     /**
-     *
+     * The file backed buffer.
      */
     protected RandomAccessFile buffer;
 
     /**
+     * Create a trace tester.
      *
-     * @param fileName
+     * @param fileName the file name
      */
     public TraceTester(String fileName) {
         this.fileName = fileName;
     }
 
     /**
+     * Run the specified action.
      *
-     * @param action
+     * @param action the action
      */
-    public void run(Action1<TraceRecordT> action) {
+    public void run(Consumer<TraceRecordT> action) {
         try {
             this.buffer = new RandomAccessFile(fileName, "r");
 
@@ -59,7 +61,7 @@ public abstract class TraceTester<TraceRecordT> {
                     break;
                 }
 
-                action.apply(traceRecord);
+                action.accept(traceRecord);
             }
 
             this.buffer.close();
@@ -69,14 +71,16 @@ public abstract class TraceTester<TraceRecordT> {
     }
 
     /**
+     * Read the next trace record.
      *
-     * @return
+     * @return the next trace record if exists
      */
     protected abstract TraceRecordT readNext();
 
     /**
+     * Get the file name.
      *
-     * @return
+     * @return the file name
      */
     public String getFileName() {
         return fileName;

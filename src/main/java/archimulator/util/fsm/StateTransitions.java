@@ -18,9 +18,7 @@
  ******************************************************************************/
 package archimulator.util.fsm;
 
-import archimulator.util.action.Action1;
 import archimulator.util.action.Action4;
-import archimulator.util.action.Function4;
 import archimulator.util.Params;
 
 import java.io.Serializable;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Finite state machine state transitions.
@@ -41,7 +40,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
     private Map<ConditionT, StateTransition> perStateTransitions;
     private FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT> fsmFactory;
     private StateT state;
-    private Action1<FiniteStateMachineT> onCompletedCallback;
+    private Consumer<FiniteStateMachineT> onCompletedCallback;
 
     /**
      * Create a finite state machine state transitions object.
@@ -61,7 +60,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
      * @param onCompletedCallback the callback action that is performed when a transition completes
      * @return this
      */
-    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> setOnCompletedCallback(Action1<FiniteStateMachineT> onCompletedCallback) {
+    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> setOnCompletedCallback(Consumer<FiniteStateMachineT> onCompletedCallback) {
         this.onCompletedCallback = onCompletedCallback;
         return this;
     }
@@ -87,7 +86,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
      * @param onCompletedCallback the callback action that is performed when the transition completes
      * @return this
      */
-    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onConditions(List<ConditionT> conditions, Action4<FiniteStateMachineT, Object, ConditionT, ? extends Params> transition, StateT newState, Action1<FiniteStateMachineT> onCompletedCallback) {
+    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onConditions(List<ConditionT> conditions, Action4<FiniteStateMachineT, Object, ConditionT, ? extends Params> transition, StateT newState, Consumer<FiniteStateMachineT> onCompletedCallback) {
         for (ConditionT condition : conditions) {
             this.onCondition(condition, transition, newState, onCompletedCallback);
         }
@@ -116,7 +115,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
      * @param onCompletedCallback the callback action that is performed when the transition completes
      * @return this
      */
-    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onCondition(ConditionT condition, final Action4<FiniteStateMachineT, Object, ConditionT, ? extends Params> transition, final StateT newState, Action1<FiniteStateMachineT> onCompletedCallback) {
+    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onCondition(ConditionT condition, final Action4<FiniteStateMachineT, Object, ConditionT, ? extends Params> transition, final StateT newState, Consumer<FiniteStateMachineT> onCompletedCallback) {
         if (this.perStateTransitions.containsKey(condition)) {
             throw new IllegalArgumentException("Transition of condition " + condition + " in state " + this.state + " has already been registered");
         }
@@ -144,7 +143,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
      * @param onCompletedCallback the callback action that is performed when the transition completes
      * @return this
      */
-    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onCondition(ConditionT condition, final List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions, final StateT newState, Action1<FiniteStateMachineT> onCompletedCallback) {
+    public StateTransitions<StateT, ConditionT, FiniteStateMachineT> onCondition(ConditionT condition, final List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions, final StateT newState, Consumer<FiniteStateMachineT> onCompletedCallback) {
         if (this.perStateTransitions.containsKey(condition)) {
             throw new IllegalArgumentException("Transition of condition " + condition + " in state " + this.state + " has already been registered");
         }
@@ -155,9 +154,10 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
     }
 
     /**
+     * Ignore the specified condition.
      *
-     * @param condition
-     * @return
+     * @param condition the condition
+     * @return the state transitions
      */
     public StateTransitions<StateT, ConditionT, FiniteStateMachineT> ignoreCondition(ConditionT condition) {
         return this.onCondition(condition, new Action4<FiniteStateMachineT, Object, ConditionT, Params>() {
@@ -196,11 +196,11 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
             StateTransition stateTransition = this.perStateTransitions.get(condition);
             fsmFactory.changeState(fsm, sender, condition, params, stateTransition.apply(fsm, sender, condition, params));
             if(stateTransition.onCompletedCallback != null) {
-                stateTransition.onCompletedCallback.apply(fsm);
+                stateTransition.onCompletedCallback.accept(fsm);
             }
 
             if(this.onCompletedCallback != null) {
-                this.onCompletedCallback.apply(fsm);
+                this.onCompletedCallback.accept(fsm);
             }
         } else {
             throw new IllegalArgumentException("Unexpected condition " + condition + " in state " + this.state + " is not among " + this.perStateTransitions.keySet());
@@ -210,12 +210,12 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
     /**
      * State transition.
      */
-    public class StateTransition implements Function4<FiniteStateMachineT, Object, ConditionT, Params, StateT> {
+    public class StateTransition {
         private StateT state;
         private ConditionT condition;
         private StateT newState;
         private List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions;
-        private Action1<FiniteStateMachineT> onCompletedCallback;
+        private Consumer<FiniteStateMachineT> onCompletedCallback;
 
         /**
          * Create a state transition.
@@ -226,7 +226,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
          * @param actions the list of actions
          * @param onCompletedCallback the callback action that is performed when the transition completes
          */
-        public StateTransition(StateT state, ConditionT condition, StateT newState, List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions, Action1<FiniteStateMachineT> onCompletedCallback) {
+        public StateTransition(StateT state, ConditionT condition, StateT newState, List<FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params>> actions, Consumer<FiniteStateMachineT> onCompletedCallback) {
             this.state = state;
             this.condition = condition;
             this.newState = newState;
@@ -272,7 +272,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
          * @param onCompletedCallback the callback action that is performed when the transition completes
          * @return this
          */
-        public StateTransition setOnCompletedCallback(Action1<FiniteStateMachineT> onCompletedCallback) {
+        public StateTransition setOnCompletedCallback(Consumer<FiniteStateMachineT> onCompletedCallback) {
             this.onCompletedCallback = onCompletedCallback;
             return this;
         }

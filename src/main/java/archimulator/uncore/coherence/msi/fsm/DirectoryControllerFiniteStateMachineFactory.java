@@ -23,11 +23,12 @@ import archimulator.uncore.coherence.msi.controller.CacheController;
 import archimulator.uncore.coherence.msi.event.directory.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static ch.lambdaj.Lambda.*;
 import static org.hamcrest.Matchers.not;
@@ -42,7 +43,7 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
      * Create a directory controller finite state machine factory.
      */
     private DirectoryControllerFiniteStateMachineFactory() {
-        Action1<DirectoryControllerFiniteStateMachine> actionWhenStateChanged = fsm -> {
+        Consumer<DirectoryControllerFiniteStateMachine> actionWhenStateChanged = fsm -> {
             if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
                 Action onCompletedCallback = fsm.getOnCompletedCallback();
                 if (onCompletedCallback != null) {
@@ -52,16 +53,11 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
             }
 
             if (fsm.getPreviousState() != fsm.getState()) {
-                List<Action> stalledEventsToProcess = new ArrayList<>();
-                for (Action stalledEvent : fsm.getStalledEvents()) {
-                    stalledEventsToProcess.add(stalledEvent);
-                }
+                List<Action> stalledEventsToProcess = fsm.getStalledEvents().stream().collect(Collectors.toList());
 
                 fsm.getStalledEvents().clear();
 
-                for (Action stalledEvent : stalledEventsToProcess) {
-                    stalledEvent.apply();
-                }
+                stalledEventsToProcess.forEach(Action::apply);
             }
         };
 

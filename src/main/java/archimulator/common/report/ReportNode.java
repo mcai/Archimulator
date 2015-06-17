@@ -18,11 +18,10 @@
  ******************************************************************************/
 package archimulator.common.report;
 
-import archimulator.util.action.Action1;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Report node.
@@ -123,9 +122,9 @@ public class ReportNode implements Serializable {
     /**
      * Traverse the node and its child nodes using the specified callback action.
      */
-    public void traverse(Action1<ReportNode> callback) {
+    public void traverse(Consumer<ReportNode> callback) {
         if(this.value != null) {
-            callback.apply(this);
+            callback.accept(this);
         }
 
         for(ReportNode child : getChildren()) {

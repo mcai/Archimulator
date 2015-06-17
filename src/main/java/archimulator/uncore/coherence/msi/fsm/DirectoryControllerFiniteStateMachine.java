@@ -77,9 +77,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
         this.evicterTag = CacheLine.INVALID_TAG;
         this.victimTag = CacheLine.INVALID_TAG;
 
-        this.addListener(ExitStateEvent.class, exitStateEvent -> {
-            previousState = getState();
-        });
+        this.addListener(ExitStateEvent.class, exitStateEvent -> previousState = getState());
     }
 
     /**
@@ -358,11 +356,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag          the tag
      */
     public void sendInvToSharers(CacheCoherenceFlow producerFlow, CacheController requester, int tag) {
-        for (CacheController sharer : this.getDirectoryEntry().getSharers()) {
-            if (requester != sharer) {
-                this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess()));
-            }
-        }
+        this.getDirectoryEntry().getSharers().stream().filter(sharer -> requester != sharer).forEach(sharer -> this.directoryController.transfer(sharer, 8, new InvMessage(this.directoryController, producerFlow, requester, tag, producerFlow.getAccess())));
     }
 
     /**

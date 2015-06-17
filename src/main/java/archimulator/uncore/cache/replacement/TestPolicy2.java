@@ -45,6 +45,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
      *
      * @param cache the parent cache
      */
+    @SuppressWarnings("unchecked")
     public TestPolicy2(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -65,6 +66,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         if (HelperThreadingHelper.isMainThread(access.getThread().getId())) {
@@ -83,6 +85,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         super.handlePromotionOnHit(access, set, way);
@@ -90,6 +93,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
         this.handleLineReference(set, way, this.getCache().getLine(set, way).getAccess().getThread().getId());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         super.handleInsertionOnMiss(access, set, way);
@@ -112,6 +116,7 @@ public class TestPolicy2<StateT extends Serializable> extends LRUPolicy<StateT> 
      * @param way      the way
      * @param threadId the ID of the thread
      */
+    @SuppressWarnings("unchecked")
     private void handleLineReference(int set, int way, int threadId) {
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();

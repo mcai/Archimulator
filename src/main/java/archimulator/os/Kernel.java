@@ -26,12 +26,12 @@ import archimulator.isa.Memory;
 import archimulator.isa.StaticInstruction;
 import archimulator.os.event.SystemEvent;
 import archimulator.os.signal.SignalAction;
-import archimulator.util.action.Predicate;
 import archimulator.util.buffer.CircularByteBuffer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Kernel.
@@ -165,7 +165,7 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
                     }
                 }
 
-                if (!hasMapped && predicate.apply(threadId)) {
+                if (!hasMapped && predicate.test(threadId)) {
                     contextToMap.setThreadId(threadId);
                     return true;
                 }

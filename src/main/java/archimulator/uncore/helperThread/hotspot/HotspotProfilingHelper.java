@@ -183,11 +183,9 @@ public class HotspotProfilingHelper implements Reportable {
 
         for(Function hotspotFunction : hotspotFunctions) {
             for (BasicBlock basicBlock : hotspotFunction.getBasicBlocks()) {
-                for (Instruction instruction : basicBlock.getInstructions()) {
-                    if (instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
-                        this.loadsInHotspotFunction.put(instruction.getPc(), new LoadInstructionEntry(instruction));
-                    }
-                }
+                basicBlock.getInstructions().stream()
+                        .filter(instruction -> instruction.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD)
+                        .forEach(instruction -> this.loadsInHotspotFunction.put(instruction.getPc(), new LoadInstructionEntry(instruction)));
             }
         }
     }

@@ -60,7 +60,7 @@ public class CacheInteractionHelper implements Reportable {
         this.numL2InterThreadEvictions = new TreeMap<>();
 
         l2Controller.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(CacheInteractionHelper.this.l2Controller) && event.isHitInCache()) {
+            if (event.getCacheController() == CacheInteractionHelper.this.l2Controller && event.isHitInCache()) {
                 int set = event.getSet();
                 int way = event.getWay();
 

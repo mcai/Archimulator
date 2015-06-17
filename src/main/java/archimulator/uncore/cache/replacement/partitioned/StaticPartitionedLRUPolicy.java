@@ -21,11 +21,11 @@ package archimulator.uncore.cache.replacement.partitioned;
 import archimulator.common.report.ReportNode;
 import archimulator.uncore.cache.EvictableCache;
 import archimulator.uncore.cache.partitioning.Partitioner;
-import archimulator.util.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Static partitioned least recently used (LRU) policy.

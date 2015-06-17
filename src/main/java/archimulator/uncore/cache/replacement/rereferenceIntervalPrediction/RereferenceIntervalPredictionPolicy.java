@@ -44,6 +44,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
      *
      * @param cache the parent cache
      */
+    @SuppressWarnings("unchecked")
     public RereferenceIntervalPredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -59,6 +60,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         this.insertionPolicy = new DynamicInsertionPolicy(cache, 16);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         do {
@@ -80,6 +82,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         } while (true);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
@@ -88,6 +91,7 @@ public class RereferenceIntervalPredictionPolicy<StateT extends Serializable> ex
         stateProvider.predictedRereferenceInterval.reset();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);

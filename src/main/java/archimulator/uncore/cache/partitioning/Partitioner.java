@@ -19,9 +19,9 @@
 package archimulator.uncore.cache.partitioning;
 
 import archimulator.common.report.Reportable;
-import archimulator.util.action.Predicate;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Partitioner.

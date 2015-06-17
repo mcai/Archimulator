@@ -18,11 +18,10 @@
  ******************************************************************************/
 package archimulator.util;
 
-import archimulator.util.action.Function1;
-import archimulator.util.action.Predicate;
-
 import java.util.BitSet;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Round robin scheduler.
@@ -33,7 +32,7 @@ import java.util.List;
 public class RoundRobinScheduler<ResourceT> {
     private final List<ResourceT> resources;
     private final Predicate<ResourceT> predicate;
-    private final Function1<ResourceT, Boolean> consumeAction;
+    private final Function<ResourceT, Boolean> consumeAction;
     private final int quant;
 
     private int resourceId;
@@ -48,7 +47,7 @@ public class RoundRobinScheduler<ResourceT> {
      * @param consumeAction the consume action
      * @param quant the quant
      */
-    public RoundRobinScheduler(List<ResourceT> resources, Predicate<ResourceT> predicate, Function1<ResourceT, Boolean> consumeAction, int quant) {
+    public RoundRobinScheduler(List<ResourceT> resources, Predicate<ResourceT> predicate, Function<ResourceT, Boolean> consumeAction, int quant) {
         this.resources = resources;
         this.predicate = predicate;
         this.consumeAction = consumeAction;
@@ -68,7 +67,7 @@ public class RoundRobinScheduler<ResourceT> {
 
     private int findNext(BitSet except) {
         for (int i = 0; i < this.resources.size(); i++) {
-            if (this.predicate.apply(this.resources.get(i)) && !except.get(i)) {
+            if (this.predicate.test(this.resources.get(i)) && !except.get(i)) {
                 return i;
             }
         }
@@ -82,7 +81,7 @@ public class RoundRobinScheduler<ResourceT> {
         resourceId = (resourceId + 1) % this.resources.size();
 
         for (int numConsumed = 0; numConsumed < this.quant; numConsumed++) {
-            if (this.stalled.get(resourceId) || !this.predicate.apply(this.resources.get(resourceId))) {
+            if (this.stalled.get(resourceId) || !this.predicate.test(this.resources.get(resourceId))) {
                 resourceId = findNext(this.stalled);
             }
 

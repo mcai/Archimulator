@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 /**
  * Delinquent load identification table.
@@ -151,15 +152,7 @@ public class DelinquentLoadIdentificationTable {
      * @return the list of steady delinquent loads
      */
     public List<DelinquentLoad> getSteadyDelinquentLoads() {
-        List<DelinquentLoad> steadyDelinquentLoads = new ArrayList<>();
-
-        for (DelinquentLoad delinquentLoad : this.delinquentLoads) {
-            if (delinquentLoad.isSteady()) {
-                steadyDelinquentLoads.add(delinquentLoad);
-            }
-        }
-
-        return steadyDelinquentLoads;
+        return this.delinquentLoads.stream().filter(DelinquentLoad::isSteady).collect(Collectors.toList());
     }
 
     /**

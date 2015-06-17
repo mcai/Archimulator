@@ -25,11 +25,11 @@ import archimulator.uncore.cache.EvictableCache;
 import archimulator.uncore.cache.partitioning.Partitioner;
 import archimulator.uncore.cache.replacement.LRUPolicy;
 import archimulator.util.Pair;
-import archimulator.util.action.Predicate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static archimulator.uncore.cache.partitioning.mlpAware.MLPAwareCachePartitioningHelper.getThreadIdentifier;
 

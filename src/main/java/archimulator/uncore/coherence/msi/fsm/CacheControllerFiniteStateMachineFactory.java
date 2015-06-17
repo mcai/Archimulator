@@ -23,11 +23,11 @@ import archimulator.uncore.coherence.msi.controller.CacheController;
 import archimulator.uncore.coherence.msi.event.cache.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.util.action.Action;
-import archimulator.util.action.Action1;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * L1 cache controller finite state machine factory.
@@ -39,7 +39,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
      * Create an L1 cache controller finite state machine factory.
      */
     private CacheControllerFiniteStateMachineFactory() {
-        Action1<CacheControllerFiniteStateMachine> actionWhenStateChanged = fsm -> {
+        Consumer<CacheControllerFiniteStateMachine> actionWhenStateChanged = fsm -> {
             if (fsm.getPreviousState() != fsm.getState()) {
                 if (fsm.getState().isStable()) {
                     Action onCompletedCallback = fsm.getOnCompletedCallback();
@@ -53,9 +53,7 @@ public class CacheControllerFiniteStateMachineFactory extends FiniteStateMachine
                 stalledEventsToProcess.addAll(fsm.getStalledEvents());
                 fsm.getStalledEvents().clear();
 
-                for (Action stalledEvent : stalledEventsToProcess) {
-                    stalledEvent.apply();
-                }
+                stalledEventsToProcess.forEach(Action::apply);
             }
         };
 

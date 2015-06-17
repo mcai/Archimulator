@@ -30,12 +30,12 @@ import archimulator.uncore.coherence.event.LastLevelCacheControllerLineInsertEve
 import archimulator.uncore.mlp.PendingL2Hit;
 import archimulator.uncore.mlp.PendingL2Miss;
 import archimulator.util.Pair;
-import archimulator.util.action.Function1;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Memory level parallelism (MLP) aware cache partitioning helper.
@@ -54,7 +54,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
 
     private Map<Integer, Map<Integer, LRUStack>> lruStacks;
 
-    private Function1<Double, Integer> mlpCostQuantizer;
+    private Function<Double, Integer> mlpCostQuantizer;
     private List<List<Integer>> partitions;
 
     /**
@@ -101,7 +101,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         };
 
         cache.getBlockingEventDispatcher().addListener(GeneralCacheControllerServiceNonblockingRequestEvent.class, event -> {
-            if (event.getCacheController().equals(getL2Controller()) && shouldInclude(event.getSet())) {
+            if (event.getCacheController() == getL2Controller() && shouldInclude(event.getSet())) {
                 if (!event.isHitInCache()) {
                     profileBeginServicingL2Miss(event.getAccess());
                 } else {
@@ -111,7 +111,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         });
 
         cache.getBlockingEventDispatcher().addListener(LastLevelCacheControllerLineInsertEvent.class, event -> {
-            if (event.getCacheController().equals(getL2Controller()) && pendingL2Misses.containsKey(event.getAccess().getPhysicalTag())) {
+            if (event.getCacheController() == getL2Controller() && pendingL2Misses.containsKey(event.getAccess().getPhysicalTag())) {
                 profileEndServicingL2Miss(event.getAccess());
             }
         });

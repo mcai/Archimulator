@@ -45,6 +45,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      *
      * @param cache the parent evictable cache
      */
+    @SuppressWarnings("unchecked")
     public AbstractCostAwareLRUPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -67,6 +68,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @param way the way
      * @param cost the cost
      */
+    @SuppressWarnings("unchecked")
     public void setCost(int set, int way, double cost) {
         CacheLine<Boolean> mirrorLine = this.mirrorCache.getLine(set, way);
         BooleanValueProvider stateProvider = (BooleanValueProvider) mirrorLine.getStateProvider();
@@ -82,6 +84,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @param way the way
      * @return the cost for the given set and way
      */
+    @SuppressWarnings("unchecked")
     public double getCost(int set, int way) {
         if(!isStable(set, way)) {
             return this.costPredictor.predict(this.getCache().getLine(set, way).getAccess().getVirtualPc());
@@ -99,6 +102,7 @@ public abstract class AbstractCostAwareLRUPolicy<StateT extends Serializable> ex
      * @param way the way
      * @return a value indicating whether the specified line is in the stable state or not
      */
+    @SuppressWarnings("unchecked")
     protected boolean isStable(int set, int way) {
         StateT state = this.getCache().getLine(set, way).getState();
 

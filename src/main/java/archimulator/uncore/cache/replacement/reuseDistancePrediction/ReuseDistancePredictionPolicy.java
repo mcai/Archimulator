@@ -43,6 +43,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
      *
      * @param cache the parent cache
      */
+    @SuppressWarnings("unchecked")
     public ReuseDistancePredictionPolicy(EvictableCache<StateT> cache) {
         super(cache);
 
@@ -56,6 +57,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
         this.highLowCounter = new HighLowCounter(7, 16384);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
         int victimTime = 0;
@@ -105,6 +107,7 @@ public class ReuseDistancePredictionPolicy<StateT extends Serializable> extends 
      * @param threadId the thread ID
      * @param pc       the value of the program counter (PC)
      */
+    @SuppressWarnings("unchecked")
     private void handleLineReference(int set, int way, int threadId, int pc) {
         this.highLowCounter.increment();
 

@@ -143,9 +143,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
 
         access.complete();
 
-        for (MemoryHierarchyAccess alias : access.getAliases()) {
-            alias.complete();
-        }
+        access.getAliases().forEach(MemoryHierarchyAccess::complete);
 
         MemoryHierarchyAccessType type = access.getType();
         this.pendingAccessesPerType.put(type, this.pendingAccessesPerType.get(type) - 1);

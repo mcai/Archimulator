@@ -70,6 +70,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
      * @param counterMaxValue            the maximum value of the predictor
      * @param defaultValue               the default value
      */
+    @SuppressWarnings("unchecked")
     public CacheBasedPredictor(
             SimulationObject parent,
             String name,
@@ -90,6 +91,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         this.defaultValue = defaultValue;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public PredictableT predict(int address) {
         CacheLine<Boolean> lineFound = this.cache.findLine(address);
@@ -102,6 +104,7 @@ public class CacheBasedPredictor<PredictableT extends Comparable<PredictableT>> 
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void update(int address, PredictableT observedValue) {
         if (this.predict(address).equals(observedValue)) {
