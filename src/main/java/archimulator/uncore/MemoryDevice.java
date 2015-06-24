@@ -20,7 +20,7 @@ package archimulator.uncore;
 
 import archimulator.common.BasicSimulationObject;
 import archimulator.common.SimulationObject;
-import archimulator.uncore.net.common.Net;
+import archimulator.uncore.net.simple.common.Net;
 import archimulator.util.action.Action;
 
 import java.io.Serializable;

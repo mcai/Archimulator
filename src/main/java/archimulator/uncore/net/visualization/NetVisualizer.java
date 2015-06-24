@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.uncore.net.visualization;
 
-import archimulator.uncore.net.common.Net;
-import archimulator.uncore.net.common.NetMessageBeginLinkTransferEvent;
+import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.common.NetMessageBeginLinkTransferEvent;
 import archimulator.util.math.Counter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;

@@ -3,7 +3,7 @@ package archimulator.util.cmd;
 import archimulator.common.*;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.dram.MemoryControllerType;
-import archimulator.uncore.net.routing.RoutingAlgorithmType;
+import archimulator.uncore.net.simple.routing.RoutingAlgorithmType;
 import archimulator.util.serialization.JsonSerializationHelper;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;

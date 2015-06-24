@@ -137,6 +137,11 @@
             <artifactId>multiverse-core</artifactId>
             <version>0.7.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 
     <build>

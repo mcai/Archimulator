@@ -22,7 +22,7 @@ import archimulator.core.bpred.BranchPredictorType;
 import archimulator.os.Kernel;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.dram.MemoryControllerType;
-import archimulator.uncore.net.routing.RoutingAlgorithmType;
+import archimulator.uncore.net.simple.routing.RoutingAlgorithmType;
 import archimulator.util.Reference;
 import archimulator.util.StorageUnit;
 import archimulator.util.StorageUnitHelper;

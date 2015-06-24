@@ -27,7 +27,7 @@ import archimulator.uncore.dram.FixedLatencyMemoryController;
 import archimulator.uncore.dram.MemoryController;
 import archimulator.uncore.dram.SimpleMemoryController;
 import archimulator.uncore.net.visualization.NetVisualizer;
-import archimulator.uncore.net.common.Net;
+import archimulator.uncore.net.simple.common.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;

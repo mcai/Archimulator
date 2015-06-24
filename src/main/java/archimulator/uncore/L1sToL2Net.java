@@ -19,9 +19,9 @@
 package archimulator.uncore;
 
 import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.uncore.net.common.Net;
-import archimulator.uncore.net.node.EndPointNode;
-import archimulator.uncore.net.node.SwitchNode;
+import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.node.EndPointNode;
+import archimulator.uncore.net.simple.node.SwitchNode;
 
 /**
  * The net for connecting the L1 cache controllers to the L2 cache controller

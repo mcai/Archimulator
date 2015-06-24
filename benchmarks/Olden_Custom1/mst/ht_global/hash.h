@@ -1,6 +1,4 @@
 /* For copyright information, see olden_v1.0/COPYRIGHT */
-#ifndef HASH_H
-#define HASH_H
 
 #include "stdio.h"
 
@@ -20,5 +18,3 @@ Hash MakeHash(int size, int (*map)(unsigned int));
 void *HashLookup(unsigned int key, Hash hash);
 void HashInsert(void *entry,unsigned int key, Hash hash);
 void HashDelete(unsigned int key, Hash hash);
-
-#endif

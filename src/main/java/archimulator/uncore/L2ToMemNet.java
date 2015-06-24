@@ -18,9 +18,9 @@
  ******************************************************************************/
 package archimulator.uncore;
 
-import archimulator.uncore.net.common.Net;
-import archimulator.uncore.net.node.EndPointNode;
-import archimulator.uncore.net.node.SwitchNode;
+import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.node.EndPointNode;
+import archimulator.uncore.net.simple.node.SwitchNode;
 
 /**
  * The net for connecting the L2 cache controller to the memory controller.
