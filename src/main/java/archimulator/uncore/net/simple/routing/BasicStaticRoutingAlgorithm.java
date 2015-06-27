@@ -18,10 +18,11 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.routing;
 
-import archimulator.uncore.net.simple.common.BasicRoute;
-import archimulator.uncore.net.simple.common.Net;
-import archimulator.uncore.net.simple.common.NetLink;
-import archimulator.uncore.net.simple.common.Route;
+import archimulator.uncore.net.Net;
+import archimulator.uncore.net.simple.BasicRoute;
+import archimulator.uncore.net.simple.SimpleNet;
+import archimulator.uncore.net.simple.NetLink;
+import archimulator.uncore.net.simple.Route;
 import archimulator.uncore.net.simple.node.NetNode;
 import archimulator.uncore.net.simple.port.OutPort;
 
@@ -36,7 +37,7 @@ import java.util.Map;
  * @author Min Cai
  */
 public class BasicStaticRoutingAlgorithm implements RoutingAlgorithm {
-    private Net net;
+    private SimpleNet net;
     private Map<NetNode, Map<NetNode, BasicRoute>> routes;
 
     /**
@@ -44,7 +45,7 @@ public class BasicStaticRoutingAlgorithm implements RoutingAlgorithm {
      *
      * @param net the parent net
      */
-    public BasicStaticRoutingAlgorithm(Net net) {
+    public BasicStaticRoutingAlgorithm(SimpleNet net) {
         this.net = net;
         this.routes = new HashMap<>();
 

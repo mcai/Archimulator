@@ -23,6 +23,7 @@ import archimulator.common.report.Reportable;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.cache.CacheGeometry;
 import archimulator.uncore.cache.EvictableCache;
+import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.io.Serializable;
@@ -46,9 +47,10 @@ public abstract class GeneralCacheController<StateT extends Serializable, Condit
      *
      * @param memoryHierarchy the memory hierarchy
      * @param name            the name
+     * @param type            the type
      */
-    public GeneralCacheController(MemoryHierarchy memoryHierarchy, String name) {
-        super(memoryHierarchy, name);
+    public GeneralCacheController(MemoryHierarchy memoryHierarchy, String name, MemoryDeviceType type) {
+        super(memoryHierarchy, name, type);
     }
 
     /**

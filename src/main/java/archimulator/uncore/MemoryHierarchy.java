@@ -20,13 +20,11 @@ package archimulator.uncore;
 
 import archimulator.common.ExperimentStat;
 import archimulator.common.SimulationObject;
-import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.uncore.coherence.msi.controller.Controller;
-import archimulator.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.uncore.coherence.msi.controller.GeneralCacheController;
+import archimulator.core.Core;
+import archimulator.uncore.coherence.msi.controller.*;
 import archimulator.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.ArrayList;
@@ -49,6 +47,15 @@ public interface MemoryHierarchy extends SimulationObject {
     void transfer(Controller from, Controller to, int size, CoherenceMessage message);
 
     /**
+     * Get the net for the specified source and destination devices.
+     *
+     * @param from the source device
+     * @param to   the destination device
+     * @return the net for the specified source and destination devices
+     */
+    Net getNet(MemoryDevice from, MemoryDevice to);
+
+    /**
      * Get the memory controller.
      *
      * @return the memory controller
@@ -67,14 +74,14 @@ public interface MemoryHierarchy extends SimulationObject {
      *
      * @return the L1I cache controller
      */
-    List<CacheController> getL1IControllers();
+    List<L1IController> getL1IControllers();
 
     /**
      * Get the L1D cache controller.
      *
      * @return the L1D cache controller
      */
-    List<CacheController> getL1DControllers();
+    List<L1DController> getL1DControllers();
 
     /**
      * Get the the list of L1 cache controllers.
@@ -117,18 +124,13 @@ public interface MemoryHierarchy extends SimulationObject {
     }
 
     /**
-     * Get the net for the L1 cache controllers to the L2 cache controller.
+     * Get the list of cores.
      *
-     * @return the net for the L1 cache controllers to the L2 cache controller
+     * @return the list of cores
      */
-    Net getL1sToL2Net();
-
-    /**
-     * Get the net for the L2 cache controller to the memory controller.
-     *
-     * @return the net for the L2 cache controller to the memory controller
-     */
-    L2ToMemNet getL2ToMemNet();
+    default List<Core> getCores() {
+        return this.getSimulation().getProcessor().getCores();
+    }
 
     /**
      * Dump the cache controller finite state machine statistics.

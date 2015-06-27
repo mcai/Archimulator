@@ -19,9 +19,9 @@
 package archimulator.uncore.net.simple.port;
 
 import archimulator.uncore.net.simple.buffer.OutBuffer;
-import archimulator.uncore.net.simple.common.NetMessage;
-import archimulator.uncore.net.simple.common.NetMessageBeginLinkTransferEvent;
-import archimulator.uncore.net.simple.common.NetMessageEndLinkTransferEvent;
+import archimulator.uncore.net.simple.NetMessage;
+import archimulator.uncore.net.simple.NetMessageBeginLinkTransferEvent;
+import archimulator.uncore.net.simple.NetMessageEndLinkTransferEvent;
 import archimulator.uncore.net.simple.node.NetNode;
 
 /**

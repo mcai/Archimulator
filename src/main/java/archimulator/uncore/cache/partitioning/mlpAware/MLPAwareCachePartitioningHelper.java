@@ -18,6 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.cache.partitioning.mlpAware;
 
+import archimulator.common.SimulationType;
 import archimulator.common.report.ReportNode;
 import archimulator.core.event.DynamicInstructionCommittedEvent;
 import archimulator.uncore.MemoryHierarchyAccess;
@@ -31,7 +32,6 @@ import archimulator.uncore.mlp.PendingL2Hit;
 import archimulator.uncore.mlp.PendingL2Miss;
 import archimulator.util.Pair;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,10 +118,11 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
         });
 
         cache.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
-            updateL2AccessMlpCostsPerCycle();
-            updateL2HitElapsedCyclesPerCycle();
-            freeInvalidL2HitsPerCycle();
-
+            if (cache.getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                updateL2AccessMlpCostsPerCycle();
+                updateL2HitElapsedCyclesPerCycle();
+                freeInvalidL2HitsPerCycle();
+            }
         });
 
         cache.getBlockingEventDispatcher().addListener(DynamicInstructionCommittedEvent.class, event -> {

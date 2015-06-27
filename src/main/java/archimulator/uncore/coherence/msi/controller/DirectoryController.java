@@ -30,7 +30,6 @@ import archimulator.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachi
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.uncore.net.simple.common.Net;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param name            the name
      */
     public DirectoryController(MemoryHierarchy memoryHierarchy, final String name) {
-        super(memoryHierarchy, name);
+        super(memoryHierarchy, name, MemoryDeviceType.L2_CONTROLLER);
 
         this.cacheGeometry = new CacheGeometry(
                 getExperiment().getL2Size(),
@@ -81,11 +80,6 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
         this.cacheControllers = new ArrayList<>();
 
         this.fsmFactory = DirectoryControllerFiniteStateMachineFactory.getSingleton();
-    }
-
-    @Override
-    protected Net getNet(MemoryDevice to) {
-        return to instanceof MemoryController ? this.getMemoryHierarchy().getL2ToMemNet() : this.getMemoryHierarchy().getL1sToL2Net();
     }
 
     public MemoryController getNext() {

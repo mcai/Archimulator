@@ -20,6 +20,7 @@ package archimulator.uncore.mlp;
 
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
+import archimulator.common.SimulationType;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.MemoryHierarchyAccess;
@@ -135,7 +136,11 @@ public class MLPProfilingHelper implements Reportable {
             }
         });
 
-        this.l2Controller.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateL2MlpCostsPerCycle);
+        this.l2Controller.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            if (simulation.getType() != SimulationType.FAST_FORWARD) {
+                updateL2MlpCostsPerCycle();
+            }
+        });
 
         this.l2Controller.getBlockingEventDispatcher().addListener(MLPProfilingHelper.L2MissMLPProfiledEvent.class, event -> {
             double mlpCost = event.getPendingL2Miss().getMlpCost();

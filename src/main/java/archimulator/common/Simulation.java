@@ -28,7 +28,6 @@ import archimulator.core.speculativePrecomputation.DynamicSpeculativePrecomputat
 import archimulator.isa.Memory;
 import archimulator.os.Context;
 import archimulator.os.Kernel;
-import archimulator.uncore.BasicMemoryHierarchy;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.cache.Interval.IntervalHelper;
 import archimulator.uncore.cache.interference.CacheInteractionHelper;
@@ -41,6 +40,7 @@ import archimulator.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.uncore.mlp.BLPProfilingHelper;
 import archimulator.uncore.mlp.MLPProfilingHelper;
+import archimulator.uncore.net.basic.BasicMemoryHierarchy;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.Reference;
 import archimulator.util.collection.tree.NodeHelper;
@@ -388,6 +388,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * @return the memory hierarchy that is prepared
      */
     public MemoryHierarchy prepareMemoryHierarchy() {
+        //TODO: switch type
+//        return new SimpleMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
         return new BasicMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 

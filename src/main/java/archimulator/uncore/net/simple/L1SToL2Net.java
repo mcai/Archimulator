@@ -16,10 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore;
+package archimulator.uncore.net.simple;
 
-import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.coherence.msi.controller.L1DController;
+import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.net.simple.node.EndPointNode;
 import archimulator.uncore.net.simple.node.SwitchNode;
 
@@ -28,13 +29,13 @@ import archimulator.uncore.net.simple.node.SwitchNode;
  *
  * @author Min Cai
  */
-public class L1sToL2Net extends Net {
+public class L1SToL2Net extends SimpleNet {
     /**
      * Create a net for connecting the L1 cache controllers to the L2 cache controller.
      *
      * @param memoryHierarchy the memory hierarchy
      */
-    public L1sToL2Net(MemoryHierarchy memoryHierarchy) {
+    public L1SToL2Net(MemoryHierarchy memoryHierarchy) {
         super(memoryHierarchy, "l1sToL2Net");
     }
 
@@ -54,13 +55,13 @@ public class L1sToL2Net extends Net {
                 memoryHierarchy.getL1IControllers().size() + memoryHierarchy.getL1DControllers().size() + 1,
                 (l2LineSize + 8) * 2, 8));
 
-        for (CacheController l1IController : memoryHierarchy.getL1IControllers()) {
+        for (L1IController l1IController : memoryHierarchy.getL1IControllers()) {
             EndPointNode l1IControllerNode = new EndPointNode(this, l1IController.getName());
             this.getEndPointNodes().put(l1IController, l1IControllerNode);
             this.createBidirectionalLink(l1IControllerNode, this.getSwitchNode(), 32);
         }
 
-        for (CacheController l1DController : memoryHierarchy.getL1DControllers()) {
+        for (L1DController l1DController : memoryHierarchy.getL1DControllers()) {
             EndPointNode l1DControllerNode = new EndPointNode(this, l1DController.getName());
             this.getEndPointNodes().put(l1DController, l1DControllerNode);
             this.createBidirectionalLink(l1DControllerNode, this.getSwitchNode(), 32);

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.port;
 
-import archimulator.uncore.net.simple.common.NetMessage;
+import archimulator.uncore.net.simple.NetMessage;
 import archimulator.uncore.net.simple.node.NetNode;
 import archimulator.uncore.net.simple.buffer.InBuffer;
 

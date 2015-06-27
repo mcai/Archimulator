@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.node;
 
-import archimulator.uncore.net.simple.common.Crossbar;
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.Crossbar;
+import archimulator.uncore.net.simple.SimpleNet;
 import archimulator.uncore.net.simple.port.InPort;
 import archimulator.uncore.net.simple.port.NetPort;
 import archimulator.uncore.net.simple.port.OutPort;
@@ -33,7 +33,7 @@ import java.util.List;
  * @author Min Cai
  */
 public abstract class NetNode {
-    private Net net;
+    private SimpleNet net;
     private String name;
 
     private List<InPort> inPorts;
@@ -51,7 +51,7 @@ public abstract class NetNode {
      * @param outBufferSize the size of the out buffer
      * @param bandwidth     the bandwidth of the net node
      */
-    public NetNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
+    public NetNode(SimpleNet net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         this.net = net;
         this.name = name;
 
@@ -118,7 +118,7 @@ public abstract class NetNode {
      *
      * @return the parent net
      */
-    public Net getNet() {
+    public SimpleNet getNet() {
         return net;
     }
 

@@ -16,47 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.simple.buffer;
+package archimulator.uncore.net.simple;
 
-import archimulator.uncore.net.simple.NetMessage;
 import archimulator.uncore.net.simple.port.OutPort;
 
 /**
- * Out buffer.
+ * Route.
  *
  * @author Min Cai
  */
-public class OutBuffer extends NetBuffer {
-    private OutPort port;
-
-    /**
-     * Create an out buffer.
-     *
-     * @param port the out port
-     * @param size the size of the buffer
-     */
-    public OutBuffer(OutPort port, int size) {
-        super(size);
-        this.port = port;
-    }
-
-    /**
-     * End the writing of the specified message.
-     *
-     * @param message the message
-     */
-    public void endWrite(NetMessage message) {
-        super.endWrite(message);
-        this.getPort().toLink(message);
-    }
-
+public interface Route {
     /**
      * Get the out port.
      *
      * @return the out port
      */
-    @Override
-    public OutPort getPort() {
-        return port;
-    }
+    OutPort getOutPort();
 }

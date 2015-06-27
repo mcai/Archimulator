@@ -18,8 +18,9 @@
  ******************************************************************************/
 package archimulator.uncore.net.visualization;
 
-import archimulator.uncore.net.simple.common.Net;
-import archimulator.uncore.net.simple.common.NetMessageBeginLinkTransferEvent;
+import archimulator.common.SimulationType;
+import archimulator.uncore.net.simple.NetMessageBeginLinkTransferEvent;
+import archimulator.uncore.net.simple.SimpleNet;
 import archimulator.util.math.Counter;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
@@ -44,7 +45,7 @@ public class NetVisualizer {
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
     }
 
-    public static void run(List<Net> nets) {
+    public static void run(List<SimpleNet> nets) {
         Graph graph = new SingleGraph("Net Visualizer");
 
         final Counter i = new Counter();
@@ -69,44 +70,46 @@ public class NetVisualizer {
         Map<String, Long> events = new HashMap<>();
 
         nets.get(0).getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
-            if(nets.get(0).getCycleAccurateEventQueue().getCurrentCycle() % 2000 == 0) {
-                for(String edgeId : events.keySet()) {
-                    Edge edge = graph.getEdge(edgeId);
+            if (nets.get(0).getSimulation().getType() != SimulationType.FAST_FORWARD) {
+                if (nets.get(0).getCycleAccurateEventQueue().getCurrentCycle() % 2000 == 0) {
+                    for (String edgeId : events.keySet()) {
+                        Edge edge = graph.getEdge(edgeId);
 
-                    if(events.containsKey(edgeId)) {
-                        long numEvents = events.get(edgeId);
-                        edge.removeAttribute("ui.style");
-                        edge.addAttribute("ui.style",
-                                "stroke-mode: plain;\n" +
-                                "stroke-color: blue;\n" +
-                                "stroke-width: " + Math.min(1000, numEvents) + ";\n" +
-                                "fill-color: blue;\n" +
-                                "z-index: 1;");
-                        events.put(edgeId, 0L);
+                        if (events.containsKey(edgeId)) {
+                            long numEvents = events.get(edgeId);
+                            edge.removeAttribute("ui.style");
+                            edge.addAttribute("ui.style",
+                                    "stroke-mode: plain;\n" +
+                                            "stroke-color: blue;\n" +
+                                            "stroke-width: " + Math.min(1000, numEvents) + ";\n" +
+                                            "fill-color: blue;\n" +
+                                            "z-index: 1;");
+                            events.put(edgeId, 0L);
+                        }
                     }
                 }
             }
-        });
+            });
 
-        nets.get(0).getBlockingEventDispatcher().addListener(NetMessageBeginLinkTransferEvent.class, event -> {
-            String edgeId = event.getNodeFrom().getName() + "-" + event.getNodeTo().getName();
-            if(!events.containsKey(edgeId)) {
-                events.put(edgeId, 0L);
-            }
-            events.put(edgeId, events.get(edgeId) + 1);
-        });
+            nets.get(0).getBlockingEventDispatcher().addListener(NetMessageBeginLinkTransferEvent.class, event -> {
+                String edgeId = event.getNodeFrom().getName() + "-" + event.getNodeTo().getName();
+                if (!events.containsKey(edgeId)) {
+                    events.put(edgeId, 0L);
+                }
+                events.put(edgeId, events.get(edgeId) + 1);
+            });
 
-        Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
-        viewer.enableAutoLayout();
+            Viewer viewer = new Viewer(graph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+            viewer.enableAutoLayout();
 
-        ViewPanel view = viewer.addDefaultView(false);
+            ViewPanel view = viewer.addDefaultView(false);
 
-        JFrame frame = new JFrame("Net Visualizer");
-        frame.add(view);
+            JFrame frame = new JFrame("Net Visualizer");
+            frame.add(view);
 
-        frame.setPreferredSize(new Dimension(800, 600));
+            frame.setPreferredSize(new Dimension(800, 600));
 
-        frame.pack();
-        frame.setVisible(true);
+            frame.pack();
+            frame.setVisible(true);
+        }
     }
-}

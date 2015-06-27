@@ -20,6 +20,7 @@ package archimulator.uncore.coherence.msi.controller;
 
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.cache.CacheGeometry;
+import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 
 /**
@@ -35,7 +36,7 @@ public class L1DController extends CacheController {
      * @param name            the name
      */
     public L1DController(MemoryHierarchy memoryHierarchy, String name) {
-        super(memoryHierarchy, name);
+        super(memoryHierarchy, name, MemoryDeviceType.L1D_CONTROLLER);
     }
 
     @Override

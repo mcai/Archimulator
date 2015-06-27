@@ -389,6 +389,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     @Override
     public void setL1IController(CacheController l1IController) {
         this.l1IController = l1IController;
+        this.l1IController.setCore(this);
     }
 
     @Override
@@ -399,5 +400,6 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     @Override
     public void setL1DController(CacheController l1DController) {
         this.l1DController = l1DController;
+        this.l1DController.setCore(this);
     }
 }

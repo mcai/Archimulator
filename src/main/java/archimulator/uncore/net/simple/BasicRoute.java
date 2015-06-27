@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.simple.common;
+package archimulator.uncore.net.simple;
 
 import archimulator.uncore.net.simple.node.NetNode;
 import archimulator.uncore.net.simple.port.OutPort;

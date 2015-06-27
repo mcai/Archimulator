@@ -16,20 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.simple.common;
+package archimulator.uncore.net;
 
-import archimulator.uncore.net.simple.port.OutPort;
+import archimulator.common.SimulationObject;
+import archimulator.uncore.MemoryDevice;
+import archimulator.util.action.Action;
 
 /**
- * Route.
+ * Net.
  *
  * @author Min Cai
  */
-public interface Route {
+public interface Net extends SimulationObject {
     /**
-     * Get the out port.
+     * Transfer a message of the specified size from the source device to the destination device.
      *
-     * @return the out port
+     * @param deviceFrom        the source device
+     * @param deviceTo   the destination device
+     * @param size                the size
+     * @param onCompletedCallback the callback action performed when the transfer is completed
      */
-    OutPort getOutPort();
+    void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Action onCompletedCallback);
 }

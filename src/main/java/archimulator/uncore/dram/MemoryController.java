@@ -22,8 +22,8 @@ import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.uncore.net.simple.common.Net;
 import archimulator.util.action.Action;
 
 /**
@@ -41,18 +41,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
      * @param memoryHierarchy the parent memory hierarchy
      */
     public MemoryController(MemoryHierarchy memoryHierarchy) {
-        super(memoryHierarchy, "memoryController");
-    }
-
-    /**
-     * Get the net for the destination memory device.
-     *
-     * @param to the destination memory device
-     * @return the net for the destination memory device
-     */
-    @Override
-    protected Net getNet(MemoryDevice to) {
-        return this.getMemoryHierarchy().getL2ToMemNet();
+        super(memoryHierarchy, "memoryController", MemoryDeviceType.MEMORY_CONTROLLER);
     }
 
     /**

@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.node;
 
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.SimpleNet;
 
 /**
  * Switch node.
@@ -37,7 +37,7 @@ public class SwitchNode extends NetNode {
      * @param outBufferSize the size of the out buffer
      * @param bandwidth     the bandwidth of the switch node
      */
-    public SwitchNode(Net net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
+    public SwitchNode(SimpleNet net, String name, int numInPorts, int inBufferSize, int numOutPorts, int outBufferSize, int bandwidth) {
         super(net, name, numInPorts, inBufferSize, numOutPorts, outBufferSize, bandwidth);
     }
 }

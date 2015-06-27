@@ -26,8 +26,6 @@ import archimulator.uncore.dram.BasicMemoryController;
 import archimulator.uncore.dram.FixedLatencyMemoryController;
 import archimulator.uncore.dram.MemoryController;
 import archimulator.uncore.dram.SimpleMemoryController;
-import archimulator.uncore.net.visualization.NetVisualizer;
-import archimulator.uncore.net.simple.common.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -38,33 +36,30 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Basic memory hierarchy.
+ * Abstract memory hierarchy.
  *
  * @author Min Cai
  */
-public class BasicMemoryHierarchy extends BasicSimulationObject implements MemoryHierarchy {
+public abstract class AbstractMemoryHierarchy extends BasicSimulationObject implements MemoryHierarchy {
     private MemoryController memoryController;
     private DirectoryController l2Controller;
-    private List<CacheController> l1IControllers;
-    private List<CacheController> l1DControllers;
+    private List<L1IController> l1IControllers;
+    private List<L1DController> l1DControllers;
 
     private List<TranslationLookasideBuffer> itlbs;
     private List<TranslationLookasideBuffer> dtlbs;
 
-    private L1sToL2Net l1sToL2Net;
-    private L2ToMemNet l2ToMemNet;
-
     private Map<Controller, Map<Controller, PointToPointReorderBuffer>> p2pReorderBuffers;
 
     /**
-     * Create a basic memory hierarchy.
+     * Create an abstract memory hierarchy.
      *
      * @param experiment              the experiment
      * @param simulation              the simulation
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public BasicMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public AbstractMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (getExperiment().getMemoryControllerType()) {
@@ -89,11 +84,11 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
         this.dtlbs = new ArrayList<>();
 
         for (int i = 0; i < getExperiment().getNumCores(); i++) {
-            CacheController l1IController = new L1IController(this, "c" + i + "/icache");
+            L1IController l1IController = new L1IController(this, "c" + i + "/icache");
             l1IController.setNext(this.l2Controller);
             this.l1IControllers.add(l1IController);
 
-            CacheController l1DController = new L1DController(this, "c" + i + "/dcache");
+            L1DController l1DController = new L1DController(this, "c" + i + "/dcache");
             l1DController.setNext(this.l2Controller);
             this.l1DControllers.add(l1DController);
 
@@ -101,13 +96,6 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
                 this.itlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb"));
                 this.dtlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/dtlb"));
             }
-        }
-
-        this.l1sToL2Net = new L1sToL2Net(this);
-        this.l2ToMemNet = new L2ToMemNet(this);
-
-        if(this.getSimulation().getType() == SimulationType.MEASUREMENT) {
-            NetVisualizer.run(Arrays.asList(this.l1sToL2Net, this.l2ToMemNet));
         }
 
         this.p2pReorderBuffers = new HashMap<>();
@@ -176,7 +164,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
 
         this.p2pReorderBuffers.get(from).get(to).transfer(message);
 
-        from.getNet(to).transfer(from, to, size, () -> p2pReorderBuffers.get(from).get(to).onDestinationArrived(message));
+        this.getNet(from, to).transfer(from, to, size, () -> p2pReorderBuffers.get(from).get(to).onDestinationArrived(message));
     }
 
     /**
@@ -202,7 +190,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      *
      * @return the list of L1I cache controllers
      */
-    public List<CacheController> getL1IControllers() {
+    public List<L1IController> getL1IControllers() {
         return l1IControllers;
     }
 
@@ -211,7 +199,7 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      *
      * @return the list of L1D cache controllers
      */
-    public List<CacheController> getL1DControllers() {
+    public List<L1DController> getL1DControllers() {
         return l1DControllers;
     }
 
@@ -231,24 +219,6 @@ public class BasicMemoryHierarchy extends BasicSimulationObject implements Memor
      */
     public List<TranslationLookasideBuffer> getDtlbs() {
         return dtlbs;
-    }
-
-    /**
-     * Get the net for the L1 cache controllers to the L2 cache controller.
-     *
-     * @return the net for the L1 cache controllers to the L2 cache controller.
-     */
-    public Net getL1sToL2Net() {
-        return l1sToL2Net;
-    }
-
-    /**
-     * Get the net for the L2 cache controller to the memory controller.
-     *
-     * @return the net for the L2 cache controller to the memory controller.
-     */
-    public L2ToMemNet getL2ToMemNet() {
-        return l2ToMemNet;
     }
 
     /**

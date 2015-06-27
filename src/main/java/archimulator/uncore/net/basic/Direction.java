@@ -6,12 +6,41 @@ package archimulator.uncore.net.basic;
  * @author Min Cai
  */
 public enum Direction {
+    /**
+     * Local.
+     */
     LOCAL,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN;
 
+    /**
+     * Left.
+     */
+    LEFT,
+
+    /**
+     * Right.
+     */
+    RIGHT,
+
+    /**
+     * Up.
+     */
+    UP,
+
+    /**
+     * Down.
+     */
+    DOWN,
+
+    /**
+     * Unknown.
+     */
+    UNKNOWN;
+
+    /**
+     * Get the opposite direction.
+     *
+     * @return the opposite direction
+     */
     public Direction opposite() {
         switch (this) {
             case LOCAL:

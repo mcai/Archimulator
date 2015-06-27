@@ -19,7 +19,7 @@
 package archimulator.uncore.net.simple.buffer;
 
 import archimulator.uncore.net.simple.port.InPort;
-import archimulator.uncore.net.simple.common.NetMessage;
+import archimulator.uncore.net.simple.NetMessage;
 
 /**
  * In buffer.

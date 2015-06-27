@@ -20,6 +20,7 @@ package archimulator.uncore.mlp;
 
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
+import archimulator.common.SimulationType;
 import archimulator.uncore.dram.BasicMemoryController;
 import archimulator.uncore.dram.MemoryController;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -117,7 +118,11 @@ public class BLPProfilingHelper {
 
         memoryController.getBlockingEventDispatcher().addListener(BasicMemoryController.EndAccessEvent.class, this::profileEndServicingL2Miss);
 
-        memoryController.getCycleAccurateEventQueue().getPerCycleEvents().add(this::updateBlpCostsPerCycle);
+        memoryController.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+            if (simulation.getType() != SimulationType.FAST_FORWARD) {
+                updateBlpCostsPerCycle();
+            }
+        });
     }
 
 

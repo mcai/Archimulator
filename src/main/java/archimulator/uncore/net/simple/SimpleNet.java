@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.simple.common;
+package archimulator.uncore.net.simple;
 
 import archimulator.common.BasicSimulationObject;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.net.Net;
 import archimulator.uncore.net.simple.node.EndPointNode;
 import archimulator.uncore.net.simple.node.NetNode;
 import archimulator.uncore.net.simple.node.SwitchNode;
@@ -36,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Net.
+ * Simple net.
  *
  * @author Min Cai
  */
-public abstract class Net extends BasicSimulationObject {
+public abstract class SimpleNet extends BasicSimulationObject implements Net {
     private String name;
 
     private Map<MemoryDevice, EndPointNode> endPointNodes;
@@ -51,12 +52,12 @@ public abstract class Net extends BasicSimulationObject {
     private RoutingAlgorithm routingAlgorithm;
 
     /**
-     * Create a net.
+     * Create a simple net.
      *
-     *  @param memoryHierarchy the parent memory hierarchy
-     * @param name the name
+     * @param memoryHierarchy the parent memory hierarchy
+     * @param name            the name
      */
-    public Net(MemoryHierarchy memoryHierarchy, String name) {
+    public SimpleNet(MemoryHierarchy memoryHierarchy, String name) {
         super(memoryHierarchy);
 
         this.name = name;
@@ -101,11 +102,12 @@ public abstract class Net extends BasicSimulationObject {
     /**
      * Transfer a message of the specified size from the source device to the destination device.
      *
-     * @param deviceFrom        the source device
-     * @param deviceTo   the destination device
+     * @param deviceFrom          the source device
+     * @param deviceTo            the destination device
      * @param size                the size
      * @param onCompletedCallback the callback action performed when the transfer is completed
      */
+    @Override
     public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Action onCompletedCallback) {
         EndPointNode nodeFrom = this.endPointNodes.get(deviceFrom);
         EndPointNode nodeTo = this.endPointNodes.get(deviceTo);

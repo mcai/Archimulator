@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore.net.simple.common;
+package archimulator.uncore.net.simple;
 
 import archimulator.uncore.net.simple.node.NetNode;
+import archimulator.uncore.net.simple.port.InPort;
+import archimulator.uncore.net.simple.port.NetPort;
 import archimulator.uncore.net.simple.port.OutPort;
 import archimulator.util.action.Action;
 
@@ -26,45 +28,53 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cross bar.
+ * Net link.
  *
  * @author Min Cai
  */
-public class Crossbar {
-    private NetNode node;
+public class NetLink {
+    private OutPort portFrom;
+    private InPort portTo;
     private int bandwidth;
     private boolean busy;
     private List<Action> pendingActions;
 
     /**
-     * Create a cross bar.
+     * Create a net link from the source node to the destination node.
      *
-     * @param node      the node
-     * @param bandwidth the bandwidth
+     * @param sourceNode      the source node
+     * @param destinationNode the destination node
+     * @param bandwidth       the bandwidth of the link
      */
-    public Crossbar(NetNode node, int bandwidth) {
-        this.node = node;
+    public NetLink(NetNode sourceNode, NetNode destinationNode, int bandwidth) {
+        this.portFrom = sourceNode.findFreeOutPort();
+        this.portTo = destinationNode.findFreeInPort();
+
         this.bandwidth = bandwidth;
+
+        this.portFrom.setLink(this);
+        this.portTo.setLink(this);
+
         this.pendingActions = new ArrayList<>();
     }
 
     /**
-     * Transfer a message to the out buffer.
+     * Transfer the specified message to the in buffer.
      *
-     * @param message the message to be transferred to the out buffer
+     * @param message the message
      */
-    public void toOutBuffer(final NetMessage message) {
-        final OutPort portTo = this.node.getPort(message.getNodeTo());
-
-        if (portTo.getBuffer() != null) {
-            if (portTo.getBuffer().isWriteBusy()) {
-                portTo.getBuffer().addPendingWriteAction(() -> toOutBuffer(message));
-            } else if (portTo.getBuffer().becomesFull(message)) {
-                portTo.getBuffer().addPendingFullAction(() -> toOutBuffer(message));
+    public void toInBuffer(final NetMessage message) {
+        if (this.portTo.getBuffer() != null) {
+            if (this.portTo.getBuffer().isWriteBusy()) {
+                this.portTo.getBuffer().addPendingWriteAction(() -> toInBuffer(message));
+            } else if (this.portTo.getBuffer().becomesFull(message)) {
+                this.portTo.getBuffer().addPendingFullAction(() -> toInBuffer(message));
             } else {
-                portTo.getBuffer().beginWrite();
-                this.node.getNet().getCycleAccurateEventQueue().schedule(this, () -> portTo.getBuffer().endWrite(message), 1); //TODO: latency
+                this.portTo.getBuffer().beginWrite();
+                this.portFrom.getNode().getNet().getCycleAccurateEventQueue().schedule(this, () -> portTo.getBuffer().endWrite(message), 1); //TODO: latency
             }
+        } else {
+            message.complete();
         }
     }
 
@@ -76,14 +86,15 @@ public class Crossbar {
     }
 
     /**
-     * End the transfer.
+     * End the transfer of the specified message.
      *
-     * @param message the message to end transfer
+     * @param message the message to end transferring
      */
     public void endTransfer(NetMessage message) {
         this.busy = false;
         this.doPendingActions();
-        getNode().getCrossbar().toOutBuffer(message);
+
+        this.toInBuffer(message);
     }
 
     /**
@@ -107,27 +118,36 @@ public class Crossbar {
     }
 
     /**
-     * Get the node.
+     * Get the source port.
      *
-     * @return the node
+     * @return the source port
      */
-    public NetNode getNode() {
-        return node;
+    public NetPort getPortFrom() {
+        return portFrom;
     }
 
     /**
-     * Get the bandwidth.
+     * Get the destination port.
      *
-     * @return the bandwidth
+     * @return the destination port
+     */
+    public NetPort getPortTo() {
+        return portTo;
+    }
+
+    /**
+     * Get the bandwidth of the link.
+     *
+     * @return the bandwidth of the link
      */
     public int getBandwidth() {
         return bandwidth;
     }
 
     /**
-     * Get a value indicating whether the cross bar is busy or not.
+     * Get a value indicating whether the link is busy or not.
      *
-     * @return a value indicating whether the cross bar is busy or not
+     * @return a value indicating whether the link is busy or not
      */
     public boolean isBusy() {
         return busy;

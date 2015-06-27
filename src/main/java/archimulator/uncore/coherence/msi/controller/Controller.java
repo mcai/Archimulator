@@ -20,6 +20,7 @@ package archimulator.uncore.coherence.msi.controller;
 
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.coherence.msi.message.CoherenceMessage;
 
@@ -36,9 +37,10 @@ public abstract class Controller extends MemoryDevice {
      *
      * @param memoryHierarchy the parent memory hierarchy
      * @param name            the name
+     * @param type            the type
      */
-    public Controller(MemoryHierarchy memoryHierarchy, String name) {
-        super(memoryHierarchy, name);
+    public Controller(MemoryHierarchy memoryHierarchy, String name, MemoryDeviceType type) {
+        super(memoryHierarchy, name, type);
     }
 
     /**

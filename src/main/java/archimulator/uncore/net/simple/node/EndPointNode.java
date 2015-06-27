@@ -18,7 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.node;
 
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.net.simple.SimpleNet;
 
 /**
  * End point node.
@@ -32,7 +32,7 @@ public class EndPointNode extends NetNode {
      * @param net  the parent net
      * @param name the name of the end point node
      */
-    public EndPointNode(Net net, String name) {
+    public EndPointNode(SimpleNet net, String name) {
         super(net, name, 1, 0, 1, 0, 1);
     }
 }

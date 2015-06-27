@@ -20,7 +20,7 @@ package archimulator.uncore;
 
 import archimulator.common.BasicSimulationObject;
 import archimulator.common.SimulationObject;
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.util.action.Action;
 
 import java.io.Serializable;
@@ -33,18 +33,21 @@ import java.io.Serializable;
 public abstract class MemoryDevice extends BasicSimulationObject implements SimulationObject, Serializable {
     private MemoryHierarchy memoryHierarchy;
     private String name;
+    private MemoryDeviceType type;
 
     /**
      * Create a memory device.
      *
      * @param memoryHierarchy the parent memory hierarchy
      * @param name            the name of the memory device
+     * @param type            the type of the memory device
      */
-    public MemoryDevice(MemoryHierarchy memoryHierarchy, String name) {
+    public MemoryDevice(MemoryHierarchy memoryHierarchy, String name, MemoryDeviceType type) {
         super(memoryHierarchy);
 
         this.memoryHierarchy = memoryHierarchy;
         this.name = name;
+        this.type = type;
     }
 
     /**
@@ -55,16 +58,8 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
      * @param action the callback action performed when the message arrives at the destination
      */
     public void transfer(MemoryDevice to, int size, Action action) {
-        this.getNet(to).transfer(this, to, size, action);
+        this.getMemoryHierarchy().getNet(this, to).transfer(this, to, size, action);
     }
-
-    /**
-     * Get the net for the specified destination device
-     *
-     * @param to the destination device
-     * @return the net for the specified destination device
-     */
-    protected abstract Net getNet(MemoryDevice to);
 
     /**
      * Get the parent memory hierarchy.
@@ -82,5 +77,14 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get the type of the memory device.
+     *
+     * @return the type of the memory device
+     */
+    public MemoryDeviceType getType() {
+        return type;
     }
 }

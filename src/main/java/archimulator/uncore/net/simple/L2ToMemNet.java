@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package archimulator.uncore;
+package archimulator.uncore.net.simple;
 
-import archimulator.uncore.net.simple.common.Net;
+import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.net.simple.node.EndPointNode;
 import archimulator.uncore.net.simple.node.SwitchNode;
 
@@ -27,7 +27,7 @@ import archimulator.uncore.net.simple.node.SwitchNode;
  *
  * @author Min Cai
  */
-public class L2ToMemNet extends Net {
+public class L2ToMemNet extends SimpleNet {
     /**
      * Create a net for connecting the L2 cache controller to the memory controller.
      *

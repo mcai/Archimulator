@@ -1,33 +1,33 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2014 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.coherence.msi.controller;
 
+import archimulator.core.Core;
 import archimulator.core.DynamicInstruction;
 import archimulator.core.Thread;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.MemoryHierarchyAccessType;
-import archimulator.uncore.cache.BasicEvictableCache;
-import archimulator.uncore.cache.CacheAccess;
-import archimulator.uncore.cache.CacheLine;
-import archimulator.uncore.cache.EvictableCache;
+import archimulator.uncore.cache.*;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.coherence.msi.event.cache.CacheControllerEventType;
 import archimulator.uncore.coherence.msi.flow.CacheCoherenceFlow;
@@ -37,7 +37,6 @@ import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
 import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachineFactory;
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
-import archimulator.uncore.net.simple.common.Net;
 import archimulator.util.action.Action;
 
 import java.util.EnumMap;
@@ -51,6 +50,8 @@ import java.util.function.BiConsumer;
  * @author Min Cai
  */
 public abstract class CacheController extends GeneralCacheController<CacheControllerState, CacheControllerEventType> {
+    private Core core;
+
     private EvictableCache<CacheControllerState> cache;
     private Map<Integer, MemoryHierarchyAccess> pendingAccesses;
     private EnumMap<MemoryHierarchyAccessType, Integer> pendingAccessesPerType;
@@ -61,9 +62,10 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      *
      * @param memoryHierarchy the memory hierarchy
      * @param name            the name
+     * @param type            the type
      */
-    public CacheController(MemoryHierarchy memoryHierarchy, final String name) {
-        super(memoryHierarchy, name);
+    public CacheController(MemoryHierarchy memoryHierarchy, final String name, MemoryDeviceType type) {
+        super(memoryHierarchy, name, type);
 
         this.cache = new BasicEvictableCache<>(memoryHierarchy, name, getGeometry(), getReplacementPolicyType(), args -> {
             int set = (Integer) args[0];
@@ -149,17 +151,6 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
         this.pendingAccessesPerType.put(type, this.pendingAccessesPerType.get(type) - 1);
 
         this.pendingAccesses.remove(physicalTag);
-    }
-
-    /**
-     * Get the net for the specified destination device.
-     *
-     * @param to the destination device
-     * @return the net for the specified destination device
-     */
-    @Override
-    protected Net getNet(MemoryDevice to) {
-        return this.getMemoryHierarchy().getL1sToL2Net();
     }
 
     /**
@@ -420,6 +411,24 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
                 onReplacementCompletedCallback.accept(set, cacheAccess.getWay());
             }
         }
+    }
+
+    /**
+     * Get the core.
+     *
+     * @return the core
+     */
+    public Core getCore() {
+        return core;
+    }
+
+    /**
+     * Set the core.
+     *
+     * @param core the core
+     */
+    public void setCore(Core core) {
+        this.core = core;
     }
 
     @Override

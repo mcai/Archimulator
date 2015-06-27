@@ -18,8 +18,8 @@
  ******************************************************************************/
 package archimulator.uncore.net.simple.routing;
 
-import archimulator.uncore.net.simple.common.Net;
-import archimulator.uncore.net.simple.common.Route;
+import archimulator.uncore.net.Net;
+import archimulator.uncore.net.simple.Route;
 import archimulator.uncore.net.simple.node.NetNode;
 
 /**
