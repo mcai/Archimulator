@@ -39,7 +39,7 @@ public class Router {
     private List<Packet> injectionBuffer;
     private int injectionBufferMaxSize;
 
-    private int bufferMaxSize;
+    private int inputBufferMaxSize;
 
     private EnumMap<Direction, InputPort> inputPorts;
     private EnumMap<Direction, OutputPort> outputPorts;
@@ -81,7 +81,7 @@ public class Router {
         this.outputPorts.put(Direction.UP, new OutputPort(this, Direction.UP));
         this.outputPorts.put(Direction.DOWN, new OutputPort(this, Direction.DOWN));
 
-        this.bufferMaxSize = 10;
+        this.inputBufferMaxSize = 10;
 
         this.pendingCredits = new ArrayList<>();
     }
@@ -111,6 +111,7 @@ public class Router {
             long oldestCycle = Long.MAX_VALUE;
             VirtualChannel outputVirtualChannelFound = null;
 
+            //TODO: use random index here!!!
             for(VirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
                 if (outputVirtualChannel.getOutputBuffer().isEmpty()) {
                     continue;
@@ -241,8 +242,7 @@ public class Router {
                 Flit flit = inputVirtualChannelFound.getInputBuffer().get(0);
                 flit.setState(FlitState.SWITCH_TRAVERSAL);
 
-                VirtualChannel outputVirtualChannel = inputVirtualChannelFound.getOutputVirtualChannel();
-                outputVirtualChannel.getOutputBuffer().add(flit);
+                inputVirtualChannelFound.getOutputVirtualChannel().getOutputBuffer().add(flit);
 
                 inputVirtualChannelFound.getInputBuffer().remove(0);
 
@@ -398,7 +398,7 @@ public class Router {
 
                 numFlits += packet.getSize() / this.net.getLinkWidth();
 
-                if(inputVirtualChannel.getInputBuffer().size() + numFlits <= this.bufferMaxSize) {
+                if(inputVirtualChannel.getInputBuffer().size() + numFlits <= this.inputBufferMaxSize) {
                     for(int i = 0; i < numFlits; i++) {
                         Flit flit = new Flit(this.net, packet, this.net.getRouter(packet.getFrom()), this.net.getRouter(packet.getTo()));
 
@@ -427,12 +427,12 @@ public class Router {
     }
 
     /**
-     * Inject the specified packet.
+     * Inject the specified packet from the network interface (NI).
      *
      * @param packet the packet
      * @return a boolean value indicating whether the packet has been injected or not
      */
-    public boolean injectRequest(Packet packet) {
+    public boolean injectPacket(Packet packet) {
         if(this.injectionBuffer.size() < this.injectionBufferMaxSize) {
             this.injectionBuffer.add(packet);
             return true;

@@ -18,10 +18,7 @@
  ******************************************************************************/
 package archimulator.uncore.net.basic;
 
-import org.apache.commons.collections.map.MultiKeyMap;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Virtual channel.
@@ -29,11 +26,10 @@ import java.util.List;
  * @author Min Cai
  */
 public class VirtualChannel {
+    private Port port;
     private int num;
 
-    private Port port;
-
-    private MultiKeyMap routes;
+    private Map<Integer, Set<Direction>> routes;
 
     private List<Flit> inputBuffer;
     private List<Flit> outputBuffer;
@@ -55,7 +51,10 @@ public class VirtualChannel {
     public VirtualChannel(Port port, int num) {
         this.port = port;
         this.num = num;
-        this.routes = new MultiKeyMap();
+
+        this.routes = new HashMap<>();
+        this.routes.put(0, new HashSet<>());
+        this.routes.put(1, new HashSet<>());
 
         this.inputBuffer = new ArrayList<>();
         this.outputBuffer = new ArrayList<>();
@@ -109,14 +108,20 @@ public class VirtualChannel {
      * @param route the route
      */
     public void setRoute(int i, Direction direction, boolean route) {
-        this.routes.put(i, direction, route);
+        if(route) {
+            this.routes.get(i).add(direction);
+        }
+        else {
+            this.routes.get(i).remove(direction);
+        }
     }
 
     /**
      * Clear the routes.
      */
     public void clearRoutes() {
-        this.routes.clear();
+        this.routes.get(0).clear();
+        this.routes.get(1).clear();
     }
 
     /**
@@ -127,7 +132,7 @@ public class VirtualChannel {
      * @return the route
      */
     public boolean getRoute(int i, Direction direction) {
-        return this.routes.containsKey(i, direction) && (boolean) this.routes.get(i, direction);
+        return this.routes.get(i).contains(direction);
     }
 
     /**

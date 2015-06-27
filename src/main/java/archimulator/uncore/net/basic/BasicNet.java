@@ -136,7 +136,7 @@ public class BasicNet extends BasicSimulationObject implements Net {
      */
     @Override
     public void transfer(MemoryDevice from, MemoryDevice to, int size, Action onCompletedCallback) {
-        if(!this.getRouter(from).injectRequest(new Packet(this, from, to, size, onCompletedCallback))) {
+        if(!this.getRouter(from).injectPacket(new Packet(this, from, to, size, onCompletedCallback))) {
             this.getCycleAccurateEventQueue().schedule(this, () -> this.transfer(from, to, size, onCompletedCallback), 1);
         }
     }
