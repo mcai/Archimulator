@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2014 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
  *
  * This file is part of the Archimulator multicore architectural simulator.
  *
