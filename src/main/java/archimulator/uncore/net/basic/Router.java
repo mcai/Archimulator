@@ -46,9 +46,6 @@ public class Router {
 
     private List<Credit> pendingCredits;
 
-    //TODO: to be removed
-    private List<Flit> pendingFlits = new ArrayList<>();
-
     /**
      * Create a router.
      *
@@ -111,30 +108,34 @@ public class Router {
             long oldestCycle = Long.MAX_VALUE;
             VirtualChannel outputVirtualChannelFound = null;
 
-            //TODO: use random index here!!!
-            for(VirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
-                if (outputVirtualChannel.getOutputBuffer().isEmpty()) {
-                    continue;
-                } else if (outputVirtualChannel.getCredit() == 0) {
+            for(int i = 0; i < outputPort.getVirtualChannels().size(); i++) {
+                int index = (int) ((i + this.net.getCycleAccurateEventQueue().getCurrentCycle()) % outputPort.getVirtualChannels().size());
+                VirtualChannel outputVirtualChannel = outputPort.getVirtualChannels().get(index);
+                if (outputVirtualChannel.getOutputBuffer().isEmpty() || outputVirtualChannel.getCredit() == 0) {
                     continue;
                 }
 
                 Flit flit = outputVirtualChannel.getOutputBuffer().get(0);
 
+                if(flit.getState() != FlitState.SWITCH_TRAVERSAL) {
+                    throw new IllegalArgumentException(flit.getState() + "");
+                }
+
                 if(flit.getTimestamp() < oldestCycle) {
                     oldestCycle = flit.getTimestamp();
                     outputVirtualChannelFound = outputVirtualChannel;
+                    break;
                 }
             }
 
             if(outputVirtualChannelFound != null) {
-                Flit flitFound = outputVirtualChannelFound.getOutputBuffer().get(0);
+                Flit flit = outputVirtualChannelFound.getOutputBuffer().get(0);
 
                 if(outputPort.getDirection() != Direction.LOCAL) {
-                    this.links.get(outputPort.getDirection()).insertFlit(flitFound, outputPort.getDirection().opposite(), outputVirtualChannelFound.getNum());
+                    this.links.get(outputPort.getDirection()).insertFlit(flit, outputPort.getDirection().opposite(), outputVirtualChannelFound.getNum());
 
-                    flitFound.setReady(false);
-                    this.net.getCycleAccurateEventQueue().schedule(this, () -> flitFound.setReady(true), this.net.getLinkLatency() + 1);
+                    flit.setReady(false);
+                    this.net.getCycleAccurateEventQueue().schedule(this, () -> flit.setReady(true), this.net.getLinkLatency() + 1);
 
                     outputPort.setLinkAvailable(false);
                     this.net.getCycleAccurateEventQueue().schedule(this, () -> outputPort.setLinkAvailable(true), this.net.getLinkLatency());
@@ -146,15 +147,13 @@ public class Router {
                     outputVirtualChannelFound.setCredit(outputVirtualChannelFound.getCredit() - 1);
                 }
 
-                if(flitFound.isTail()) {
+                if(flit.isTail()) {
                     outputVirtualChannelFound.setAvailable(true);
 
                     if(outputPort.getDirection() == Direction.LOCAL) {
-                        flitFound.getPacket().getOnCompletedCallback().apply();
+                        flit.getPacket().getOnCompletedCallback().apply();
                     }
                 }
-
-                this.pendingFlits.remove(flitFound);
             }
         }
     }
@@ -410,8 +409,6 @@ public class Router {
                         flit.setNum(i);
 
                         inputVirtualChannel.getInputBuffer().add(flit);
-
-                        this.pendingFlits.add(flit);
                     }
 
                     this.injectionBuffer.remove(0);
