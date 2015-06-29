@@ -148,14 +148,6 @@ public class Flit {
      */
     public void setState(FlitState state) {
         this.state = state;
-
-        //TODO: to be removed
-        System.out.printf("[%d] flit[%d:%d] -> %s\n",
-                this.getNet().getCycleAccurateEventQueue().getCurrentCycle(),
-                this.getPacket().getId(),
-                this.getNum(),
-                this.getState()
-        );
     }
 
     /**

@@ -25,8 +25,9 @@ import java.util.*;
  *
  * @author Min Cai
  */
+//TODO: to be refactored out!!!
 public class VirtualChannel {
-    private Port port;
+    private Direction port;
     private int num;
 
     private Map<Integer, Set<Direction>> routes;
@@ -38,7 +39,7 @@ public class VirtualChannel {
 
     private VirtualChannel outputVirtualChannel;
 
-    private OutputPort fixedRoute;
+    private Direction fixedRoute;
 
     private int credit;
 
@@ -48,7 +49,7 @@ public class VirtualChannel {
      * @param port the port
      * @param num the number
      */
-    public VirtualChannel(Port port, int num) {
+    public VirtualChannel(Direction port, int num) {
         this.port = port;
         this.num = num;
 
@@ -69,7 +70,7 @@ public class VirtualChannel {
      *
      * @return the port
      */
-    public Port getPort() {
+    public Direction getPort() {
         return port;
     }
 
@@ -176,7 +177,7 @@ public class VirtualChannel {
      *
      * @return the fixed route
      */
-    public OutputPort getFixedRoute() {
+    public Direction getFixedRoute() {
         return fixedRoute;
     }
 
@@ -185,7 +186,7 @@ public class VirtualChannel {
      *
      * @param fixedRoute the fixed route
      */
-    public void setFixedRoute(OutputPort fixedRoute) {
+    public void setFixedRoute(Direction fixedRoute) {
         this.fixedRoute = fixedRoute;
     }
 

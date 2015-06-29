@@ -24,16 +24,28 @@ package archimulator.uncore.net.basic;
  * @author Min Cai
  */
 public class Credit {
-    private VirtualChannel virtualChannel;
+    private Direction port;
+    private int virtualChannel;
     private boolean ready;
 
     /**
      * Create a credit.
      *
+     * @param port the port
      * @param virtualChannel the virtual channel
      */
-    public Credit(VirtualChannel virtualChannel) {
+    public Credit(Direction port, int virtualChannel) {
+        this.port = port;
         this.virtualChannel = virtualChannel;
+    }
+
+    /**
+     * Get the port.
+     *
+     * @return the port
+     */
+    public Direction getPort() {
+        return port;
     }
 
     /**
@@ -41,7 +53,7 @@ public class Credit {
      *
      * @return the virtual channel
      */
-    public VirtualChannel getVirtualChannel() {
+    public int getVirtualChannel() {
         return virtualChannel;
     }
 

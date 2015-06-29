@@ -41,8 +41,12 @@ public class Router {
 
     private int inputBufferMaxSize;
 
-    private EnumMap<Direction, InputPort> inputPorts;
-    private EnumMap<Direction, OutputPort> outputPorts;
+    private EnumMap<Direction, List<VirtualChannel>> inputVirtualChannels;
+    private EnumMap<Direction, List<VirtualChannel>> outputVirtualChannels;
+
+    private EnumMap<Direction, Boolean> switchAvailables;
+
+    private EnumMap<Direction, Boolean> linkAvailables;
 
     private List<Credit> pendingCredits;
 
@@ -63,22 +67,47 @@ public class Router {
         this.injectionBuffer = new ArrayList<>();
         this.injectionBufferMaxSize = 32;
 
-        this.inputPorts = new EnumMap<>(Direction.class);
-        this.outputPorts = new EnumMap<>(Direction.class);
-
-        this.inputPorts.put(Direction.LOCAL, new InputPort(this, Direction.LOCAL));
-        this.inputPorts.put(Direction.LEFT, new InputPort(this, Direction.LEFT));
-        this.inputPorts.put(Direction.RIGHT, new InputPort(this, Direction.RIGHT));
-        this.inputPorts.put(Direction.UP, new InputPort(this, Direction.UP));
-        this.inputPorts.put(Direction.DOWN, new InputPort(this, Direction.DOWN));
-
-        this.outputPorts.put(Direction.LOCAL, new OutputPort(this, Direction.LOCAL));
-        this.outputPorts.put(Direction.LEFT, new OutputPort(this, Direction.LEFT));
-        this.outputPorts.put(Direction.RIGHT, new OutputPort(this, Direction.RIGHT));
-        this.outputPorts.put(Direction.UP, new OutputPort(this, Direction.UP));
-        this.outputPorts.put(Direction.DOWN, new OutputPort(this, Direction.DOWN));
-
         this.inputBufferMaxSize = 10;
+
+        this.inputVirtualChannels = new EnumMap<>(Direction.class);
+        this.inputVirtualChannels.put(Direction.LOCAL, new ArrayList<>());
+        this.inputVirtualChannels.put(Direction.LEFT, new ArrayList<>());
+        this.inputVirtualChannels.put(Direction.RIGHT, new ArrayList<>());
+        this.inputVirtualChannels.put(Direction.UP, new ArrayList<>());
+        this.inputVirtualChannels.put(Direction.DOWN, new ArrayList<>());
+
+        for(Direction direction : this.inputVirtualChannels.keySet()) {
+            for(int i = 0; i < this.net.getNumVirtualChannels(); i++) {
+                this.inputVirtualChannels.get(direction).add(new VirtualChannel(direction, i));
+            }
+        }
+
+        this.outputVirtualChannels = new EnumMap<>(Direction.class);
+        this.outputVirtualChannels.put(Direction.LOCAL, new ArrayList<>());
+        this.outputVirtualChannels.put(Direction.LEFT, new ArrayList<>());
+        this.outputVirtualChannels.put(Direction.RIGHT, new ArrayList<>());
+        this.outputVirtualChannels.put(Direction.UP, new ArrayList<>());
+        this.outputVirtualChannels.put(Direction.DOWN, new ArrayList<>());
+
+        for(Direction direction : this.outputVirtualChannels.keySet()) {
+            for(int i = 0; i < this.net.getNumVirtualChannels(); i++) {
+                this.outputVirtualChannels.get(direction).add(new VirtualChannel(direction, i));
+            }
+        }
+
+        this.switchAvailables = new EnumMap<>(Direction.class);
+        this.switchAvailables.put(Direction.LOCAL, true);
+        this.switchAvailables.put(Direction.LEFT, true);
+        this.switchAvailables.put(Direction.RIGHT, true);
+        this.switchAvailables.put(Direction.UP, true);
+        this.switchAvailables.put(Direction.DOWN, true);
+
+        this.linkAvailables = new EnumMap<>(Direction.class);
+        this.linkAvailables.put(Direction.LOCAL, true);
+        this.linkAvailables.put(Direction.LEFT, true);
+        this.linkAvailables.put(Direction.RIGHT, true);
+        this.linkAvailables.put(Direction.UP, true);
+        this.linkAvailables.put(Direction.DOWN, true);
 
         this.pendingCredits = new ArrayList<>();
     }
@@ -100,17 +129,17 @@ public class Router {
      * The link traversal (LT) stage.
      */
     private void stageLinkTraversal() {
-        for(OutputPort outputPort : this.outputPorts.values()) {
-            if(!outputPort.isLinkAvailable()) {
+        for(Direction outputPort : Direction.values()) {
+            if(!this.linkAvailables.get(outputPort)) {
                 continue;
             }
 
             long oldestCycle = Long.MAX_VALUE;
             VirtualChannel outputVirtualChannelFound = null;
 
-            for(int i = 0; i < outputPort.getVirtualChannels().size(); i++) {
-                int index = (int) ((i + this.net.getCycleAccurateEventQueue().getCurrentCycle()) % outputPort.getVirtualChannels().size());
-                VirtualChannel outputVirtualChannel = outputPort.getVirtualChannels().get(index);
+            for(int i = 0; i < this.net.getNumVirtualChannels(); i++) {
+                int index = (int) ((i + this.net.getCycleAccurateEventQueue().getCurrentCycle()) % this.net.getNumVirtualChannels());
+                VirtualChannel outputVirtualChannel = this.outputVirtualChannels.get(outputPort).get(index);
                 if (outputVirtualChannel.getOutputBuffer().isEmpty() || outputVirtualChannel.getCredit() == 0) {
                     continue;
                 }
@@ -131,26 +160,32 @@ public class Router {
             if(outputVirtualChannelFound != null) {
                 Flit flit = outputVirtualChannelFound.getOutputBuffer().get(0);
 
-                if(outputPort.getDirection() != Direction.LOCAL) {
-                    this.links.get(outputPort.getDirection()).insertFlit(flit, outputPort.getDirection().opposite(), outputVirtualChannelFound.getNum());
+                if(outputPort != Direction.LOCAL) {
+                    this.links.get(outputPort).insertFlit(flit, outputPort.opposite(), outputVirtualChannelFound.getNum());
 
                     flit.setReady(false);
                     this.net.getCycleAccurateEventQueue().schedule(this, () -> flit.setReady(true), this.net.getLinkLatency() + 1);
 
-                    outputPort.setLinkAvailable(false);
-                    this.net.getCycleAccurateEventQueue().schedule(this, () -> outputPort.setLinkAvailable(true), this.net.getLinkLatency());
+                    this.linkAvailables.put(outputPort, false);
+                    this.net.getCycleAccurateEventQueue().schedule(this, () -> this.linkAvailables.put(outputPort, true), this.net.getLinkLatency());
                 }
 
                 outputVirtualChannelFound.getOutputBuffer().remove(0);
 
-                if(outputPort.getDirection() != Direction.LOCAL) {
+                if(outputPort != Direction.LOCAL) {
                     outputVirtualChannelFound.setCredit(outputVirtualChannelFound.getCredit() - 1);
+                    System.out.printf("[%d] vc[%s.%s].credits--=%d\n",
+                            this.net.getCycleAccurateEventQueue().getCurrentCycle(),
+                            outputVirtualChannelFound.getPort(),
+                            outputVirtualChannelFound.getNum(),
+                            outputVirtualChannelFound.getCredit()
+                    );
                 }
 
                 if(flit.isTail()) {
                     outputVirtualChannelFound.setAvailable(true);
 
-                    if(outputPort.getDirection() == Direction.LOCAL) {
+                    if(outputPort == Direction.LOCAL) {
                         flit.getPacket().getOnCompletedCallback().apply();
                     }
                 }
@@ -162,17 +197,17 @@ public class Router {
      * The switch allocation (SA) stage.
      */
     private void stageSwitchAllocation() {
-        for(OutputPort outputPort : this.outputPorts.values()) {
-            if(outputPort.isSwitchAvailable()) {
+        for(Direction outputPort : Direction.values()) {
+            if(this.switchAvailables.get(outputPort)) {
                 VirtualChannel inputVirtualChannel = this.stageSwitchAllocationPickWinner(outputPort);
 
                 if(inputVirtualChannel != null) {
                     Flit flit = inputVirtualChannel.getInputBuffer().get(0);
                     flit.setState(FlitState.SWITCH_ALLOCATION);
 
-                    outputPort.setSwitchAvailable(false);
+                    this.switchAvailables.put(outputPort, false);
 
-                    this.net.getCycleAccurateEventQueue().schedule(this, () -> outputPort.setSwitchAvailable(true), 1);
+                    this.net.getCycleAccurateEventQueue().schedule(this, () -> this.switchAvailables.put(outputPort, true), 1);
                 }
             }
         }
@@ -184,16 +219,16 @@ public class Router {
      * @param outputPort the output port
      * @return the selected winner input virtual channel
      */
-    private VirtualChannel stageSwitchAllocationPickWinner(OutputPort outputPort) {
+    private VirtualChannel stageSwitchAllocationPickWinner(Direction outputPort) {
         long oldestTimestamp = Long.MAX_VALUE;
         VirtualChannel inputVirtualChannelFound = null;
 
-        for(InputPort inputPort : this.inputPorts.values()) {
-            if(inputPort.getDirection() == outputPort.getDirection()) {
+        for(Direction inputPort : Direction.values()) {
+            if(inputPort == outputPort) {
                 continue;
             }
 
-            for(VirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
+            for(VirtualChannel inputVirtualChannel : this.inputVirtualChannels.get(inputPort)) {
                 if(inputVirtualChannel.getFixedRoute() == outputPort &&
                         inputVirtualChannel.getOutputVirtualChannel().getPort() == outputPort &&
                         !inputVirtualChannel.getInputBuffer().isEmpty()) {
@@ -216,15 +251,15 @@ public class Router {
      * The switch traversal (ST) stage.
      */
     private void stageSwitchTraversal() {
-        for(OutputPort outputPort : this.outputPorts.values()) {
+        for(Direction outputPort : Direction.values()) {
             VirtualChannel inputVirtualChannelFound = null;
 
-            for(InputPort inputPort : this.inputPorts.values()) {
-                if(inputPort.getDirection() == outputPort.getDirection()) {
+            for(Direction inputPort : Direction.values()) {
+                if(inputPort == outputPort) {
                     continue;
                 }
 
-                for(VirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
+                for(VirtualChannel inputVirtualChannel : this.inputVirtualChannels.get(inputPort)) {
                     if(inputVirtualChannel.getFixedRoute() == outputPort &&
                             inputVirtualChannel.getOutputVirtualChannel().getPort() == outputPort &&
                             !inputVirtualChannel.getInputBuffer().isEmpty()) {
@@ -250,11 +285,16 @@ public class Router {
                     inputVirtualChannelFound.setOutputVirtualChannel(null);
                 }
 
-                Direction direction = inputVirtualChannelFound.getPort().getDirection();
+                Direction direction = inputVirtualChannelFound.getPort();
                 if(direction != Direction.LOCAL) {
-                    Credit credit = new Credit(this.inputPorts.get(direction.opposite()).getVirtualChannels().get(inputVirtualChannelFound.getPort().getVirtualChannels().indexOf(inputVirtualChannelFound)));
+                    Credit credit = new Credit(direction.opposite(), inputVirtualChannelFound.getNum());
                     this.net.getCycleAccurateEventQueue().schedule(this, () -> credit.setReady(true), 1);
-                    this.links.get(direction).insertCredit(credit);
+                    this.links.get(direction).pendingCredits.add(credit);
+                    System.out.printf("[%d] vc[%s.%s].pendingCredits++\n",
+                            this.net.getCycleAccurateEventQueue().getCurrentCycle(),
+                            credit.getPort(),
+                            credit.getVirtualChannel()
+                    );
                 }
             }
         }
@@ -264,8 +304,8 @@ public class Router {
      * The route calculation (RC) stage.
      */
     private void stageRouteCalculation() {
-        for(InputPort inputPort : this.inputPorts.values()) {
-            for(VirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
+        for(Direction inputPort : Direction.values()) {
+            for(VirtualChannel inputVirtualChannel : this.inputVirtualChannels.get(inputPort)) {
                 if(inputVirtualChannel.getInputBuffer().isEmpty()) {
                     continue;
                 }
@@ -323,8 +363,8 @@ public class Router {
      * The virtual channel allocation (VCA) stage.
      */
     private void stageVirtualChannelAllocation() {
-        for(OutputPort outputPort : this.outputPorts.values()) {
-            for(VirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
+        for(Direction outputPort : Direction.values()) {
+            for(VirtualChannel outputVirtualChannel : this.outputVirtualChannels.get(outputPort)) {
                 if(outputVirtualChannel.isAvailable()) {
                     VirtualChannel inputVirtualChannel = this.stageVirtualChannelAllocationPickWinner(outputVirtualChannel);
                     if(inputVirtualChannel != null) {
@@ -353,13 +393,13 @@ public class Router {
         long oldestTimestamp = Long.MAX_VALUE;
         VirtualChannel inputVirtualChannelFound = null;
 
-        for(InputPort inputPort : this.inputPorts.values()) {
-            if(inputPort.getDirection() == outputVirtualChannel.getPort().getDirection()) {
+        for(Direction inputPort : Direction.values()) {
+            if(inputPort == outputVirtualChannel.getPort()) {
                 continue;
             }
 
-            for(VirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
-                if(inputVirtualChannel.getInputBuffer().isEmpty() || !inputVirtualChannel.getRoute(routeCalculationIndex, outputVirtualChannel.getPort().getDirection())) {
+            for(VirtualChannel inputVirtualChannel : this.inputVirtualChannels.get(inputPort)) {
+                if(inputVirtualChannel.getInputBuffer().isEmpty() || !inputVirtualChannel.getRoute(routeCalculationIndex, outputVirtualChannel.getPort())) {
                     continue;
                 }
 
@@ -386,7 +426,7 @@ public class Router {
 
             boolean requestInserted = false;
 
-            for(VirtualChannel inputVirtualChannel : this.inputPorts.get(Direction.LOCAL).getVirtualChannels()) {
+            for(VirtualChannel inputVirtualChannel : this.inputVirtualChannels.get(Direction.LOCAL)) {
                 if(this.injectionBuffer.isEmpty()) {
                     continue;
                 }
@@ -446,7 +486,7 @@ public class Router {
      * @param inputVirtualChannelNum the input virtual channel number
      */
     private void insertFlit(Flit flit, Direction direction, int inputVirtualChannelNum) {
-        this.inputPorts.get(direction).getVirtualChannels().get(inputVirtualChannelNum).getInputBuffer().add(flit);
+        this.inputVirtualChannels.get(direction).get(inputVirtualChannelNum).getInputBuffer().add(flit);
         flit.setState(FlitState.INPUT_BUFFER);
     }
 
@@ -458,19 +498,17 @@ public class Router {
             Credit credit = it.next();
 
             if(credit.isReady()) {
-                credit.getVirtualChannel().setCredit(credit.getVirtualChannel().getCredit() + 1);
+                VirtualChannel inputVirtualChannel = this.inputVirtualChannels.get(credit.getPort()).get(credit.getVirtualChannel());
+                inputVirtualChannel.setCredit(inputVirtualChannel.getCredit() + 1);
+                System.out.printf("[%d] vc[%s.%s].credits++=%d\n",
+                        this.net.getCycleAccurateEventQueue().getCurrentCycle(),
+                        inputVirtualChannel.getPort(),
+                        inputVirtualChannel.getNum(),
+                        inputVirtualChannel.getCredit()
+                );
                 it.remove();
             }
         }
-    }
-
-    /**
-     * Insert the credit.
-     *
-     * @param credit the credit
-     */
-    private void insertCredit(Credit credit) {
-        this.pendingCredits.add(credit);
     }
 
     /**

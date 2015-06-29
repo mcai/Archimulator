@@ -47,12 +47,7 @@ public enum Direction {
     /**
      * Down.
      */
-    DOWN,
-
-    /**
-     * Unknown.
-     */
-    UNKNOWN;
+    DOWN;
 
     /**
      * Get the opposite direction.
