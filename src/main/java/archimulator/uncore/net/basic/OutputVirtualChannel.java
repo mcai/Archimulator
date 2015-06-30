@@ -18,25 +18,34 @@
  ******************************************************************************/
 package archimulator.uncore.net.basic;
 
+import java.util.*;
+
 /**
- * Credit.
+ * Output virtual channel.
  *
  * @author Min Cai
  */
-public class Credit {
+public class OutputVirtualChannel {
     private Direction port;
-    private int virtualChannel;
-    private boolean ready;
+    private int num;
+
+    private boolean available;
+
+    private List<Flit> outputBuffer;
 
     /**
-     * Create a credit.
+     * Create an output virtual channel.
      *
      * @param port the port
-     * @param virtualChannel the virtual channel
+     * @param num the number
      */
-    public Credit(Direction port, int virtualChannel) {
+    public OutputVirtualChannel(Direction port, int num) {
         this.port = port;
-        this.virtualChannel = virtualChannel;
+        this.num = num;
+
+        this.available = true;
+
+        this.outputBuffer = new ArrayList<>();
     }
 
     /**
@@ -49,29 +58,38 @@ public class Credit {
     }
 
     /**
-     * Get the virtual channel.
+     * Get the number.
      *
-     * @return the virtual channel
+     * @return the number
      */
-    public int getVirtualChannel() {
-        return virtualChannel;
+    public int getNum() {
+        return num;
     }
 
     /**
-     * Get a boolean value indicating whether it is ready or not.
+     * Get a boolean value indicating whether it is available or not.
      *
-     * @return a boolean value indicating whether it is ready or not
+     * @return a boolean value indicating whether it is available or not
      */
-    public boolean isReady() {
-        return ready;
+    public boolean isAvailable() {
+        return available;
     }
 
     /**
-     * Set a boolean value indicating whether it is ready or not.
+     * Set a boolean value indicating whether it is available or not.
      *
-     * @param ready a boolean value indicating whether it is ready or not
+     * @param available a boolean value indicating whether it is available or not
      */
-    public void setReady(boolean ready) {
-        this.ready = ready;
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
+    /**
+     * Get the output buffer.
+     *
+     * @return the output buffer
+     */
+    public List<Flit> getOutputBuffer() {
+        return outputBuffer;
     }
 }

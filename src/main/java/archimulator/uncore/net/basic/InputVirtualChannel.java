@@ -21,31 +21,29 @@ package archimulator.uncore.net.basic;
 import java.util.*;
 
 /**
- * Virtual channel.
+ * Input virtual channel.
  *
  * @author Min Cai
  */
-//TODO: to be refactored out!!!
-public class VirtualChannel {
+public class InputVirtualChannel {
     private Direction port;
     private int num;
 
     private Map<Integer, Set<Direction>> routes;
 
     private List<Flit> inputBuffer;
-    private List<Flit> outputBuffer;
 
-    private VirtualChannel outputVirtualChannel;
+    private OutputVirtualChannel outputVirtualChannel;
 
     private Direction fixedRoute;
 
     /**
-     * Create a virtual channel.
+     * Create an input virtual channel.
      *
      * @param port the port
      * @param num the number
      */
-    public VirtualChannel(Direction port, int num) {
+    public InputVirtualChannel(Direction port, int num) {
         this.port = port;
         this.num = num;
 
@@ -54,7 +52,6 @@ public class VirtualChannel {
         this.routes.put(1, new HashSet<>());
 
         this.inputBuffer = new ArrayList<>();
-        this.outputBuffer = new ArrayList<>();
     }
 
     /**
@@ -120,20 +117,11 @@ public class VirtualChannel {
     }
 
     /**
-     * Get the output buffer.
-     *
-     * @return the output buffer
-     */
-    public List<Flit> getOutputBuffer() {
-        return outputBuffer;
-    }
-
-    /**
      * Get the output virtual channel.
      *
      * @return the output virtual channel
      */
-    public VirtualChannel getOutputVirtualChannel() {
+    public OutputVirtualChannel getOutputVirtualChannel() {
         return outputVirtualChannel;
     }
 
@@ -142,7 +130,7 @@ public class VirtualChannel {
      *
      * @param outputVirtualChannel the output virtual channel
      */
-    public void setOutputVirtualChannel(VirtualChannel outputVirtualChannel) {
+    public void setOutputVirtualChannel(OutputVirtualChannel outputVirtualChannel) {
         this.outputVirtualChannel = outputVirtualChannel;
     }
 

@@ -40,8 +40,6 @@ public class Flit {
 
     private long timestamp;
 
-    private boolean ready;
-
     /**
      * Create a flit.
      *
@@ -157,24 +155,6 @@ public class Flit {
      */
     public long getTimestamp() {
         return timestamp;
-    }
-
-    /**
-     * Get a boolean value indicating whether the flit is ready or not.
-     *
-     * @return a boolean value indicating whether the flit is ready or not
-     */
-    public boolean isReady() {
-        return ready;
-    }
-
-    /**
-     * Set a boolean value indicating whether the flit is ready or not.
-     *
-     * @param ready a boolean value indicating whether the flit is ready or not
-     */
-    public void setReady(boolean ready) {
-        this.ready = ready;
     }
 
     /**
