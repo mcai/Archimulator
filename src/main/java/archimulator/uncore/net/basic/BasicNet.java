@@ -71,7 +71,11 @@ public class BasicNet extends BasicSimulationObject implements Net {
             Router router = new Router(this, RouterType.CORE, numRouters++);
             this.routers.add(router);
             this.devicesToRouters.put(l1IController, router);
-            this.devicesToRouters.put(memoryHierarchy.getL1DControllers().get(memoryHierarchy.getL1IControllers().indexOf(l1IController)), router);
+            this.devicesToRouters.put(
+                    memoryHierarchy.getL1DControllers().get(
+                            memoryHierarchy.getL1IControllers().indexOf(l1IController)
+                    ),
+                    router);
         }
 
         Router routerL2Controller = new Router(this, RouterType.L2_CONTROLLER, numRouters++);
@@ -137,7 +141,9 @@ public class BasicNet extends BasicSimulationObject implements Net {
     @Override
     public void transfer(MemoryDevice from, MemoryDevice to, int size, Action onCompletedCallback) {
         if(!this.getRouter(from).injectPacket(new Packet(this, from, to, size, onCompletedCallback))) {
-            this.getCycleAccurateEventQueue().schedule(this, () -> this.transfer(from, to, size, onCompletedCallback), 1);
+            this.getCycleAccurateEventQueue().schedule(
+                    this, () -> this.transfer(from, to, size, onCompletedCallback), 1
+            );
         }
     }
 

@@ -35,13 +35,9 @@ public class VirtualChannel {
     private List<Flit> inputBuffer;
     private List<Flit> outputBuffer;
 
-    private boolean available;
-
     private VirtualChannel outputVirtualChannel;
 
     private Direction fixedRoute;
-
-    private int credit;
 
     /**
      * Create a virtual channel.
@@ -59,10 +55,6 @@ public class VirtualChannel {
 
         this.inputBuffer = new ArrayList<>();
         this.outputBuffer = new ArrayList<>();
-
-        this.available = true;
-
-        this.credit = 10;
     }
 
     /**
@@ -81,24 +73,6 @@ public class VirtualChannel {
      */
     public int getNum() {
         return num;
-    }
-
-    /**
-     * Get a boolean value indicating whether it is available or not.
-     *
-     * @return boolean value indicating whether is is available or not
-     */
-    public boolean isAvailable() {
-        return available;
-    }
-
-    /**
-     * Set a boolean value indicating whether it is available or not.
-     *
-     * @param available a boolean value indicating whether it is available or not
-     */
-    public void setAvailable(boolean available) {
-        this.available = available;
     }
 
     /**
@@ -188,23 +162,5 @@ public class VirtualChannel {
      */
     public void setFixedRoute(Direction fixedRoute) {
         this.fixedRoute = fixedRoute;
-    }
-
-    /**
-     * Get the credit.
-     *
-     * @return the credit
-     */
-    public int getCredit() {
-        return credit;
-    }
-
-    /**
-     * Set the credit.
-     *
-     * @param credit the credit
-     */
-    public void setCredit(int credit) {
-        this.credit = credit;
     }
 }
