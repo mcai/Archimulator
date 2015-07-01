@@ -26,10 +26,8 @@ import java.util.*;
  * @author Min Cai
  */
 public class OutputVirtualChannel {
-    private Direction port;
+    private Port port;
     private int num;
-
-    private boolean available;
 
     private List<Flit> outputBuffer;
 
@@ -39,11 +37,9 @@ public class OutputVirtualChannel {
      * @param port the port
      * @param num the number
      */
-    public OutputVirtualChannel(Direction port, int num) {
+    public OutputVirtualChannel(Port port, int num) {
         this.port = port;
         this.num = num;
-
-        this.available = true;
 
         this.outputBuffer = new ArrayList<>();
     }
@@ -53,7 +49,7 @@ public class OutputVirtualChannel {
      *
      * @return the port
      */
-    public Direction getPort() {
+    public Port getPort() {
         return port;
     }
 
@@ -64,24 +60,6 @@ public class OutputVirtualChannel {
      */
     public int getNum() {
         return num;
-    }
-
-    /**
-     * Get a boolean value indicating whether it is available or not.
-     *
-     * @return a boolean value indicating whether it is available or not
-     */
-    public boolean isAvailable() {
-        return available;
-    }
-
-    /**
-     * Set a boolean value indicating whether it is available or not.
-     *
-     * @param available a boolean value indicating whether it is available or not
-     */
-    public void setAvailable(boolean available) {
-        this.available = available;
     }
 
     /**

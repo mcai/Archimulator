@@ -26,16 +26,14 @@ import java.util.*;
  * @author Min Cai
  */
 public class InputVirtualChannel {
-    private Direction port;
+    private Port port;
     private int num;
 
-    private Map<Integer, Set<Direction>> routes;
+    private Map<Integer, Set<Port>> routes;
 
     private List<Flit> inputBuffer;
 
     private OutputVirtualChannel outputVirtualChannel;
-
-    private Direction fixedRoute;
 
     /**
      * Create an input virtual channel.
@@ -43,7 +41,7 @@ public class InputVirtualChannel {
      * @param port the port
      * @param num the number
      */
-    public InputVirtualChannel(Direction port, int num) {
+    public InputVirtualChannel(Port port, int num) {
         this.port = port;
         this.num = num;
 
@@ -59,7 +57,7 @@ public class InputVirtualChannel {
      *
      * @return the port
      */
-    public Direction getPort() {
+    public Port getPort() {
         return port;
     }
 
@@ -76,15 +74,15 @@ public class InputVirtualChannel {
      * Set the route.
      *
      * @param i the index
-     * @param direction the direction
+     * @param port the direction
      * @param route the route
      */
-    public void setRoute(int i, Direction direction, boolean route) {
+    public void setRoute(int i, Port port, boolean route) {
         if(route) {
-            this.routes.get(i).add(direction);
+            this.routes.get(i).add(port);
         }
         else {
-            this.routes.get(i).remove(direction);
+            this.routes.get(i).remove(port);
         }
     }
 
@@ -100,11 +98,11 @@ public class InputVirtualChannel {
      * Get the route.
      *
      * @param i the index
-     * @param direction the direction
+     * @param port the direction
      * @return the route
      */
-    public boolean getRoute(int i, Direction direction) {
-        return this.routes.get(i).contains(direction);
+    public boolean getRoute(int i, Port port) {
+        return this.routes.get(i).contains(port);
     }
 
     /**
@@ -132,23 +130,5 @@ public class InputVirtualChannel {
      */
     public void setOutputVirtualChannel(OutputVirtualChannel outputVirtualChannel) {
         this.outputVirtualChannel = outputVirtualChannel;
-    }
-
-    /**
-     * Get the fixed route.
-     *
-     * @return the fixed route
-     */
-    public Direction getFixedRoute() {
-        return fixedRoute;
-    }
-
-    /**
-     * Set the fixed route.
-     *
-     * @param fixedRoute the fixed route
-     */
-    public void setFixedRoute(Direction fixedRoute) {
-        this.fixedRoute = fixedRoute;
     }
 }

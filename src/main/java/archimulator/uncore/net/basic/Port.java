@@ -19,11 +19,11 @@
 package archimulator.uncore.net.basic;
 
 /**
- * Direction.
+ * Port.
  *
  * @author Min Cai
  */
-public enum Direction {
+public enum Port {
     /**
      * Local.
      */
@@ -50,11 +50,11 @@ public enum Direction {
     DOWN;
 
     /**
-     * Get the opposite direction.
+     * Get the opposite port.
      *
-     * @return the opposite direction
+     * @return the opposite port
      */
-    public Direction opposite() {
+    public Port opposite() {
         switch (this) {
             case LOCAL:
                 return LOCAL;

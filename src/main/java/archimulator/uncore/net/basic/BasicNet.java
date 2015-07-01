@@ -97,19 +97,19 @@ public class BasicNet extends BasicSimulationObject implements Net {
         for (Router router : this.routers) {
             int id = router.getId();
             if (id / width > 0) {
-                router.getLinks().put(Direction.UP, this.routers.get(id - width));
+                router.getLinks().put(Port.UP, this.routers.get(id - width));
             }
 
             if (id / width < (width - 1)) {
-                router.getLinks().put(Direction.DOWN, this.routers.get(id + width));
+                router.getLinks().put(Port.DOWN, this.routers.get(id + width));
             }
 
             if (id % width != 0) {
-                router.getLinks().put(Direction.LEFT, this.routers.get(id - 1));
+                router.getLinks().put(Port.LEFT, this.routers.get(id - 1));
             }
 
             if (id % width != (width - 1)) {
-                router.getLinks().put(Direction.RIGHT, this.routers.get(id + 1));
+                router.getLinks().put(Port.RIGHT, this.routers.get(id + 1));
             }
         }
 
