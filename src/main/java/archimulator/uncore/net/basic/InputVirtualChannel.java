@@ -33,7 +33,8 @@ public class InputVirtualChannel {
 
     private List<Flit> inputBuffer;
 
-    private OutputVirtualChannel outputVirtualChannel;
+    private Port outputPort;
+    private int outputVirtualChannel;
 
     /**
      * Create an input virtual channel.
@@ -50,6 +51,9 @@ public class InputVirtualChannel {
         this.routes.put(1, new HashSet<>());
 
         this.inputBuffer = new ArrayList<>();
+
+        this.outputPort = null;
+        this.outputVirtualChannel = -1;
     }
 
     /**
@@ -115,20 +119,38 @@ public class InputVirtualChannel {
     }
 
     /**
-     * Get the output virtual channel.
+     * Get the output port.
      *
-     * @return the output virtual channel
+     * @return the output port
      */
-    public OutputVirtualChannel getOutputVirtualChannel() {
+    public Port getOutputPort() {
+        return outputPort;
+    }
+
+    /**
+     * Set the output port.
+     *
+     * @param outputPort the output port
+     */
+    public void setOutputPort(Port outputPort) {
+        this.outputPort = outputPort;
+    }
+
+    /**
+     * Get the output virtual channel number.
+     *
+     * @return the output virtual channel number
+     */
+    public int getOutputVirtualChannel() {
         return outputVirtualChannel;
     }
 
     /**
-     * Set the output virtual channel.
+     * Set the output virtual channel number.
      *
-     * @param outputVirtualChannel the output virtual channel
+     * @param outputVirtualChannel the output virtual channel number
      */
-    public void setOutputVirtualChannel(OutputVirtualChannel outputVirtualChannel) {
+    public void setOutputVirtualChannel(int outputVirtualChannel) {
         this.outputVirtualChannel = outputVirtualChannel;
     }
 }
