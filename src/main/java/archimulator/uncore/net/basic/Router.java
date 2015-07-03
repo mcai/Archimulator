@@ -41,15 +41,13 @@ public class Router {
 
     private List<Packet> injectionBuffer;
 
-    //per input port
     private EnumMap<Port, List<List<Flit>>> inputBuffers;
 
-    //per output port
     private EnumMap<Port, List<List<Flit>>> outputBuffers;
 
     private Switch aSwitch;
 
-    private RouteComputation routeComputation;
+    private AbstractRouteComputation routeComputation;
 
     private VirtualChannelAllocator virtualChannelAllocator;
 
@@ -100,7 +98,7 @@ public class Router {
 
         this.aSwitch = new Switch(this);
 
-        this.routeComputation = new RouteComputation(this);
+        this.routeComputation = new BasicRouteComputation(this);
 
         this.virtualChannelAllocator = new VirtualChannelAllocator(this);
 
@@ -346,7 +344,7 @@ public class Router {
      *
      * @return the route computation component
      */
-    public RouteComputation getRouteComputation() {
+    public AbstractRouteComputation getRouteComputation() {
         return routeComputation;
     }
 

@@ -44,14 +44,14 @@ public class BasicNet extends BasicSimulationObject implements Net {
 
     private Map<SimulationObject, Router> devicesToRouters;
 
-    private int numVirtualChannels = 4;
+    private int numVirtualChannels;
 
-    private int linkLatency = 1;
-    private int linkWidth = 16;
+    private int linkLatency;
+    private int linkWidth;
 
-    private int injectionBufferMaxSize = 32;
+    private int injectionBufferMaxSize;
 
-    private int inputBufferMaxSize = 10;
+    private int inputBufferMaxSize;
 
     public long currentRequestId = 0;
 
@@ -68,6 +68,15 @@ public class BasicNet extends BasicSimulationObject implements Net {
         this.routers = new ArrayList<>();
 
         this.devicesToRouters = new HashMap<>();
+
+        this.numVirtualChannels = 4;
+
+        this.linkLatency = 1;
+        this.linkWidth = 16;
+
+        this.injectionBufferMaxSize = 32;
+
+        this.inputBufferMaxSize = 10;
 
         int numRouters = 0;
 

@@ -1,3 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
+ *
+ * This file is part of the Archimulator multicore architectural simulator.
+ *
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package archimulator.uncore.net.basic;
 
 import java.util.*;
@@ -7,8 +25,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class RouteComputation {
-    private Router router;
+public class BasicRouteComputation extends AbstractRouteComputation {
     private EnumMap<Port, List<Map<Integer, Set<Port>>>> routes;
 
     /**
@@ -16,8 +33,8 @@ public class RouteComputation {
      *
      * @param router the parent router
      */
-    public RouteComputation(Router router) {
-        this.router = router;
+    public BasicRouteComputation(Router router) {
+        super(router);
 
         this.routes = new EnumMap<>(Port.class);
         this.routes.put(Port.LOCAL, new ArrayList<>());
@@ -27,7 +44,7 @@ public class RouteComputation {
         this.routes.put(Port.DOWN, new ArrayList<>());
 
         for(Port inputPort : Port.values()) {
-            for(int ivc = 0; ivc < this.router.getNet().getNumVirtualChannels(); ivc++) {
+            for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
                 Map<Integer, Set<Port>> routes = new HashMap<>();
                 routes.put(0, new HashSet<>());
                 routes.put(1, new HashSet<>());
@@ -39,48 +56,49 @@ public class RouteComputation {
     /**
      * The route calculation (RC) stage. Calculate the permissible routes for every first flit in each ivc.
      */
+    @Override
     public void stageRouteCalculation() {
         for(Port inputPort : Port.values()) {
-            for(int ivc = 0; ivc < this.router.getNet().getNumVirtualChannels(); ivc++) {
-                if(this.router.getInputBuffers().get(inputPort).get(ivc).isEmpty()) {
+            for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
+                if(this.getRouter().getInputBuffers().get(inputPort).get(ivc).isEmpty()) {
                     continue;
                 }
 
-                Flit flit = this.router.getInputBuffers().get(inputPort).get(ivc).get(0);
+                Flit flit = this.getRouter().getInputBuffers().get(inputPort).get(ivc).get(0);
                 if(flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
                     this.routes.get(inputPort).get(ivc).get(0).clear();
                     this.routes.get(inputPort).get(ivc).get(1).clear();
-                    if(flit.getDestination() == this.router) {
+                    if(flit.getDestination() == this.getRouter()) {
                         this.routes.get(inputPort).get(ivc).get(0).add(Port.LOCAL);
                         this.routes.get(inputPort).get(ivc).get(1).add(Port.LOCAL);
                     }
                     else {
                         //adaptive routing
-                        if(this.router.getX() > flit.getDestination().getX()) {
+                        if(this.getRouter().getX() > flit.getDestination().getX()) {
                             this.routes.get(inputPort).get(ivc).get(0).add(Port.LEFT);
                         }
-                        else if (this.router.getX() < flit.getDestination().getX()) {
+                        else if (this.getRouter().getX() < flit.getDestination().getX()) {
                             this.routes.get(inputPort).get(ivc).get(0).add(Port.RIGHT);
                         }
 
-                        if(this.router.getY() > flit.getDestination().getY()) {
+                        if(this.getRouter().getY() > flit.getDestination().getY()) {
                             this.routes.get(inputPort).get(ivc).get(0).add(Port.UP);
                         }
-                        else if(this.router.getY() < flit.getDestination().getY()) {
+                        else if(this.getRouter().getY() < flit.getDestination().getY()) {
                             this.routes.get(inputPort).get(ivc).get(0).add(Port.DOWN);
                         }
 
                         //escape routing
-                        if(this.router.getX() > flit.getDestination().getX()) {
+                        if(this.getRouter().getX() > flit.getDestination().getX()) {
                             this.routes.get(inputPort).get(ivc).get(1).add(Port.LEFT);
                         }
-                        else if(this.router.getX() < flit.getDestination().getX()) {
+                        else if(this.getRouter().getX() < flit.getDestination().getX()) {
                             this.routes.get(inputPort).get(ivc).get(1).add(Port.RIGHT);
                         }
-                        else if(this.router.getY() > flit.getDestination().getY()) {
+                        else if(this.getRouter().getY() > flit.getDestination().getY()) {
                             this.routes.get(inputPort).get(ivc).get(1).add(Port.UP);
                         }
-                        else if(this.router.getY() < flit.getDestination().getY()) {
+                        else if(this.getRouter().getY() < flit.getDestination().getY()) {
                             this.routes.get(inputPort).get(ivc).get(1).add(Port.DOWN);
                         }
                     }
@@ -100,17 +118,9 @@ public class RouteComputation {
      *
      * @return a boolean value indicating whether the specified path is routed or not
      */
+    @Override
     public boolean isRouted(Port inputPort, int ivc, Port outputPort, int ovc) {
         int routeCalculationIndex = ovc == this.getRouter().getNet().getNumVirtualChannels() - 1 ? 0 : 1;
         return this.routes.get(inputPort).get(ivc).get(routeCalculationIndex).contains(outputPort);
-    }
-
-    /**
-     * Get the parent router.
-     *
-     * @return the parent router
-     */
-    public Router getRouter() {
-        return router;
     }
 }
