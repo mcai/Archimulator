@@ -68,7 +68,7 @@ public class BasicNet extends BasicSimulationObject implements Net {
         int numRouters = 0;
 
         for(L1IController l1IController : memoryHierarchy.getL1IControllers()) {
-            Router router = new Router(this, RouterType.CORE, numRouters++);
+            Router router = new Router(this, numRouters++);
             this.routers.add(router);
             this.devicesToRouters.put(l1IController, router);
             this.devicesToRouters.put(
@@ -78,18 +78,18 @@ public class BasicNet extends BasicSimulationObject implements Net {
                     router);
         }
 
-        Router routerL2Controller = new Router(this, RouterType.L2_CONTROLLER, numRouters++);
+        Router routerL2Controller = new Router(this, numRouters++);
         this.routers.add(routerL2Controller);
         this.devicesToRouters.put(memoryHierarchy.getL2Controller(), routerL2Controller);
 
-        Router routerMemoryController = new Router(this, RouterType.MEMORY_CONTROLLER, numRouters++);
+        Router routerMemoryController = new Router(this, numRouters++);
         this.routers.add(routerMemoryController);
         this.devicesToRouters.put(memoryHierarchy.getMemoryController(), routerMemoryController);
 
         int width = (int) Math.sqrt(numRouters);
         if (width * width != numRouters) {
             for (; numRouters < (width + 1) * (width + 1); ++numRouters) {
-                this.routers.add(new Router(this, RouterType.DUMMY, numRouters));
+                this.routers.add(new Router(this, numRouters));
             }
             ++width;
         }
