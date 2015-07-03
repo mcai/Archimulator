@@ -49,6 +49,10 @@ public class BasicNet extends BasicSimulationObject implements Net {
     private int linkLatency = 1;
     private int linkWidth = 16;
 
+    private int injectionBufferMaxSize = 32;
+
+    private int inputBufferMaxSize = 10;
+
     public long currentRequestId = 0;
 
     /**
@@ -205,5 +209,23 @@ public class BasicNet extends BasicSimulationObject implements Net {
      */
     public int getLinkWidth() {
         return linkWidth;
+    }
+
+    /**
+     * Get the injection buffer max size.
+     *
+     * @return the injection buffer max size
+     */
+    public int getInjectionBufferMaxSize() {
+        return injectionBufferMaxSize;
+    }
+
+    /**
+     * Get the input buffer max size.
+     *
+     * @return the input buffer max size
+     */
+    public int getInputBufferMaxSize() {
+        return inputBufferMaxSize;
     }
 }

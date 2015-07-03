@@ -40,9 +40,6 @@ public class Router {
     private EnumMap<Port, Router> links;
 
     private List<Packet> injectionBuffer;
-    private int injectionBufferMaxSize;
-
-    private int inputBufferMaxSize;
 
     //per input port
     private EnumMap<Port, List<List<Flit>>> inputBuffers;
@@ -74,9 +71,6 @@ public class Router {
         this.links = new EnumMap<>(Port.class);
 
         this.injectionBuffer = new ArrayList<>();
-        this.injectionBufferMaxSize = 32;
-
-        this.inputBufferMaxSize = 10;
 
         this.inputBuffers = new EnumMap<>(Port.class);
         this.inputBuffers.put(Port.LOCAL, new ArrayList<>());
@@ -208,7 +202,7 @@ public class Router {
 
                 List<Flit> inputBuffer = this.inputBuffers.get(Port.LOCAL).get(ivc);
 
-                if(inputBuffer.size() + numFlits <= this.inputBufferMaxSize) {
+                if(inputBuffer.size() + numFlits <= this.net.getInputBufferMaxSize()) {
                     for(int i = 0; i < numFlits; i++) {
                         Flit flit = new Flit(
                                 this.net,
@@ -245,7 +239,7 @@ public class Router {
      * @return a boolean value indicating whether the packet has been injected or not
      */
     public boolean injectPacket(Packet packet) {
-        if(this.injectionBuffer.size() < this.injectionBufferMaxSize) {
+        if(this.injectionBuffer.size() < this.net.getInjectionBufferMaxSize()) {
             this.injectionBuffer.add(packet);
             return true;
         }
