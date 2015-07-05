@@ -47,6 +47,9 @@ public class ShortestPathFirstRouting implements Routing {
         this.routes = new HashMap<>();
     }
 
+    /**
+     * Calculate the routes.
+     */
     private void calculateRoutes() {
         Map<Route, Router> routes = new HashMap<>();
 
