@@ -47,7 +47,7 @@ public class Router {
 
     private Switch aSwitch;
 
-    private AbstractRouteComputation routeComputation;
+    private RouteComputation routeComputation;
 
     private VirtualChannelAllocator virtualChannelAllocator;
 
@@ -98,7 +98,7 @@ public class Router {
 
         this.aSwitch = new Switch(this);
 
-        this.routeComputation = new XYRouteComputation(this);
+        this.routeComputation = new RouteComputation(this);
 
         this.virtualChannelAllocator = new VirtualChannelAllocator(this);
 
@@ -145,7 +145,6 @@ public class Router {
                 if(flit.getTimestamp() < oldestCycle) {
                     oldestCycle = flit.getTimestamp();
                     ovcFoundRef.set(index);
-                    break;
                 }
             }
 
@@ -344,7 +343,7 @@ public class Router {
      *
      * @return the route computation component
      */
-    public AbstractRouteComputation getRouteComputation() {
+    public RouteComputation getRouteComputation() {
         return routeComputation;
     }
 

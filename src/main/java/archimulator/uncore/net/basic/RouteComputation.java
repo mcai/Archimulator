@@ -18,23 +18,31 @@
  ******************************************************************************/
 package archimulator.uncore.net.basic;
 
-import java.util.*;
+import archimulator.uncore.net.basic.routing.Routing;
+import archimulator.uncore.net.basic.routing.XYRouting;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 
 /**
- * XY Route computation component.
+ * Route computation component.
  *
  * @author Min Cai
  */
-public class XYRouteComputation extends AbstractRouteComputation {
+public class RouteComputation {
+    private Router router;
     private EnumMap<Port, List<Port>> routes;
 
+    private Routing routing;
+
     /**
-     * Create an XY route computation component.
+     * Create a route computation component.
      *
-     * @param router the parent router
+     * @param router the router
      */
-    public XYRouteComputation(Router router) {
-        super(router);
+    public RouteComputation(Router router) {
+        this.router = router;
 
         this.routes = new EnumMap<>(Port.class);
         this.routes.put(Port.LOCAL, new ArrayList<>());
@@ -48,12 +56,13 @@ public class XYRouteComputation extends AbstractRouteComputation {
                 this.routes.get(inputPort).add(null);
             }
         }
+
+        this.routing = new XYRouting();
     }
 
     /**
      * The route calculation (RC) stage. Calculate the permissible routes for every first flit in each ivc.
      */
-    @Override
     public void stageRouteCalculation() {
         for(Port inputPort : Port.values()) {
             for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
@@ -68,18 +77,7 @@ public class XYRouteComputation extends AbstractRouteComputation {
                         this.routes.get(inputPort).set(ivc, Port.LOCAL);
                     }
                     else {
-                        if(this.getRouter().getX() > flit.getDestination().getX()) {
-                            this.routes.get(inputPort).set(ivc, Port.LEFT);
-                        }
-                        else if(this.getRouter().getX() < flit.getDestination().getX()) {
-                            this.routes.get(inputPort).set(ivc, Port.RIGHT);
-                        }
-                        else if(this.getRouter().getY() > flit.getDestination().getY()) {
-                            this.routes.get(inputPort).set(ivc, Port.UP);
-                        }
-                        else if(this.getRouter().getY() < flit.getDestination().getY()) {
-                            this.routes.get(inputPort).set(ivc, Port.DOWN);
-                        }
+                        this.routes.get(inputPort).set(ivc, this.routing.getOutputPort(this.router, flit));
                     }
                     flit.setState(FlitState.ROUTE_CALCULATION);
                 }
@@ -94,8 +92,16 @@ public class XYRouteComputation extends AbstractRouteComputation {
      * @param ivc the input virtual channel
      * @return the corresponding output port for the specified input port and input VC
      */
-    @Override
     public Port getRoute(Port inputPort, int ivc) {
         return this.routes.get(inputPort).get(ivc);
+    }
+
+    /**
+     * Get the parent router.
+     *
+     * @return the parent router
+     */
+    public Router getRouter() {
+        return router;
     }
 }
