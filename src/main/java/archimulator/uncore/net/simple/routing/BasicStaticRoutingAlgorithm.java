@@ -90,13 +90,13 @@ public class BasicStaticRoutingAlgorithm implements RoutingAlgorithm {
         for (NetNode k : nodes) {
             for (NetNode i : nodes) {
                 for (NetNode j : nodes) {
-                    BasicRoute nodeIk = getRoutes(i).get(k);
-                    BasicRoute nodeKj = getRoutes(k).get(j);
-                    BasicRoute nodeIj = getRoutes(i).get(j);
+                    BasicRoute routeIk = getRoutes(i).get(k);
+                    BasicRoute routeKj = getRoutes(k).get(j);
+                    BasicRoute routeIj = getRoutes(i).get(j);
 
-                    if (nodeIk.getCost() + nodeKj.getCost() < nodeIj.getCost()) {
-                        nodeIj.setCost(nodeIk.getCost() + nodeKj.getCost());
-                        routes.put(nodeIj, k);
+                    if (routeIk.getCost() + routeKj.getCost() < routeIj.getCost()) {
+                        routeIj.setCost(routeIk.getCost() + routeKj.getCost());
+                        routes.put(routeIj, k);
                     }
                 }
             }

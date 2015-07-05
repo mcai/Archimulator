@@ -19,7 +19,7 @@
 package archimulator.uncore.net.basic;
 
 import archimulator.uncore.net.basic.routing.Routing;
-import archimulator.uncore.net.basic.routing.XYRouting;
+import archimulator.uncore.net.basic.routing.ShortestPathFirstRouting;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -57,7 +57,8 @@ public class RouteComputation {
             }
         }
 
-        this.routing = new XYRouting();
+//        this.routing = new XYRouting();
+        this.routing = new ShortestPathFirstRouting(this.router.getNet());
     }
 
     /**
