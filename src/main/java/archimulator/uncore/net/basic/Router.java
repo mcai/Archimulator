@@ -98,7 +98,7 @@ public class Router {
 
         this.aSwitch = new Switch(this);
 
-        this.routeComputation = new BasicRouteComputation(this);
+        this.routeComputation = new XYRouteComputation(this);
 
         this.virtualChannelAllocator = new VirtualChannelAllocator(this);
 

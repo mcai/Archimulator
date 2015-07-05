@@ -108,7 +108,7 @@ public class VirtualChannelAllocator {
         for(Port outputPort : Port.values()) {
             for(int ovc = 0; ovc < this.router.getNet().getNumVirtualChannels(); ovc++) {
                 if(this.outputVirtualChannelAvailables.get(outputPort).get(ovc)) {
-                    Pair<Port, Integer> pair = this.stageVirtualChannelAllocationPickWinner(outputPort, ovc);
+                    Pair<Port, Integer> pair = this.stageVirtualChannelAllocationPickWinner(outputPort);
 
                     Port inputPortFound = pair.getFirst();
                     int inputVirtualChannelFound = pair.getSecond();
@@ -130,10 +130,9 @@ public class VirtualChannelAllocator {
     /**
      * Pick a winner input virtual channel for the specified output virtual channel in the virtual channel allocation (VCA) stage.
      *
-     * @param outputVirtualChannel the output virtual channel
      * @return the selected winner input virtual channel
      */
-    private Pair<Port, Integer> stageVirtualChannelAllocationPickWinner(Port outputPort, int outputVirtualChannel) {
+    private Pair<Port, Integer> stageVirtualChannelAllocationPickWinner(Port outputPort) {
         long oldestTimestamp = Long.MAX_VALUE;
         Port inputPortFound = null;
         int inputVirtualChannelFound = -1;
@@ -146,7 +145,7 @@ public class VirtualChannelAllocator {
             for (int ivc = 0; ivc < this.router.getNet().getNumVirtualChannels(); ivc++) {
                 List<Flit> inputBuffer = this.router.getInputBuffers().get(inputPort).get(ivc);
                 if(inputBuffer.isEmpty() ||
-                        !this.router.getRouteComputation().isRouted(inputPort, ivc, outputPort, outputVirtualChannel)) {
+                        this.router.getRouteComputation().getRoute(inputPort, ivc) != outputPort) {
                     continue;
                 }
 

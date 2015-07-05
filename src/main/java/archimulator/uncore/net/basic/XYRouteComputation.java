@@ -21,19 +21,19 @@ package archimulator.uncore.net.basic;
 import java.util.*;
 
 /**
- * Route computation component.
+ * XY Route computation component.
  *
  * @author Min Cai
  */
-public class BasicRouteComputation extends AbstractRouteComputation {
-    private EnumMap<Port, List<Map<Integer, Set<Port>>>> routes;
+public class XYRouteComputation extends AbstractRouteComputation {
+    private EnumMap<Port, List<Port>> routes;
 
     /**
-     * Create a route computation component.
+     * Create an XY route computation component.
      *
      * @param router the parent router
      */
-    public BasicRouteComputation(Router router) {
+    public XYRouteComputation(Router router) {
         super(router);
 
         this.routes = new EnumMap<>(Port.class);
@@ -45,10 +45,7 @@ public class BasicRouteComputation extends AbstractRouteComputation {
 
         for(Port inputPort : Port.values()) {
             for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
-                Map<Integer, Set<Port>> routes = new HashMap<>();
-                routes.put(0, new HashSet<>());
-                routes.put(1, new HashSet<>());
-                this.routes.get(inputPort).add(routes);
+                this.routes.get(inputPort).add(null);
             }
         }
     }
@@ -66,40 +63,22 @@ public class BasicRouteComputation extends AbstractRouteComputation {
 
                 Flit flit = this.getRouter().getInputBuffers().get(inputPort).get(ivc).get(0);
                 if(flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
-                    this.routes.get(inputPort).get(ivc).get(0).clear();
-                    this.routes.get(inputPort).get(ivc).get(1).clear();
+                    this.routes.get(inputPort).set(ivc, null);
                     if(flit.getDestination() == this.getRouter()) {
-                        this.routes.get(inputPort).get(ivc).get(0).add(Port.LOCAL);
-                        this.routes.get(inputPort).get(ivc).get(1).add(Port.LOCAL);
+                        this.routes.get(inputPort).set(ivc, Port.LOCAL);
                     }
                     else {
-                        //adaptive routing
                         if(this.getRouter().getX() > flit.getDestination().getX()) {
-                            this.routes.get(inputPort).get(ivc).get(0).add(Port.LEFT);
-                        }
-                        else if (this.getRouter().getX() < flit.getDestination().getX()) {
-                            this.routes.get(inputPort).get(ivc).get(0).add(Port.RIGHT);
-                        }
-
-                        if(this.getRouter().getY() > flit.getDestination().getY()) {
-                            this.routes.get(inputPort).get(ivc).get(0).add(Port.UP);
-                        }
-                        else if(this.getRouter().getY() < flit.getDestination().getY()) {
-                            this.routes.get(inputPort).get(ivc).get(0).add(Port.DOWN);
-                        }
-
-                        //escape routing
-                        if(this.getRouter().getX() > flit.getDestination().getX()) {
-                            this.routes.get(inputPort).get(ivc).get(1).add(Port.LEFT);
+                            this.routes.get(inputPort).set(ivc, Port.LEFT);
                         }
                         else if(this.getRouter().getX() < flit.getDestination().getX()) {
-                            this.routes.get(inputPort).get(ivc).get(1).add(Port.RIGHT);
+                            this.routes.get(inputPort).set(ivc, Port.RIGHT);
                         }
                         else if(this.getRouter().getY() > flit.getDestination().getY()) {
-                            this.routes.get(inputPort).get(ivc).get(1).add(Port.UP);
+                            this.routes.get(inputPort).set(ivc, Port.UP);
                         }
                         else if(this.getRouter().getY() < flit.getDestination().getY()) {
-                            this.routes.get(inputPort).get(ivc).get(1).add(Port.DOWN);
+                            this.routes.get(inputPort).set(ivc, Port.DOWN);
                         }
                     }
                     flit.setState(FlitState.ROUTE_CALCULATION);
@@ -109,18 +88,14 @@ public class BasicRouteComputation extends AbstractRouteComputation {
     }
 
     /**
-     * Get a boolean value indicating whether the specified path is routed or not.
+     * Get the corresponding output port for the specified input port and input VC.
      *
      * @param inputPort the input port
      * @param ivc the input virtual channel
-     * @param outputPort the output port
-     * @param ovc the output virtual channel
-     *
-     * @return a boolean value indicating whether the specified path is routed or not
+     * @return the corresponding output port for the specified input port and input VC
      */
     @Override
-    public boolean isRouted(Port inputPort, int ivc, Port outputPort, int ovc) {
-        int routeCalculationIndex = ovc == this.getRouter().getNet().getNumVirtualChannels() - 1 ? 0 : 1;
-        return this.routes.get(inputPort).get(ivc).get(routeCalculationIndex).contains(outputPort);
+    public Port getRoute(Port inputPort, int ivc) {
+        return this.routes.get(inputPort).get(ivc);
     }
 }

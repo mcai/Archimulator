@@ -41,16 +41,13 @@ public abstract class AbstractRouteComputation {
     public abstract void stageRouteCalculation();
 
     /**
-     * Get a boolean value indicating whether the specified path is routed or not.
+     * Get the corresponding output port for the specified input port and input VC.
      *
      * @param inputPort the input port
      * @param ivc the input virtual channel
-     * @param outputPort the output port
-     * @param ovc the output virtual channel
-     *
-     * @return a boolean value indicating whether the specified path is routed or not
+     * @return the corresponding output port for the specified input port and input VC
      */
-    public abstract boolean isRouted(Port inputPort, int ivc, Port outputPort, int ovc);
+    public abstract Port getRoute(Port inputPort, int ivc);
 
     /**
      * Get the parent router.
