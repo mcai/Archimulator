@@ -30,4 +30,51 @@ import archimulator.uncore.net.basic.Router;
 public class Memory {
     private Router router;
     private double tripTime;
+
+    /**
+     * Create a memory.
+     *
+     * @param router the router
+     * @param tripTime the trip time
+     */
+    public Memory(Router router, double tripTime) {
+        this.router = router;
+        this.tripTime = tripTime;
+    }
+
+    /**
+     * Get the router.
+     *
+     * @return the router
+     */
+    public Router getRouter() {
+        return router;
+    }
+
+    /**
+     * Set the router.
+     *
+     * @param router the router
+     */
+    public void setRouter(Router router) {
+        this.router = router;
+    }
+
+    /**
+     * Get the trip time.
+     *
+     * @return the trip time
+     */
+    public double getTripTime() {
+        return tripTime;
+    }
+
+    /**
+     * Set the trip time.
+     *
+     * @param tripTime the trip time
+     */
+    public void setTripTime(double tripTime) {
+        this.tripTime = tripTime;
+    }
 }
