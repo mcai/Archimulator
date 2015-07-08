@@ -20,9 +20,6 @@
  */
 package archimulator.uncore.net.basic;
 
-import archimulator.uncore.net.basic.routing.Routing;
-import archimulator.uncore.net.basic.routing.ShortestPathFirstRouting;
-
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -35,8 +32,6 @@ import java.util.List;
 public class RouteComputation {
     private Router router;
     private EnumMap<Port, List<Port>> routes;
-
-    private Routing routing;
 
     /**
      * Create a route computation component.
@@ -58,9 +53,6 @@ public class RouteComputation {
                 this.routes.get(inputPort).add(null);
             }
         }
-
-//        this.routing = new XYRouting();
-        this.routing = new ShortestPathFirstRouting(this.router.getNet());
     }
 
     /**
@@ -79,7 +71,8 @@ public class RouteComputation {
                     if (flit.getDestination() == this.getRouter()) {
                         this.routes.get(inputPort).set(ivc, Port.LOCAL);
                     } else {
-                        this.routes.get(inputPort).set(ivc, this.routing.getOutputPort(this.router, flit));
+                        this.routes.get(inputPort).set(ivc,
+                                this.router.getNet().getRouting().getOutputPort(this.router, flit));
                     }
                     flit.setState(FlitState.ROUTE_CALCULATION);
                 }

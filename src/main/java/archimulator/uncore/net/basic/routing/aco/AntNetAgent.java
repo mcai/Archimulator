@@ -56,7 +56,7 @@ public class AntNetAgent {
             if (this.router != router) {
                 List<Router> neighbors = this.routing.getNeighbors(this.router);
                 for (Router neighbor : neighbors) {
-                    double pheromoneValue = 1.0 / neighbors.size();
+                    double pheromoneValue = 1.0d / neighbors.size();
                     this.routingTable.addEntry(router, neighbor, pheromoneValue);
                 }
             }
@@ -133,7 +133,9 @@ public class AntNetAgent {
      */
     public void forwardAntPacket(AntPacket packet) {
         Router parent = packet.getSource();
-        Router next = this.routingTable.calculateNext(this.router, packet.getDestination());
+
+        //TODO: parent is not the current router
+        Router next = this.routingTable.calculateNext(packet.getDestination(), this.router);
         if (next == this.router || next == parent) {
             return;
         }

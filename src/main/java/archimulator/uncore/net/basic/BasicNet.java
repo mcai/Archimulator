@@ -27,6 +27,8 @@ import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.net.Net;
+import archimulator.uncore.net.basic.routing.Routing;
+import archimulator.uncore.net.basic.routing.ShortestPathFirstRouting;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;
@@ -45,6 +47,8 @@ public class BasicNet extends BasicSimulationObject implements Net {
     private List<Router> routers;
 
     private Map<SimulationObject, Router> devicesToRouters;
+
+    private Routing routing;
 
     private int numVirtualChannels;
 
@@ -128,6 +132,9 @@ public class BasicNet extends BasicSimulationObject implements Net {
             }
         }
 
+//        this.routing = new XYRouting();
+        this.routing = new ShortestPathFirstRouting(this);
+
         memoryHierarchy.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
             if (memoryHierarchy.getSimulation().getType() != SimulationType.FAST_FORWARD) {
                 advanceOneCycle();
@@ -193,6 +200,15 @@ public class BasicNet extends BasicSimulationObject implements Net {
      */
     public Router getRouter(MemoryDevice device) {
         return this.devicesToRouters.get(device);
+    }
+
+    /**
+     * Get the routing.
+     *
+     * @return the routing
+     */
+    public Routing getRouting() {
+        return routing;
     }
 
     /**

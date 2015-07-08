@@ -26,7 +26,10 @@ import archimulator.uncore.net.basic.Port;
 import archimulator.uncore.net.basic.Router;
 import archimulator.uncore.net.basic.routing.Routing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Ant colony optimization (ACO) based routing.
@@ -37,6 +40,8 @@ public class ACORouting implements Routing {
     public static final double REINFORCEMENT_FACTOR = 0.05;
 
     private BasicNet net;
+
+    private Map<Router, AntNetAgent> agents;
 
     /**
      * Current ant ID.
@@ -50,12 +55,24 @@ public class ACORouting implements Routing {
      */
     public ACORouting(BasicNet net) {
         this.net = net;
+
+        this.agents = new HashMap<>();
+
+        for(Router router : this.net.getRouters()) {
+            this.agents.put(router, new AntNetAgent(router, this));
+        }
     }
 
     @Override
     public Port getOutputPort(Router router, Flit flit) {
-        //TODO
-        throw new UnsupportedOperationException();
+        Router next = this.agents.get(router).getRoutingTable().calculateNext(flit.getDestination(), router);
+        for(Port port : Port.values()) {
+            if (router.getLinks().containsKey(port) && router.getLinks().get(port) == next) {
+                return port;
+            }
+        }
+
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -65,8 +82,7 @@ public class ACORouting implements Routing {
      * @return the list of neighbors of the specified router
      */
     public List<Router> getNeighbors(Router router) {
-        //TODO
-        throw new UnsupportedOperationException();
+        return new ArrayList<>(router.getLinks().values());
     }
 
     /**
@@ -76,5 +92,14 @@ public class ACORouting implements Routing {
      */
     public BasicNet getNet() {
         return net;
+    }
+
+    /**
+     * Get the map of ant net agents.
+     *
+     * @return the map of ant net agents
+     */
+    public Map<Router, AntNetAgent> getAgents() {
+        return agents;
     }
 }

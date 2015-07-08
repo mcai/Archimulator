@@ -33,7 +33,6 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-//TODO: should be instantiated per net other than per router.
 public class ShortestPathFirstRouting implements Routing {
     private BasicNet net;
     private Map<Router, Map<Router, Route>> routes;
