@@ -32,7 +32,7 @@ public interface Routing {
      * Get the output port for the specified router and flit.
      *
      * @param router the router
-     * @param flit the flit
+     * @param flit   the flit
      * @return the output port for the specified router and flit
      */
     Port getOutputPort(Router router, Flit flit);

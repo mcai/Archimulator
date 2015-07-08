@@ -35,7 +35,7 @@ public class Pheromone {
      * Create a pheromone.
      *
      * @param neighbor the neighbor router
-     * @param value the pheromone value
+     * @param value    the pheromone value
      */
     public Pheromone(Router neighbor, double value) {
         this.neighbor = neighbor;

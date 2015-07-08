@@ -1,25 +1,27 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the PickaPack library.
- *
+ * <p>
  * PickaPack is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * PickaPack is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with PickaPack. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.util.fsm;
 
-import archimulator.util.action.Action4;
 import archimulator.util.Params;
+import archimulator.util.action.Action4;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -125,7 +127,7 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
             @Override
             @SuppressWarnings("unchecked")
             public void apply(FiniteStateMachineT fsm, Object sender, ConditionT eventType, Params params) {
-                ((Action4<FiniteStateMachineT, Object, ConditionT, Params>) transition).apply(fsm, sender,  eventType, params);
+                ((Action4<FiniteStateMachineT, Object, ConditionT, Params>) transition).apply(fsm, sender, eventType, params);
             }
         });
 
@@ -193,11 +195,11 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
         if (this.perStateTransitions.containsKey(condition)) {
             StateTransition stateTransition = this.perStateTransitions.get(condition);
             fsmFactory.changeState(fsm, sender, condition, params, stateTransition.apply(fsm, sender, condition, params));
-            if(stateTransition.onCompletedCallback != null) {
+            if (stateTransition.onCompletedCallback != null) {
                 stateTransition.onCompletedCallback.accept(fsm);
             }
 
-            if(this.onCompletedCallback != null) {
+            if (this.onCompletedCallback != null) {
                 this.onCompletedCallback.accept(fsm);
             }
         } else {
@@ -243,21 +245,21 @@ public class StateTransitions<StateT, ConditionT, FiniteStateMachineT extends Fi
          */
         @SuppressWarnings("unchecked")
         public StateT apply(FiniteStateMachineT fsm, Object sender, ConditionT condition, Params params) {
-            for(FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params> action : this.actions) {
+            for (FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ? extends Params> action : this.actions) {
                 ((FiniteStateMachineAction<FiniteStateMachineT, ConditionT, Params>) action).apply(fsm, sender, condition, params);
             }
 
-            if(!fsm.getNumExecutions().containsKey(state)) {
+            if (!fsm.getNumExecutions().containsKey(state)) {
                 fsm.getNumExecutions().put(state, new LinkedHashMap<>());
             }
 
-            if(!fsm.getNumExecutions().get(state).containsKey(condition)) {
+            if (!fsm.getNumExecutions().get(state).containsKey(condition)) {
                 fsm.getNumExecutions().get(state).put(condition, 0L);
             }
 
             fsm.getNumExecutions().get(state).put(condition, fsm.getNumExecutions().get(state).get(condition) + 1);
 
-            if(this.newState == null) {
+            if (this.newState == null) {
                 return fsm.getState();
             }
 

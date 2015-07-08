@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.net.basic;
 
 import archimulator.uncore.net.basic.routing.Routing;
@@ -51,8 +53,8 @@ public class RouteComputation {
         this.routes.put(Port.UP, new ArrayList<>());
         this.routes.put(Port.DOWN, new ArrayList<>());
 
-        for(Port inputPort : Port.values()) {
-            for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
+        for (Port inputPort : Port.values()) {
+            for (int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
                 this.routes.get(inputPort).add(null);
             }
         }
@@ -65,19 +67,18 @@ public class RouteComputation {
      * The route calculation (RC) stage. Calculate the permissible routes for every first flit in each ivc.
      */
     public void stageRouteCalculation() {
-        for(Port inputPort : Port.values()) {
-            for(int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
-                if(this.getRouter().getInputBuffers().get(inputPort).get(ivc).isEmpty()) {
+        for (Port inputPort : Port.values()) {
+            for (int ivc = 0; ivc < this.getRouter().getNet().getNumVirtualChannels(); ivc++) {
+                if (this.getRouter().getInputBuffers().get(inputPort).get(ivc).isEmpty()) {
                     continue;
                 }
 
                 Flit flit = this.getRouter().getInputBuffers().get(inputPort).get(ivc).get(0);
-                if(flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
+                if (flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
                     this.routes.get(inputPort).set(ivc, null);
-                    if(flit.getDestination() == this.getRouter()) {
+                    if (flit.getDestination() == this.getRouter()) {
                         this.routes.get(inputPort).set(ivc, Port.LOCAL);
-                    }
-                    else {
+                    } else {
                         this.routes.get(inputPort).set(ivc, this.routing.getOutputPort(this.router, flit));
                     }
                     flit.setState(FlitState.ROUTE_CALCULATION);

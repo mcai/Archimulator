@@ -22,32 +22,28 @@ package archimulator.uncore.net.basic.routing.aco;
 
 import archimulator.uncore.net.basic.Router;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Ant.
+ * Ant net agent.
  *
  * @author Min Cai
  */
-public class Ant {
+public class AntNetAgent {
     private Router router;
     private ACORouting routing;
     private RoutingTable routingTable;
-    private Map<Router, Traffic> traffics;
 
     /**
-     * Create an ant.
+     * Create an ant net agent.
      *
-     * @param router the parent router
+     * @param router  the parent router
      * @param routing the ACO routing
      */
-    public Ant(Router router, ACORouting routing) {
+    public AntNetAgent(Router router, ACORouting routing) {
         this.router = router;
         this.routing = routing;
         this.routingTable = new RoutingTable(this.routing);
-        this.traffics = new HashMap<>();
 
         this.initializeRoutingTable();
     }
@@ -56,11 +52,11 @@ public class Ant {
      * Initialize the routing table.
      */
     private void initializeRoutingTable() {
-        for(Router router : this.router.getNet().getRouters()) {
-            if(this.router != router) {
+        for (Router router : this.router.getNet().getRouters()) {
+            if (this.router != router) {
                 List<Router> neighbors = this.routing.getNeighbors(this.router);
-                for(Router neighbor : neighbors) {
-                    double pheromoneValue = 1.0/neighbors.size();
+                for (Router neighbor : neighbors) {
+                    double pheromoneValue = 1.0 / neighbors.size();
                     this.routingTable.addEntry(router, neighbor, pheromoneValue);
                 }
             }
@@ -73,12 +69,12 @@ public class Ant {
     public void sendAntPacket() {
         Router destination = this.routingTable.calculateDestination(this.router);
 
-        AntPacket packet = new AntPacket(AntType.FORWARD_ANT, this.router, destination);
+        AntPacket packet = new AntPacket(this.routing, AntPacketType.FORWARD_ANT, this.router, destination);
         packet.getMemories().add(new Memory(this.router, 0.0d));
 
         Router next = this.routingTable.calculateNext(destination, this.router);
 
-        if(next == this.router) {
+        if (next == this.router) {
             return;
         }
 
@@ -93,15 +89,14 @@ public class Ant {
      * @param packet the received packet
      */
     public void receiveAntPacket(AntPacket packet) {
-        if(packet.getAntType() == AntType.FORWARD_ANT) {
+        if (packet.getType() == AntPacketType.FORWARD_ANT) {
             this.memorize(packet);
             if (this.getRouter() != packet.getDestination()) {
                 this.forwardAntPacket(packet);
             } else {
                 this.createBackwardAntPacket(packet);
             }
-        }
-        else {
+        } else {
             this.updateRoutingTable(packet);
             if (this.getRouter() != packet.getDestination()) {
                 this.backwardAntPacket(packet);
@@ -118,8 +113,8 @@ public class Ant {
         double tripTime = this.router.getNet().getCycleAccurateEventQueue().getCurrentCycle()
                 - packet.getCreateTime();
 
-        for(Memory memory : packet.getMemories()) {
-            if(memory.getRouter() == this.getRouter()) {
+        for (Memory memory : packet.getMemories()) {
+            if (memory.getRouter() == this.getRouter()) {
                 double t = tripTime - memory.getTripTime();
                 packet.getMemories().forEach(
                         mem -> mem.setTripTime(mem.getTripTime() + t)
@@ -139,7 +134,7 @@ public class Ant {
     public void forwardAntPacket(AntPacket packet) {
         Router parent = packet.getSource();
         Router next = this.routingTable.calculateNext(this.router, packet.getDestination());
-        if(next == this.router || next == parent) {
+        if (next == this.router || next == parent) {
             return;
         }
 
@@ -160,7 +155,7 @@ public class Ant {
 
         int index = packet.getMemories().size() - 2;
 
-        packet.setAntType(AntType.BACKWARD_ANT);
+        packet.setType(AntPacketType.BACKWARD_ANT);
         packet.setNextHop(packet.getMemories().get(index).getRouter());
 
         //TODO: target.receive(packet);
@@ -174,15 +169,15 @@ public class Ant {
     public void backwardAntPacket(AntPacket packet) {
         int index = -1;
 
-        for(int i = packet.getMemories().size() - 1; i >= 0; i--) {
-            if(packet.getMemories().get(i).getRouter() == this.router) {
+        for (int i = packet.getMemories().size() - 1; i >= 0; i--) {
+            if (packet.getMemories().get(i).getRouter() == this.router) {
                 index = i - 1;
                 break;
             }
         }
 
         packet.setNextHop(packet.getMemories().get(index).getRouter());
-        packet.setAntType(AntType.BACKWARD_ANT);
+        packet.setType(AntPacketType.BACKWARD_ANT);
 
         //TODO: target.receive(packet);
     }
@@ -194,11 +189,11 @@ public class Ant {
      */
     public void updateRoutingTable(AntPacket packet) {
         int i;
-        for(i = 0; packet.getMemories().get(i).getRouter() != this.router; i++);
+        for (i = 0; packet.getMemories().get(i).getRouter() != this.router; i++) ;
         i++;
         Router next = packet.getMemories().get(i).getRouter();
 
-        for(int index = i; index < packet.getMemories().size(); index++) {
+        for (int index = i; index < packet.getMemories().size(); index++) {
             Router destination = packet.getMemories().get(index).getRouter();
             this.routingTable.update(destination, next);
         }
@@ -229,14 +224,5 @@ public class Ant {
      */
     public RoutingTable getRoutingTable() {
         return routingTable;
-    }
-
-    /**
-     * Get the map of traffics.
-     *
-     * @return the map of traffics
-     */
-    public Map<Router, Traffic> getTraffics() {
-        return traffics;
     }
 }

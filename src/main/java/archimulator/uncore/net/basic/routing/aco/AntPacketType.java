@@ -21,18 +21,18 @@
 package archimulator.uncore.net.basic.routing.aco;
 
 /**
- * Ant type.
+ * Ant packet type.
  *
  * @author Min Cai
  */
-public enum AntType {
+public enum AntPacketType {
     /**
-     * Forward ant.
+     * Forward ant packet.
      */
     FORWARD_ANT,
 
     /**
-     * Backward ant.
+     * Backward ant packet.
      */
     BACKWARD_ANT
 }

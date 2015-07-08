@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the PickaPack library.
- *
+ * <p>
  * PickaPack is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * PickaPack is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with PickaPack. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.util.fsm;
 
 import archimulator.util.Params;
@@ -96,12 +98,12 @@ public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT e
      * Dump.
      */
     public void dump() {
-        for(StateT state : this.getTransitions().keySet()) {
+        for (StateT state : this.getTransitions().keySet()) {
             System.out.println(state);
 
             StateTransitions<StateT, ConditionT, FiniteStateMachineT> stateTransitions = this.getTransitions().get(state);
             Map<ConditionT, StateTransitions<StateT, ConditionT, FiniteStateMachineT>.StateTransition> perStateTransitions = stateTransitions.getPerStateTransitions();
-            for(ConditionT condition : perStateTransitions.keySet()) {
+            for (ConditionT condition : perStateTransitions.keySet()) {
                 StateTransitions<StateT, ConditionT, FiniteStateMachineT>.StateTransition stateTransition = perStateTransitions.get(condition);
                 System.out.printf(" :%s ->%s/%s %n", condition, stateTransition.getActions(), stateTransition.getNewState());
             }
@@ -118,12 +120,12 @@ public class FiniteStateMachineFactory<StateT, ConditionT, FiniteStateMachineT e
      * @param stats the map of statistics
      */
     public void dump(String name, List<? extends FiniteStateMachine<StateT, ConditionT>> fsms, Map<String, String> stats) {
-        for(StateT state : this.transitions.keySet()) {
+        for (StateT state : this.transitions.keySet()) {
             StateTransitions<StateT, ConditionT, FiniteStateMachineT> stateTransitions = this.transitions.get(state);
             Map<ConditionT, StateTransitions<StateT, ConditionT, FiniteStateMachineT>.StateTransition> perStateTransitions = stateTransitions.getPerStateTransitions();
-            for(ConditionT condition : perStateTransitions.keySet()) {
+            for (ConditionT condition : perStateTransitions.keySet()) {
                 long numExecutions = 0;
-                for(FiniteStateMachine<StateT, ConditionT> fsm : fsms) {
+                for (FiniteStateMachine<StateT, ConditionT> fsm : fsms) {
                     numExecutions += fsm.getNumExecutionsByTransition(state, condition);
                 }
 

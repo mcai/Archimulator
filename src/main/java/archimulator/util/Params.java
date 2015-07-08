@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the PickaPack library.
- *
+ * <p>
  * PickaPack is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * PickaPack is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with PickaPack. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.util;
 
 import java.io.Serializable;
@@ -44,7 +46,7 @@ public class Params implements Serializable {
      * @param value the value
      */
     public void put(Object key, Object value) {
-        if(key == null || value == null) {
+        if (key == null || value == null) {
             throw new IllegalArgumentException();
         }
 
@@ -62,11 +64,11 @@ public class Params implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> clz, Object key, T defaultValue) {
-        if(clz == null || key == null) {
+        if (clz == null || key == null) {
             throw new IllegalArgumentException();
         }
 
-        return this.properties.containsKey (key) ? (T) this.properties.get(key) : defaultValue;
+        return this.properties.containsKey(key) ? (T) this.properties.get(key) : defaultValue;
     }
 
     /**

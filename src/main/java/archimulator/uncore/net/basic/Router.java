@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.net.basic;
 
 import archimulator.util.Reference;
@@ -77,8 +79,8 @@ public class Router {
         this.inputBuffers.put(Port.UP, new ArrayList<>());
         this.inputBuffers.put(Port.DOWN, new ArrayList<>());
 
-        for(Port inputPort : Port.values()) {
-            for(int i = 0; i < this.net.getNumVirtualChannels(); i++) {
+        for (Port inputPort : Port.values()) {
+            for (int i = 0; i < this.net.getNumVirtualChannels(); i++) {
                 this.inputBuffers.get(inputPort).add(new ArrayList<>());
             }
         }
@@ -90,8 +92,8 @@ public class Router {
         this.outputBuffers.put(Port.UP, new ArrayList<>());
         this.outputBuffers.put(Port.DOWN, new ArrayList<>());
 
-        for(Port outputPort : Port.values()) {
-            for(int ovc = 0; ovc < this.net.getNumVirtualChannels(); ovc++) {
+        for (Port outputPort : Port.values()) {
+            for (int ovc = 0; ovc < this.net.getNumVirtualChannels(); ovc++) {
                 this.outputBuffers.get(outputPort).add(new ArrayList<>());
             }
         }
@@ -126,11 +128,11 @@ public class Router {
      * The link traversal (LT) stage.
      */
     private void stageLinkTraversal() {
-        for(Port outputPort : Port.values()) {
+        for (Port outputPort : Port.values()) {
             long oldestCycle = Long.MAX_VALUE;
             final Reference<Integer> ovcFoundRef = new Reference<>(-1);
 
-            for(int ovc = 0; ovc < this.net.getNumVirtualChannels(); ovc++) {
+            for (int ovc = 0; ovc < this.net.getNumVirtualChannels(); ovc++) {
                 int index = (int) ((ovc + this.net.getCycleAccurateEventQueue().getCurrentCycle())
                         % this.net.getNumVirtualChannels());
                 List<Flit> outputBuffer = this.outputBuffers.get(outputPort).get(index);
@@ -142,7 +144,7 @@ public class Router {
 
                 Flit flit = outputBuffer.get(0);
 
-                if(flit.getTimestamp() < oldestCycle) {
+                if (flit.getTimestamp() < oldestCycle) {
                     oldestCycle = flit.getTimestamp();
                     ovcFoundRef.set(index);
                 }
@@ -150,12 +152,12 @@ public class Router {
 
             Integer ovcFound = ovcFoundRef.get();
 
-            if(ovcFound != -1) {
+            if (ovcFound != -1) {
                 List<Flit> outputBuffer = this.outputBuffers.get(outputPort).get(ovcFound);
 
                 Flit flit = outputBuffer.get(0);
 
-                if(outputPort != Port.LOCAL) {
+                if (outputPort != Port.LOCAL) {
                     this.net.getCycleAccurateEventQueue().schedule(
                             this, () -> this.links.get(outputPort).insertFlit(
                                     flit,
@@ -166,14 +168,14 @@ public class Router {
 
                 outputBuffer.remove(0);
 
-                if(outputPort != Port.LOCAL) {
+                if (outputPort != Port.LOCAL) {
                     this.virtualChannelAllocator.getCredits().get(outputPort).get(ovcFound).decrement();
                 }
 
-                if(flit.isTail()) {
+                if (flit.isTail()) {
                     this.virtualChannelAllocator.getOutputVirtualChannelAvailables().get(outputPort).set(ovcFound, true);
 
-                    if(outputPort == Port.LOCAL) {
+                    if (outputPort == Port.LOCAL) {
                         flit.getPacket().getOnCompletedCallback().apply();
                     }
                 }
@@ -185,11 +187,11 @@ public class Router {
      * Perform local packet injection.
      */
     private void localPacketInjection() {
-        for(;;) {
+        for (; ; ) {
             boolean requestInserted = false;
 
-            for(int ivc = 0; ivc < this.net.getNumVirtualChannels(); ivc++) {
-                if(this.injectionBuffer.isEmpty()) {
+            for (int ivc = 0; ivc < this.net.getNumVirtualChannels(); ivc++) {
+                if (this.injectionBuffer.isEmpty()) {
                     continue;
                 }
 
@@ -199,8 +201,8 @@ public class Router {
 
                 List<Flit> inputBuffer = this.inputBuffers.get(Port.LOCAL).get(ivc);
 
-                if(inputBuffer.size() + numFlits <= this.net.getInputBufferMaxSize()) {
-                    for(int i = 0; i < numFlits; i++) {
+                if (inputBuffer.size() + numFlits <= this.net.getInputBufferMaxSize()) {
+                    for (int i = 0; i < numFlits; i++) {
                         Flit flit = new Flit(
                                 this.net,
                                 packet,
@@ -223,7 +225,7 @@ public class Router {
                 }
             }
 
-            if(!requestInserted) {
+            if (!requestInserted) {
                 break;
             }
         }
@@ -236,7 +238,7 @@ public class Router {
      * @return a boolean value indicating whether the packet has been injected or not
      */
     public boolean injectPacket(Packet packet) {
-        if(this.injectionBuffer.size() < this.net.getInjectionBufferMaxSize()) {
+        if (this.injectionBuffer.size() < this.net.getInjectionBufferMaxSize()) {
             this.injectionBuffer.add(packet);
             return true;
         }
@@ -271,7 +273,7 @@ public class Router {
      * @return x coordinate
      */
     public int getX() {
-        if(x == -1) {
+        if (x == -1) {
             int width = (int) Math.sqrt(this.net.getRouters().size());
             x = this.id % width;
         }
@@ -285,7 +287,7 @@ public class Router {
      * @return y coordinate
      */
     public int getY() {
-        if(y == -1) {
+        if (y == -1) {
             int width = (int) Math.sqrt(this.net.getRouters().size());
             y = this.id / width;
         }

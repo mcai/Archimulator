@@ -50,14 +50,14 @@ public class RoutingTable {
     /**
      * Add a router entry.
      *
-     * @param destination the destination router
-     * @param next the next router
+     * @param destination    the destination router
+     * @param next           the next router
      * @param pheromoneValue the pheromone value
      */
     public void addEntry(Router destination, Router next, double pheromoneValue) {
         Pheromone pheromone = new Pheromone(next, pheromoneValue);
 
-        if(!this.pheromones.containsKey(destination)) {
+        if (!this.pheromones.containsKey(destination)) {
             this.pheromones.put(destination, new ArrayList<>());
         }
 
@@ -84,7 +84,7 @@ public class RoutingTable {
      * Calculate the next hop router for the specified destination and parent routers.
      *
      * @param destination the destination router
-     * @param parent the parent router
+     * @param parent      the parent router
      * @return the next hop router for the specified destination and parent routers
      */
     public Router calculateNext(Router destination, Router parent) {
@@ -93,11 +93,11 @@ public class RoutingTable {
         //calculate probability range for parent link
         double lRange = 0.0d;
         double uRange = 0.0d;
-        for(Pheromone pheromone : pheromones) {
+        for (Pheromone pheromone : pheromones) {
             Router next = pheromone.getNeighbor();
             double pheromoneValue = pheromone.getValue();
 
-            if(next == parent) {
+            if (next == parent) {
                 uRange = lRange + pheromoneValue;
                 break;
             }
@@ -105,12 +105,12 @@ public class RoutingTable {
             lRange += pheromoneValue;
         }
 
-        if(uRange == 0.0d) {
+        if (uRange == 0.0d) {
             uRange = 1.0d;
         }
 
         //dead end, loopback
-        if(lRange == 0.0d && uRange == 1.0d) {
+        if (lRange == 0.0d && uRange == 1.0d) {
             return parent;
         }
 
@@ -123,12 +123,12 @@ public class RoutingTable {
         //find next hop router corresponding to this range of probability
         lRange = 0.0d;
         uRange = 0.0d;
-        for(Pheromone pheromone : pheromones) {
+        for (Pheromone pheromone : pheromones) {
             Router next = pheromone.getNeighbor();
             double pheromoneValue = pheromone.getValue();
 
             uRange += pheromoneValue;
-            if(tempDouble >= lRange && tempDouble < uRange) {
+            if (tempDouble >= lRange && tempDouble < uRange) {
                 return next;
             }
             lRange = uRange;
@@ -141,17 +141,16 @@ public class RoutingTable {
      * Update the routing table by incrementing or evaporating pheromone values as per the AntNet algorithm.
      *
      * @param destination the destination router
-     * @param next the next router
+     * @param next        the next router
      */
     public void update(Router destination, Router next) {
         List<Pheromone> pheromones = this.pheromones.get(destination);
 
-        for(Pheromone pheromone : pheromones) {
+        for (Pheromone pheromone : pheromones) {
             double oldPheromoneValue = pheromone.getValue();
-            if(pheromone.getNeighbor() == next) {
+            if (pheromone.getNeighbor() == next) {
                 pheromone.setValue(oldPheromoneValue + ACORouting.REINFORCEMENT_FACTOR * (1 - oldPheromoneValue));
-            }
-            else {
+            } else {
                 pheromone.setValue((1 - ACORouting.REINFORCEMENT_FACTOR) * oldPheromoneValue);
             }
         }

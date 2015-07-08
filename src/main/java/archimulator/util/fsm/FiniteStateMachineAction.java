@@ -1,15 +1,15 @@
 package archimulator.util.fsm;
 
-import archimulator.util.action.Action4;
 import archimulator.util.Params;
+import archimulator.util.action.Action4;
 
 /**
  * Finite state machine action.
  *
- * @author Min Cai
  * @param <FiniteStateMachineT> the type of the finite state machine
- * @param <ConditionT> the type of the conditions
- * @param <ParamsT> the type of the event parameters
+ * @param <ConditionT>          the type of the conditions
+ * @param <ParamsT>             the type of the event parameters
+ * @author Min Cai
  */
 public abstract class FiniteStateMachineAction<FiniteStateMachineT, ConditionT, ParamsT extends Params> implements Action4<FiniteStateMachineT, Object, ConditionT, ParamsT> {
     private String name;

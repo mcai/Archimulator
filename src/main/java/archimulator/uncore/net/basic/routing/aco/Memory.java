@@ -34,7 +34,7 @@ public class Memory {
     /**
      * Create a memory.
      *
-     * @param router the router
+     * @param router   the router
      * @param tripTime the trip time
      */
     public Memory(Router router, double tripTime) {

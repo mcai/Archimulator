@@ -31,9 +31,11 @@ import java.util.List;
  * @author Min Cai
  */
 public class AntPacket {
+    private long id;
     private long createTime;
 
-    private AntType antType;
+    private ACORouting routing;
+    private AntPacketType type;
     private Router source;
     private Router destination;
 
@@ -44,18 +46,31 @@ public class AntPacket {
     /**
      * Create an ant packet.
      *
-     * @param antType the ant type
-     * @param source the source router
+     * @param routing     the ACO routing
+     * @param type        the type of the ant packet
+     * @param source      the source router
      * @param destination the destination router
      */
-    public AntPacket(AntType antType, Router source, Router destination) {
-        this.antType = antType;
+    public AntPacket(ACORouting routing, AntPacketType type, Router source, Router destination) {
+        this.id = routing.currentAntId++;
+
+        this.routing = routing;
+        this.type = type;
         this.source = source;
         this.destination = destination;
 
         this.memories = new ArrayList<>();
 
         this.createTime = source.getNet().getCycleAccurateEventQueue().getCurrentCycle();
+    }
+
+    /**
+     * Get the ID of the ant packet.
+     *
+     * @return the ID of the ant packet
+     */
+    public long getId() {
+        return id;
     }
 
     /**
@@ -68,21 +83,30 @@ public class AntPacket {
     }
 
     /**
-     * Get the ant type.
+     * Get the ACO routing.
      *
-     * @return the ant type
+     * @return the ACO routing
      */
-    public AntType getAntType() {
-        return antType;
+    public ACORouting getRouting() {
+        return routing;
     }
 
     /**
-     * Set the ant type.
+     * Get the type of the ant packet.
      *
-     * @param antType the ant type
+     * @return the type of the ant packet
      */
-    public void setAntType(AntType antType) {
-        this.antType = antType;
+    public AntPacketType getType() {
+        return type;
+    }
+
+    /**
+     * Set the type of the ant packet.
+     *
+     * @param type the type of the ant packet
+     */
+    public void setType(AntPacketType type) {
+        this.type = type;
     }
 
     /**

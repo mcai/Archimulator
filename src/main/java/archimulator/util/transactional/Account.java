@@ -1,6 +1,7 @@
 package archimulator.util.transactional;
 
-import org.multiverse.api.references.*;
+import org.multiverse.api.references.TxnInteger;
+import org.multiverse.api.references.TxnRef;
 
 import java.util.Date;
 
@@ -34,7 +35,7 @@ public class Account {
         return balance.atomicGet();
     }
 
-    public static void transfer(final Account from, final Account to, final int amount){
+    public static void transfer(final Account from, final Account to, final int amount) {
         atomic(() -> {
             Date date = new Date();
 

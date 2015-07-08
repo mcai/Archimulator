@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.net.basic;
 
 import archimulator.util.Pair;
@@ -52,10 +54,10 @@ public class SwitchAllocator {
      * The switch allocation (SA) stage.
      */
     public void stageSwitchAllocation() {
-        for(Port outputPort : Port.values()) {
-            if(this.switchAvailables.get(outputPort)) {
+        for (Port outputPort : Port.values()) {
+            if (this.switchAvailables.get(outputPort)) {
                 Pair<Port, Integer> pair = this.stageSwitchAllocationPickWinner(outputPort);
-                if(pair.getFirst() != null) {
+                if (pair.getFirst() != null) {
                     Flit flit = this.router.getInputBuffers().get(pair.getFirst()).get(pair.getSecond()).get(0);
                     flit.setState(FlitState.SWITCH_ALLOCATION);
 
@@ -79,13 +81,13 @@ public class SwitchAllocator {
         Port inputPortFound = null;
         int ivcFound = -1;
 
-        for(Port inputPort : Port.values()) {
-            if(inputPort == outputPort) {
+        for (Port inputPort : Port.values()) {
+            if (inputPort == outputPort) {
                 continue;
             }
 
-            for(int ivc = 0; ivc < this.router.getNet().getNumVirtualChannels(); ivc++) {
-                if(this.router.getVirtualChannelAllocator().getOutputVirtualChannels().get(inputPort).get(ivc) != -1 &&
+            for (int ivc = 0; ivc < this.router.getNet().getNumVirtualChannels(); ivc++) {
+                if (this.router.getVirtualChannelAllocator().getOutputVirtualChannels().get(inputPort).get(ivc) != -1 &&
                         this.router.getVirtualChannelAllocator().getOutputPorts().get(inputPort).get(ivc) == outputPort &&
                         !this.router.getInputBuffers().get(inputPort).get(ivc).isEmpty()) {
                     Flit flit = this.router.getInputBuffers().get(inputPort).get(ivc).get(0);

@@ -23,10 +23,9 @@ public class Startup {
         try {
             commander.parse(args);
 
-            if(commander.getParsedCommand() == null) {
+            if (commander.getParsedCommand() == null) {
                 commander.usage();
-            }
-            else {
+            } else {
                 switch (commander.getParsedCommand()) {
                     case "simulate":
                         simulateCommand.run();

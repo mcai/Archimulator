@@ -37,9 +37,9 @@ public class ExperimentStat implements Serializable {
     /**
      * Create an experiment statistic.
      *
-     * @param prefix   the prefix
-     * @param key      the key
-     * @param value    the value
+     * @param prefix the prefix
+     * @param key    the key
+     * @param value  the value
      */
     public ExperimentStat(String prefix, String key, String value) {
         this.prefix = prefix;

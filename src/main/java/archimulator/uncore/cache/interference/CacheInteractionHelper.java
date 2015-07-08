@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.cache.interference;
 
 import archimulator.common.Simulation;
@@ -67,20 +69,20 @@ public class CacheInteractionHelper implements Reportable {
                 int broughterThreadId = l2Controller.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
-                if(broughterThreadId == -1) {
+                if (broughterThreadId == -1) {
                     throw new IllegalArgumentException();
                 }
 
-                if(requesterThreadId == -1) {
+                if (requesterThreadId == -1) {
                     throw new IllegalArgumentException();
                 }
 
-                if(broughterThreadId != requesterThreadId) {
-                    if(!numL2InterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
+                if (broughterThreadId != requesterThreadId) {
+                    if (!numL2InterThreadConstructiveInteractions.containsKey(broughterThreadId)) {
                         numL2InterThreadConstructiveInteractions.put(broughterThreadId, new TreeMap<>());
                     }
 
-                    if(!numL2InterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                    if (!numL2InterThreadConstructiveInteractions.get(broughterThreadId).containsKey(requesterThreadId)) {
                         numL2InterThreadConstructiveInteractions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
@@ -97,20 +99,20 @@ public class CacheInteractionHelper implements Reportable {
                 int broughterThreadId = l2Controller.getCache().getLine(set, way).getAccess().getThread().getId();
                 int requesterThreadId = event.getAccess().getThread().getId();
 
-                if(broughterThreadId == -1) {
+                if (broughterThreadId == -1) {
                     throw new IllegalArgumentException();
                 }
 
-                if(requesterThreadId == -1) {
+                if (requesterThreadId == -1) {
                     throw new IllegalArgumentException();
                 }
 
-                if(broughterThreadId != requesterThreadId) {
-                    if(!numL2InterThreadEvictions.containsKey(broughterThreadId)) {
+                if (broughterThreadId != requesterThreadId) {
+                    if (!numL2InterThreadEvictions.containsKey(broughterThreadId)) {
                         numL2InterThreadEvictions.put(broughterThreadId, new TreeMap<>());
                     }
 
-                    if(!numL2InterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
+                    if (!numL2InterThreadEvictions.get(broughterThreadId).containsKey(requesterThreadId)) {
                         numL2InterThreadEvictions.get(broughterThreadId).put(requesterThreadId, 0L);
                     }
 
@@ -123,9 +125,9 @@ public class CacheInteractionHelper implements Reportable {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "cacheInteractionHelper") {{
-            for(int threadFrom : numL2InterThreadConstructiveInteractions.keySet()) {
+            for (int threadFrom : numL2InterThreadConstructiveInteractions.keySet()) {
                 Map<Integer, Long> constructiveInteractionsPerThread = numL2InterThreadConstructiveInteractions.get(threadFrom);
-                for(int threadTo : constructiveInteractionsPerThread.keySet()) {
+                for (int threadTo : constructiveInteractionsPerThread.keySet()) {
                     getChildren().add(
                             new ReportNode(
                                     this,
@@ -136,9 +138,9 @@ public class CacheInteractionHelper implements Reportable {
                 }
             }
 
-            for(int threadFrom : numL2InterThreadEvictions.keySet()) {
+            for (int threadFrom : numL2InterThreadEvictions.keySet()) {
                 Map<Integer, Long> evictionsPerThread = numL2InterThreadEvictions.get(threadFrom);
-                for(int threadTo : evictionsPerThread.keySet()) {
+                for (int threadTo : evictionsPerThread.keySet()) {
                     getChildren().add(
                             new ReportNode(
                                     this,

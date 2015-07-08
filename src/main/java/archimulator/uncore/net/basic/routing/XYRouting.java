@@ -34,7 +34,7 @@ public class XYRouting implements Routing {
      * Get the output port for the specified router and flit.
      *
      * @param router the router
-     * @param flit the flit
+     * @param flit   the flit
      * @return the output port for the specified router and flit
      */
     @Override

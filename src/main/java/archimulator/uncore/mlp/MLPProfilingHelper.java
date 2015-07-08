@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.mlp;
 
 import archimulator.common.Simulation;
@@ -160,12 +162,12 @@ public class MLPProfilingHelper implements Reportable {
     private void updateL2MlpCostsPerCycle() {
         int mlp = this.pendingL2Misses.size();
 
-        if(!this.pendingL2Misses.isEmpty()) {
+        if (!this.pendingL2Misses.isEmpty()) {
             for (PendingL2Miss pendingL2Miss : this.pendingL2Misses.values()) {
                 pendingL2Miss.setMlpCost(pendingL2Miss.getMlpCost() + (double) 1 / mlp);
             }
 
-            if(!this.numCyclesPerMlp.containsKey(mlp)) {
+            if (!this.numCyclesPerMlp.containsKey(mlp)) {
                 this.numCyclesPerMlp.put(mlp, 0L);
             }
             this.numCyclesPerMlp.put(mlp, this.numCyclesPerMlp.get(mlp) + 1);
@@ -209,11 +211,11 @@ public class MLPProfilingHelper implements Reportable {
             getChildren().add(new ReportNode(this, "quantum", mlpCostQuantizer.getQuantum() + ""));
         }});
 
-        for(int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
+        for (int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
             reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", (numL2MissesPerMlpCostQuantum.containsKey(i) ? numL2MissesPerMlpCostQuantum.get(i) : 0) + ""));
         }
 
-        for(int i : numCyclesPerMlp.keySet()) {
+        for (int i : numCyclesPerMlp.keySet()) {
             reportNode.getChildren().add(new ReportNode(reportNode, "numCyclesPerMlp[" + i + "]", numCyclesPerMlp.get(i) + ""));
         }
     }

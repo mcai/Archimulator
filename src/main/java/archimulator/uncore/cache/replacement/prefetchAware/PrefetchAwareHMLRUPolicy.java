@@ -1,21 +1,23 @@
-/*******************************************************************************
+/**
+ * ****************************************************************************
  * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
- *
+ * <p>
  * This file is part of the Archimulator multicore architectural simulator.
- *
+ * <p>
  * Archimulator is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Archimulator is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ * ****************************************************************************
+ */
 package archimulator.uncore.cache.replacement.prefetchAware;
 
 import archimulator.uncore.MemoryHierarchyAccess;
@@ -125,7 +127,7 @@ public class PrefetchAwareHMLRUPolicy<StateT extends Serializable> extends LRUPo
 
     @Override
     public CacheAccess<StateT> handleReplacement(MemoryHierarchyAccess access, int set, int tag) {
-        if(this.type.alterReplacement() && this.shouldVictimizeMainThreadLine()) {
+        if (this.type.alterReplacement() && this.shouldVictimizeMainThreadLine()) {
             for (int stackPosition = this.getCache().getAssociativity() - 1; stackPosition >= 0; stackPosition--) {
                 int way = this.getWayInStackPosition(set, stackPosition);
                 if (lineFoundIsMainThread(set, way)) {
@@ -140,7 +142,7 @@ public class PrefetchAwareHMLRUPolicy<StateT extends Serializable> extends LRUPo
 
     @Override
     public void handlePromotionOnHit(MemoryHierarchyAccess access, int set, int way) {
-        if(this.type.alterPromotionOnHit() && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
+        if (this.type.alterPromotionOnHit() && access.getType() == MemoryHierarchyAccessType.LOAD && requesterIsMainThread(access) && lineFoundIsHelperThread(set, way)) {
             // HT-MT inter-thread hit, never used again: low locality => Demote to LRU position
             this.setLRU(set, way);
             return;
@@ -151,7 +153,7 @@ public class PrefetchAwareHMLRUPolicy<StateT extends Serializable> extends LRUPo
 
     @Override
     public void handleInsertionOnMiss(MemoryHierarchyAccess access, int set, int way) {
-        if(this.type.alterInsertionOnMiss() && access.getType() == MemoryHierarchyAccessType.LOAD && (requesterIsMainThread(access) || !isUseful(access.getVirtualPc()))) {
+        if (this.type.alterInsertionOnMiss() && access.getType() == MemoryHierarchyAccessType.LOAD && (requesterIsMainThread(access) || !isUseful(access.getVirtualPc()))) {
             // Thrashing MT miss or Non-useful HT miss, prevented from thrashing: low locality => insert in LRU position
             this.setLRU(set, way);
             return;
