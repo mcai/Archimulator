@@ -28,7 +28,7 @@ import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.net.Net;
 import archimulator.uncore.net.basic.routing.Routing;
-import archimulator.uncore.net.basic.routing.ShortestPathFirstRouting;
+import archimulator.uncore.net.basic.routing.aco.ACORouting;
 import archimulator.util.action.Action;
 
 import java.util.ArrayList;
@@ -133,7 +133,8 @@ public class BasicNet extends BasicSimulationObject implements Net {
         }
 
 //        this.routing = new XYRouting();
-        this.routing = new ShortestPathFirstRouting(this);
+//        this.routing = new ShortestPathFirstRouting(this);
+        this.routing = new ACORouting(this);
 
         memoryHierarchy.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
             if (memoryHierarchy.getSimulation().getType() != SimulationType.FAST_FORWARD) {

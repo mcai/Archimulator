@@ -366,4 +366,9 @@ public class Router {
     public SwitchAllocator getSwitchAllocator() {
         return switchAllocator;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%d,%d)", getX(), getY());
+    }
 }

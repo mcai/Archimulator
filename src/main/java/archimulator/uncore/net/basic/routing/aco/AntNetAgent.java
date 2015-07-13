@@ -46,6 +46,8 @@ public class AntNetAgent {
         this.routingTable = new RoutingTable(this.routing);
 
         this.initializeRoutingTable();
+
+        this.createAndSendForwardAntPacket();
     }
 
     /**
@@ -66,11 +68,11 @@ public class AntNetAgent {
     /**
      * Create and send a forward ant.
      */
-    public void sendAntPacket() {
-        Router destination = this.routingTable.calculateDestination(this.router);
+    public void createAndSendForwardAntPacket() {
+        Router destination = this.routingTable.calculateRandomDestination(this.router);
 
         AntPacket packet = new AntPacket(this.routing, AntPacketType.FORWARD_ANT, this.router, destination);
-        packet.getMemories().add(new Memory(this.router, 0.0d));
+        packet.getMemory().add(this.router);
 
         Router next = this.routingTable.calculateNext(destination, this.router);
 
@@ -78,9 +80,7 @@ public class AntNetAgent {
             return;
         }
 
-        packet.setNextHop(next);
-
-        //TODO: send it!
+        this.sendPacket(packet, next);
     }
 
     /**
@@ -94,12 +94,15 @@ public class AntNetAgent {
             if (this.getRouter() != packet.getDestination()) {
                 this.forwardAntPacket(packet);
             } else {
-                this.createBackwardAntPacket(packet);
+                this.createAndSendBackwardAntPacket(packet);
             }
         } else {
             this.updateRoutingTable(packet);
             if (this.getRouter() != packet.getDestination()) {
                 this.backwardAntPacket(packet);
+            }
+            else {
+                this.createAndSendForwardAntPacket();
             }
         }
     }
@@ -110,20 +113,7 @@ public class AntNetAgent {
      * @param packet the ant packet
      */
     public void memorize(AntPacket packet) {
-        double tripTime = this.router.getNet().getCycleAccurateEventQueue().getCurrentCycle()
-                - packet.getCreateTime();
-
-        for (Memory memory : packet.getMemories()) {
-            if (memory.getRouter() == this.getRouter()) {
-                double t = tripTime - memory.getTripTime();
-                packet.getMemories().forEach(
-                        mem -> mem.setTripTime(mem.getTripTime() + t)
-                );
-                return;
-            }
-        }
-
-        packet.getMemories().add(new Memory(this.router, tripTime));
+        packet.getMemory().add(this.router);
     }
 
     /**
@@ -140,9 +130,7 @@ public class AntNetAgent {
             return;
         }
 
-        packet.setNextHop(next);
-
-        //TODO: target.receive(packet);
+        this.sendPacket(packet, next);
     }
 
     /**
@@ -150,17 +138,16 @@ public class AntNetAgent {
      *
      * @param packet the original forward ant packet
      */
-    public void createBackwardAntPacket(AntPacket packet) {
+    public void createAndSendBackwardAntPacket(AntPacket packet) {
         Router temp = packet.getSource();
         packet.setSource(packet.getDestination());
         packet.setDestination(temp);
 
-        int index = packet.getMemories().size() - 2;
+        int index = packet.getMemory().size() - 2;
 
         packet.setType(AntPacketType.BACKWARD_ANT);
-        packet.setNextHop(packet.getMemories().get(index).getRouter());
 
-        //TODO: target.receive(packet);
+        this.sendPacket(packet, packet.getMemory().get(index));
     }
 
     /**
@@ -171,17 +158,16 @@ public class AntNetAgent {
     public void backwardAntPacket(AntPacket packet) {
         int index = -1;
 
-        for (int i = packet.getMemories().size() - 1; i >= 0; i--) {
-            if (packet.getMemories().get(i).getRouter() == this.router) {
+        for (int i = packet.getMemory().size() - 1; i >= 0; i--) {
+            if (packet.getMemory().get(i) == this.router) {
                 index = i - 1;
                 break;
             }
         }
 
-        packet.setNextHop(packet.getMemories().get(index).getRouter());
         packet.setType(AntPacketType.BACKWARD_ANT);
 
-        //TODO: target.receive(packet);
+        this.sendPacket(packet, packet.getMemory().get(index));
     }
 
     /**
@@ -191,14 +177,28 @@ public class AntNetAgent {
      */
     public void updateRoutingTable(AntPacket packet) {
         int i;
-        for (i = 0; packet.getMemories().get(i).getRouter() != this.router; i++) ;
+        for (i = 0; packet.getMemory().get(i) != this.router; i++) ;
         i++;
-        Router next = packet.getMemories().get(i).getRouter();
+        Router next = packet.getMemory().get(i);
 
-        for (int index = i; index < packet.getMemories().size(); index++) {
-            Router destination = packet.getMemories().get(index).getRouter();
+        for (int index = i; index < packet.getMemory().size(); index++) {
+            Router destination = packet.getMemory().get(index);
             this.routingTable.update(destination, next);
         }
+    }
+
+    /**
+     * Send the packet to the next hop.
+     *
+     * @param packet the packet
+     * @param nextHop the next hop
+     */
+    private void sendPacket(AntPacket packet, Router nextHop) {
+        this.router.getNet().getCycleAccurateEventQueue().schedule(
+                this,
+                () -> this.routing.getAgents().get(nextHop).receiveAntPacket(packet),
+                10
+        );
     }
 
     /**

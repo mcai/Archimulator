@@ -39,9 +39,7 @@ public class AntPacket {
     private Router source;
     private Router destination;
 
-    private Router nextHop;
-
-    private List<Memory> memories;
+    private List<Router> memory;
 
     /**
      * Create an ant packet.
@@ -59,7 +57,7 @@ public class AntPacket {
         this.source = source;
         this.destination = destination;
 
-        this.memories = new ArrayList<>();
+        this.memory = new ArrayList<>();
 
         this.createTime = source.getNet().getCycleAccurateEventQueue().getCurrentCycle();
     }
@@ -146,29 +144,11 @@ public class AntPacket {
     }
 
     /**
-     * Get the next hop router.
+     * Get the memory.
      *
-     * @return the next hop router
+     * @return the memory
      */
-    public Router getNextHop() {
-        return nextHop;
-    }
-
-    /**
-     * Set the next hop router.
-     *
-     * @param nextHop the next hop router
-     */
-    public void setNextHop(Router nextHop) {
-        this.nextHop = nextHop;
-    }
-
-    /**
-     * Get the map of memories.
-     *
-     * @return the map of memories
-     */
-    public List<Memory> getMemories() {
-        return memories;
+    public List<Router> getMemory() {
+        return memory;
     }
 }

@@ -70,11 +70,13 @@ public class RoutingTable {
      * @param source the source router
      * @return a randomly chosen destination router for the specified source router
      */
-    public Router calculateDestination(Router source) {
+    public Router calculateRandomDestination(Router source) {
+        int size = this.routing.getNet().getRouters().size();
+
         int i;
 
         do {
-            i = random.nextInt(this.routing.getNet().getRouters().size());
+            i = random.nextInt(size);
         } while (i == source.getId());
 
         return this.routing.getNet().getRouters().get(i);
