@@ -217,11 +217,15 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
             this.endSimulation();
 
+            Logger.info(Logger.SIMULATION, "Simulation aborted with errors.", this.getCycleAccurateEventQueue().getCurrentCycle());
+
             throw new RuntimeException(e);
         }
 
         this.endTime = DateHelper.toTick(new Date());
         this.collectStats();
+
+        Logger.info(Logger.SIMULATION, "Simulation completed successfully.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
         this.endSimulation();
     }
