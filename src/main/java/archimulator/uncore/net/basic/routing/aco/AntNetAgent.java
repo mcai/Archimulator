@@ -48,7 +48,7 @@ public class AntNetAgent {
         this.initializeRoutingTable();
 
         this.router.getNet().getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
-            if(this.router.getNet().getCycleAccurateEventQueue().getCurrentCycle() % 100 == 0) {
+            if (this.router.getNet().getCycleAccurateEventQueue().getCurrentCycle() % 10000 == 0) {
                 this.createAndSendForwardAntPacket();
             }
         });
@@ -93,14 +93,14 @@ public class AntNetAgent {
     private void receiveAntPacket(AntPacket packet, Router parent) {
         if (packet.getType() == AntPacketType.FORWARD_ANT) {
             this.memorize(packet);
-            if (this.getRouter() != packet.getDestination()) {
+            if (this.getRouter() != packet.getTo()) {
                 this.forwardAntPacket(packet, parent);
             } else {
                 this.createAndSendBackwardAntPacket(packet);
             }
         } else {
             this.updateRoutingTable(packet);
-            if (this.getRouter() != packet.getDestination()) {
+            if (this.getRouter() != packet.getTo()) {
                 this.backwardAntPacket(packet);
             }
         }
@@ -113,7 +113,7 @@ public class AntNetAgent {
      * @param parent the parent router
      */
     private void forwardAntPacket(AntPacket packet, Router parent) {
-        Router neighbor = this.routingTable.calculateNeighbor(packet.getDestination(), parent);
+        Router neighbor = this.routingTable.calculateNeighbor(packet.getTo(), parent);
         this.sendPacket(packet, neighbor);
     }
 
@@ -123,9 +123,9 @@ public class AntNetAgent {
      * @param packet the original forward ant packet
      */
     private void createAndSendBackwardAntPacket(AntPacket packet) {
-        Router temp = packet.getSource();
-        packet.setSource(packet.getDestination());
-        packet.setDestination(temp);
+        Router temp = packet.getFrom();
+        packet.setFrom(packet.getTo());
+        packet.setTo(temp);
 
         packet.setType(AntPacketType.BACKWARD_ANT);
 
@@ -173,14 +173,12 @@ public class AntNetAgent {
      * @param packet   the packet
      * @param neighbor the neighbor router
      */
-    //TODO: forward ants share the same queues as data packets, so that they experience the same traffic loads.
     private void sendPacket(AntPacket packet, Router neighbor) {
-//        System.out.printf("[%d] %s->%s: %s\n", this.router.getNet().getCycleAccurateEventQueue().getCurrentCycle(), this.router, neighbor, packet);
-
-        this.router.getNet().getCycleAccurateEventQueue().schedule(
-                this,
-                () -> this.routing.getAgents().get(neighbor).receiveAntPacket(packet, this.router),
-                1
+        this.router.getNet().transfer(
+                this.router,
+                neighbor,
+                8,
+                () -> this.routing.getAgents().get(neighbor).receiveAntPacket(packet, this.router)
         );
     }
 

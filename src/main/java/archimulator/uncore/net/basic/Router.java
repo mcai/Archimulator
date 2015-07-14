@@ -206,8 +206,8 @@ public class Router {
                         Flit flit = new Flit(
                                 this.net,
                                 packet,
-                                this.net.getRouter(packet.getFrom()),
-                                this.net.getRouter(packet.getTo())
+                                packet.getFrom(),
+                                packet.getTo()
                         );
 
                         flit.setHead(i == 0);

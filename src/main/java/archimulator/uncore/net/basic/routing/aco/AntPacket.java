@@ -36,30 +36,30 @@ public class AntPacket {
 
     private ACORouting routing;
     private AntPacketType type;
-    private Router source;
-    private Router destination;
+    private Router from;
+    private Router to;
 
     private List<Router> memory;
 
     /**
      * Create an ant packet.
      *
-     * @param routing     the ACO routing
-     * @param type        the type of the ant packet
-     * @param source      the source router
-     * @param destination the destination router
+     * @param routing the ACO routing
+     * @param type    the type of the ant packet
+     * @param from    the source router
+     * @param to      the destination router
      */
-    public AntPacket(ACORouting routing, AntPacketType type, Router source, Router destination) {
+    public AntPacket(ACORouting routing, AntPacketType type, Router from, Router to) {
         this.id = routing.currentAntId++;
 
         this.routing = routing;
         this.type = type;
-        this.source = source;
-        this.destination = destination;
+        this.from = from;
+        this.to = to;
 
         this.memory = new ArrayList<>();
 
-        this.createTime = source.getNet().getCycleAccurateEventQueue().getCurrentCycle();
+        this.createTime = from.getNet().getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     /**
@@ -112,17 +112,17 @@ public class AntPacket {
      *
      * @return the source router
      */
-    public Router getSource() {
-        return source;
+    public Router getFrom() {
+        return from;
     }
 
     /**
      * Set the source router.
      *
-     * @param source the source router
+     * @param from the source router
      */
-    public void setSource(Router source) {
-        this.source = source;
+    public void setFrom(Router from) {
+        this.from = from;
     }
 
     /**
@@ -130,17 +130,17 @@ public class AntPacket {
      *
      * @return the destination router
      */
-    public Router getDestination() {
-        return destination;
+    public Router getTo() {
+        return to;
     }
 
     /**
      * Set the destination router.
      *
-     * @param destination the destination router
+     * @param to the destination router
      */
-    public void setDestination(Router destination) {
-        this.destination = destination;
+    public void setTo(Router to) {
+        this.to = to;
     }
 
     /**
@@ -154,6 +154,6 @@ public class AntPacket {
 
     @Override
     public String toString() {
-        return String.format("AntPacket{id=%d, type=%s, source=%s, destination=%s}", id, type, source, destination);
+        return String.format("AntPacket{id=%d, type=%s, from=%s, to=%s}", id, type, from, to);
     }
 }

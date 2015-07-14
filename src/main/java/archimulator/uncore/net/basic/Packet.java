@@ -20,7 +20,6 @@
  */
 package archimulator.uncore.net.basic;
 
-import archimulator.uncore.MemoryDevice;
 import archimulator.util.action.Action;
 
 /**
@@ -33,8 +32,8 @@ public class Packet {
 
     private long id;
 
-    private MemoryDevice from;
-    private MemoryDevice to;
+    private Router from;
+    private Router to;
 
     private int size;
     private Action onCompletedCallback;
@@ -43,12 +42,12 @@ public class Packet {
      * Create a packet.
      *
      * @param net the net
-     * @param from the source memory device
-     * @param to the destination memory device
+     * @param from the source router
+     * @param to the destination router
      * @param size the size of the packet
      * @param onCompletedCallback the callback performed on completion
      */
-    public Packet(BasicNet net, MemoryDevice from, MemoryDevice to, int size, Action onCompletedCallback) {
+    public Packet(BasicNet net, Router from, Router to, int size, Action onCompletedCallback) {
         this.net = net;
         this.id = net.currentRequestId++;
         this.from = from;
@@ -76,20 +75,20 @@ public class Packet {
     }
 
     /**
-     * Get the source memory device.
+     * Get the source router.
      *
-     * @return the source memory device
+     * @return the source router
      */
-    public MemoryDevice getFrom() {
+    public Router getFrom() {
         return from;
     }
 
     /**
-     * Get the destination memory device.
+     * Get the destination router.
      *
-     * @return the destination memory device
+     * @return the destination router
      */
-    public MemoryDevice getTo() {
+    public Router getTo() {
         return to;
     }
 

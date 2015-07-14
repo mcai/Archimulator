@@ -96,6 +96,10 @@ public class RoutingTable {
             throw new IllegalArgumentException();
         }
 
+        if(this.agent.getRouter().getLinks().values().contains(destination)) {
+            return destination;
+        }
+
         List<Pheromone> pheromonesPerDestination = this.pheromones.get(destination);
 
         double maxPheromoneValue = 0;
