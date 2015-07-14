@@ -88,9 +88,10 @@ public class RoutingTable {
      * Calculate the neighbor (next hop) router for the specified destination and parent routers.
      *
      * @param destination the destination router
+     * @param parent the parent router
      * @return the next hop router for the specified destination and parent routers
      */
-    public Router calculateNeighbor(Router destination) {
+    public Router calculateNeighbor(Router destination, Router parent) {
         if(destination == this.agent.getRouter()) {
             throw new IllegalArgumentException();
         }
@@ -104,7 +105,7 @@ public class RoutingTable {
             Router neighbor = pheromone.getNeighbor();
             double pheromoneValue = pheromone.getValue();
 
-            if(pheromoneValue > maxPheromoneValue) {
+            if(neighbor != parent && pheromoneValue > maxPheromoneValue) {
                 maxPheromoneValue = pheromoneValue;
                 maxPheromoneNeighbor = neighbor;
             }

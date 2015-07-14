@@ -61,7 +61,7 @@ public class ACORouting implements Routing {
 
     @Override
     public Port getOutputPort(Router router, Flit flit) {
-        Router neighbor = this.agents.get(router).getRoutingTable().calculateNeighbor(flit.getDestination());
+        Router neighbor = this.agents.get(router).getRoutingTable().calculateNeighbor(flit.getDestination(), router);
         for(Port port : router.getLinks().keySet()) {
             if(router.getLinks().get(port) == neighbor) {
                 return port;
