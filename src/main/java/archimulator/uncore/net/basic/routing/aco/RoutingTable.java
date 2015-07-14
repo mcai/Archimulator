@@ -30,7 +30,9 @@ import java.util.*;
  * @author Min Cai
  */
 public class RoutingTable {
-    private ACORouting routing;
+    public static final double REINFORCEMENT_FACTOR = 0.05;
+
+    private AntNetAgent agent;
     private Map<Router, List<Pheromone>> pheromones;
 
     private Random random;
@@ -38,10 +40,10 @@ public class RoutingTable {
     /**
      * Create a routing table.
      *
-     * @param routing the ACO routing
+     * @param agent the ACO routing
      */
-    public RoutingTable(ACORouting routing) {
-        this.routing = routing;
+    public RoutingTable(AntNetAgent agent) {
+        this.agent = agent;
         this.pheromones = new HashMap<>();
 
         this.random = new Random(13);
@@ -51,11 +53,11 @@ public class RoutingTable {
      * Add a router entry.
      *
      * @param destination    the destination router
-     * @param next           the next router
+     * @param neighbor       the neighbor router
      * @param pheromoneValue the pheromone value
      */
-    public void addEntry(Router destination, Router next, double pheromoneValue) {
-        Pheromone pheromone = new Pheromone(next, pheromoneValue);
+    public void addEntry(Router destination, Router neighbor, double pheromoneValue) {
+        Pheromone pheromone = new Pheromone(neighbor, pheromoneValue);
 
         if (!this.pheromones.containsKey(destination)) {
             this.pheromones.put(destination, new ArrayList<>());
@@ -71,7 +73,7 @@ public class RoutingTable {
      * @return a randomly chosen destination router for the specified source router
      */
     public Router calculateRandomDestination(Router source) {
-        int size = this.routing.getNet().getRouters().size();
+        int size = this.agent.getRouter().getNet().getRouters().size();
 
         int i;
 
@@ -79,92 +81,68 @@ public class RoutingTable {
             i = random.nextInt(size);
         } while (i == source.getId());
 
-        return this.routing.getNet().getRouters().get(i);
+        return this.agent.getRouter().getNet().getRouters().get(i);
     }
 
     /**
-     * Calculate the next hop router for the specified destination and parent routers.
+     * Calculate the neighbor (next hop) router for the specified destination and parent routers.
      *
      * @param destination the destination router
-     * @param parent      the parent router
      * @return the next hop router for the specified destination and parent routers
      */
-    public Router calculateNext(Router destination, Router parent) {
-        List<Pheromone> pheromones = this.pheromones.get(destination);
+    public Router calculateNeighbor(Router destination) {
+        if(destination == this.agent.getRouter()) {
+            throw new IllegalArgumentException();
+        }
 
-        //calculate probability range for parent link
-        double lRange = 0.0d;
-        double uRange = 0.0d;
-        for (Pheromone pheromone : pheromones) {
-            Router next = pheromone.getNeighbor();
+        List<Pheromone> pheromonesPerDestination = this.pheromones.get(destination);
+
+        double maxPheromoneValue = 0;
+        Router maxPheromoneNeighbor = null;
+
+        for(Pheromone pheromone : pheromonesPerDestination) {
+            Router neighbor = pheromone.getNeighbor();
             double pheromoneValue = pheromone.getValue();
 
-            if (next == parent) {
-                uRange = lRange + pheromoneValue;
-                break;
+            if(pheromoneValue > maxPheromoneValue) {
+                maxPheromoneValue = pheromoneValue;
+                maxPheromoneNeighbor = neighbor;
             }
-
-            lRange += pheromoneValue;
         }
 
-        if (uRange == 0.0d) {
-            uRange = 1.0d;
+        if(maxPheromoneNeighbor == null) {
+            throw new IllegalArgumentException();
         }
 
-        //dead end, loopback
-        if (lRange == 0.0d && uRange == 1.0d) {
-            return parent;
-        }
-
-        //generate random probability value, out of range of parent link
-        double tempDouble;
-        do {
-            tempDouble = random.nextDouble();
-        } while (tempDouble >= lRange && tempDouble < uRange);
-
-        //find next hop router corresponding to this range of probability
-        lRange = 0.0d;
-        uRange = 0.0d;
-        for (Pheromone pheromone : pheromones) {
-            Router next = pheromone.getNeighbor();
-            double pheromoneValue = pheromone.getValue();
-
-            uRange += pheromoneValue;
-            if (tempDouble >= lRange && tempDouble < uRange) {
-                return next;
-            }
-            lRange = uRange;
-        }
-
-        throw new IllegalArgumentException();
+        return maxPheromoneNeighbor;
     }
 
     /**
      * Update the routing table by incrementing or evaporating pheromone values as per the AntNet algorithm.
      *
      * @param destination the destination router
-     * @param next        the next router
+     * @param neighbor    the neighbor router
      */
-    public void update(Router destination, Router next) {
-        List<Pheromone> pheromones = this.pheromones.get(destination);
+    public void update(Router destination, Router neighbor) {
+        List<Pheromone> pheromonesPerDestination = this.pheromones.get(destination);
 
-        for (Pheromone pheromone : pheromones) {
+        for (Pheromone pheromone : pheromonesPerDestination) {
             double oldPheromoneValue = pheromone.getValue();
-            if (pheromone.getNeighbor() == next) {
-                pheromone.setValue(oldPheromoneValue + ACORouting.REINFORCEMENT_FACTOR * (1 - oldPheromoneValue));
+            if (pheromone.getNeighbor() == neighbor) {
+                pheromone.setValue(oldPheromoneValue + REINFORCEMENT_FACTOR * (1 - oldPheromoneValue));
             } else {
-                pheromone.setValue((1 - ACORouting.REINFORCEMENT_FACTOR) * oldPheromoneValue);
+                pheromone.setValue((1 - REINFORCEMENT_FACTOR) * oldPheromoneValue);
             }
         }
     }
 
     /**
-     * Get the ACO routing.
+     * Get the ant net agent.
      *
-     * @return the ACO routing
+     * @return the ant net agent
      */
-    public ACORouting getRouting() {
-        return routing;
+    public AntNetAgent getAgent() {
+        return agent;
     }
 
     /**

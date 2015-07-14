@@ -151,4 +151,9 @@ public class AntPacket {
     public List<Router> getMemory() {
         return memory;
     }
+
+    @Override
+    public String toString() {
+        return String.format("AntPacket{id=%d, type=%s, source=%s, destination=%s}", id, type, source, destination);
+    }
 }

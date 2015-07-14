@@ -26,9 +26,7 @@ import archimulator.uncore.net.basic.Port;
 import archimulator.uncore.net.basic.Router;
 import archimulator.uncore.net.basic.routing.Routing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,8 +35,6 @@ import java.util.Map;
  * @author Min Cai
  */
 public class ACORouting implements Routing {
-    public static final double REINFORCEMENT_FACTOR = 0.05;
-
     private BasicNet net;
 
     private Map<Router, AntNetAgent> agents;
@@ -65,24 +61,14 @@ public class ACORouting implements Routing {
 
     @Override
     public Port getOutputPort(Router router, Flit flit) {
-        Router next = this.agents.get(router).getRoutingTable().calculateNext(flit.getDestination(), router);
-        for(Port port : Port.values()) {
-            if (router.getLinks().containsKey(port) && router.getLinks().get(port) == next) {
+        Router neighbor = this.agents.get(router).getRoutingTable().calculateNeighbor(flit.getDestination());
+        for(Port port : router.getLinks().keySet()) {
+            if(router.getLinks().get(port) == neighbor) {
                 return port;
             }
         }
 
         throw new IllegalArgumentException();
-    }
-
-    /**
-     * Get the list of neighbors of the specified router.
-     *
-     * @param router the router
-     * @return the list of neighbors of the specified router
-     */
-    public List<Router> getNeighbors(Router router) {
-        return new ArrayList<>(router.getLinks().values());
     }
 
     /**
