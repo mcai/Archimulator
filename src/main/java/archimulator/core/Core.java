@@ -20,12 +20,9 @@
  */
 package archimulator.core;
 
-import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.core.functionalUnit.FunctionalUnitPool;
-import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.util.action.Action;
 
 import java.util.List;
 
@@ -34,70 +31,13 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public interface Core extends SimulationObject, Reportable {
+public interface Core extends MemoryHierarchyCore, Reportable {
     /**
      * Remove the entry from the queues.
      *
      * @param reorderBufferEntry the entry to be removed from the queues
      */
     void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry);
-
-    /**
-     * Get a value indicating whether the specified thread can fetch the instruction at the specified address.
-     *
-     * @param thread         the thread
-     * @param virtualAddress the virtual address
-     * @return a value indicating whether the specified thread can fetch the instruction at the specified address
-     */
-    boolean canIfetch(Thread thread, int virtualAddress);
-
-    /**
-     * Get a value indicating whether the specified thread can perform a load at the specified address.
-     *
-     * @param thread         the thread
-     * @param virtualAddress the virtual address
-     * @return a value indicating whether the specified thread can perform a load at the specified address
-     */
-    boolean canLoad(Thread thread, int virtualAddress);
-
-    /**
-     * Get a value indicating whether the specified thread can perform a store at the specified address.
-     *
-     * @param thread         the thread
-     * @param virtualAddress the virtual address
-     * @return a value indicating whether the specified thread can perform a store at the specified address
-     */
-    boolean canStore(Thread thread, int virtualAddress);
-
-    /**
-     * Act on when the specified thread fetch the instruction at the specified address.
-     *
-     * @param thread              the thread
-     * @param virtualAddress      the virtual address
-     * @param virtualPc           the virtual address of the program counter (PC)
-     * @param onCompletedCallback the callback action performed when the instruction fetch is completed
-     */
-    void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
-
-    /**
-     * Act on when the specified thread perform a load at the specified address.
-     *
-     * @param dynamicInstruction  the dynamic instruction
-     * @param virtualAddress      the virtual address
-     * @param virtualPc           the virtual address of the program counter (PC)
-     * @param onCompletedCallback the callback action performed when the load is completed
-     */
-    void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
-
-    /**
-     * Act on when the specified thread perform a store at the specified address.
-     *
-     * @param dynamicInstruction  the dynamic instruction
-     * @param virtualAddress      the virtual address
-     * @param virtualPc           the virtual address of the program counter (PC)
-     * @param onCompletedCallback the callback action performed when the store is completed
-     */
-    void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
     /**
      * Do fast forward for one cycle.
@@ -114,11 +54,6 @@ public interface Core extends SimulationObject, Reportable {
     }
 
     /**
-     * Do measurement for one cycle.
-     */
-    void doMeasurementOneCycle();
-
-    /**
      * Update the statistics per cycle.
      */
     default void updatePerCycleStats() {
@@ -126,27 +61,6 @@ public interface Core extends SimulationObject, Reportable {
 
         this.getFunctionalUnitPool().updatePerCycleStats();
     }
-
-    /**
-     * Get the number of the core.
-     *
-     * @return the number of the core
-     */
-    int getNum();
-
-    /**
-     * Get the name of the core.
-     *
-     * @return the name of the core
-     */
-    String getName();
-
-    /**
-     * Get the parent processor.
-     *
-     * @return the parent processor
-     */
-    Processor getProcessor();
 
     /**
      * Get the list of SMT threads.
@@ -203,34 +117,6 @@ public interface Core extends SimulationObject, Reportable {
      * @return the out-of-order event queue
      */
     List<AbstractReorderBufferEntry> getOooEventQueue();
-
-    /**
-     * Get the L1I cache controller.
-     *
-     * @return the L1I cache controller
-     */
-    CacheController getL1IController();
-
-    /**
-     * Set the L1I cache controller.
-     *
-     * @param l1IController the L1I cache controller
-     */
-    void setL1IController(CacheController l1IController);
-
-    /**
-     * Get the L1D cache controller.
-     *
-     * @return the L1D cache controller
-     */
-    CacheController getL1DController();
-
-    /**
-     * Set the L1D cache controller.
-     *
-     * @param l1DController the L1D cache controller
-     */
-    void setL1DController(CacheController l1DController);
 
     /**
      * Get the number of instructions executed on all the threads.

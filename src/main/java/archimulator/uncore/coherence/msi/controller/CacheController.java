@@ -20,8 +20,8 @@
  */
 package archimulator.uncore.coherence.msi.controller;
 
-import archimulator.core.Core;
 import archimulator.core.DynamicInstruction;
+import archimulator.core.MemoryHierarchyCore;
 import archimulator.core.Thread;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
@@ -50,7 +50,7 @@ import java.util.function.BiConsumer;
  * @author Min Cai
  */
 public abstract class CacheController extends GeneralCacheController<CacheControllerState, CacheControllerEventType> {
-    private Core core;
+    private MemoryHierarchyCore core;
 
     private EvictableCache<CacheControllerState> cache;
     private Map<Integer, MemoryHierarchyAccess> pendingAccesses;
@@ -418,7 +418,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      *
      * @return the core
      */
-    public Core getCore() {
+    public MemoryHierarchyCore getCore() {
         return core;
     }
 
@@ -427,7 +427,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      *
      * @param core the core
      */
-    public void setCore(Core core) {
+    public void setCore(MemoryHierarchyCore core) {
         this.core = core;
     }
 

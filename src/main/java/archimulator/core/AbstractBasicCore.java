@@ -20,14 +20,7 @@
  */
 package archimulator.core;
 
-import archimulator.common.BasicSimulationObject;
 import archimulator.core.functionalUnit.FunctionalUnitPool;
-import archimulator.uncore.MemoryAccessInitiatedEvent;
-import archimulator.uncore.MemoryHierarchyAccess;
-import archimulator.uncore.MemoryHierarchyAccessType;
-import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.util.action.Action;
-import archimulator.util.math.Counter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,36 +30,11 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public abstract class AbstractBasicCore extends BasicSimulationObject implements Core {
-    /**
-     * The number of the core.
-     */
-    private int num;
-
-    /**
-     * The name of the core.
-     */
-    private String name;
-
-    /**
-     * The processor.
-     */
-    private Processor processor;
-
+public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore implements Core {
     /**
      * The list of threads.
      */
     protected List<Thread> threads;
-
-    /**
-     * The L1I cache controller.
-     */
-    private CacheController l1IController;
-
-    /**
-     * The L1D cache controller.
-     */
-    private CacheController l1DController;
 
     /**
      * The functional unit pool.
@@ -110,12 +78,7 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
      * @param num       the number of the core
      */
     public AbstractBasicCore(Processor processor, int num) {
-        super(processor);
-
-        this.num = num;
-        this.name = "c" + this.num;
-
-        this.processor = processor;
+        super(processor, num);
 
         this.threads = new ArrayList<>();
 
@@ -187,133 +150,6 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     protected abstract void commit();
 
     @Override
-    public boolean canIfetch(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1IController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1IController.canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
-    }
-
-    @Override
-    public boolean canLoad(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1DController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1DController.canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
-    }
-
-    @Override
-    public boolean canStore(Thread thread, int virtualAddress) {
-        int physicalTag = this.l1DController.getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
-        return this.l1DController.canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
-    }
-
-    @Override
-    public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
-        final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1IController.getCache().getTag(physicalAddress);
-
-        final Counter counterPending = new Counter(0);
-
-        counterPending.increment();
-
-        MemoryHierarchyAccess alias = this.l1IController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1IController.beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, () -> {
-            counterPending.decrement();
-
-            if (counterPending.getValue() == 0) {
-                onCompletedCallback.apply();
-            }
-        });
-
-        if (alias == null) {
-            counterPending.increment();
-
-            thread.getItlb().access(access, () -> {
-                counterPending.decrement();
-
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
-            });
-
-            this.l1IController.receiveIfetch(access, () -> l1IController.endAccess(physicalTag));
-        }
-
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
-    }
-
-    @Override
-    public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
-        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1DController.getCache().getTag(physicalAddress);
-
-        final Counter counterPending = new Counter(0);
-
-        counterPending.increment();
-
-        MemoryHierarchyAccess alias = this.l1DController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
-            public void apply() {
-                counterPending.decrement();
-
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
-            }
-        });
-
-        if (alias == null) {
-            counterPending.increment();
-
-            dynamicInstruction.getThread().getDtlb().access(access, () -> {
-                counterPending.decrement();
-
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
-            });
-
-            this.l1DController.receiveLoad(access, () -> l1DController.endAccess(physicalTag));
-        }
-
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
-    }
-
-    @Override
-    public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
-        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
-        final int physicalTag = this.l1DController.getCache().getTag(physicalAddress);
-
-        final Counter counterPending = new Counter(0);
-
-        counterPending.increment();
-
-        MemoryHierarchyAccess alias = this.l1DController.findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.l1DController.beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
-            public void apply() {
-                counterPending.decrement();
-
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
-            }
-        });
-
-        if (alias == null) {
-            counterPending.increment();
-
-            dynamicInstruction.getThread().getDtlb().access(access, () -> {
-                counterPending.decrement();
-
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
-            });
-
-            this.l1DController.receiveStore(access, () -> l1DController.endAccess(physicalTag));
-        }
-
-        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
-    }
-
-    @Override
     public void removeFromQueues(AbstractReorderBufferEntry reorderBufferEntry) {
         this.oooEventQueue.remove(reorderBufferEntry);
 
@@ -326,21 +162,6 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
         this.waitingStoreQueue.remove(reorderBufferEntry);
 
         reorderBufferEntry.setSquashed();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getNum() {
-        return num;
-    }
-
-    @Override
-    public Processor getProcessor() {
-        return processor;
     }
 
     @Override
@@ -381,27 +202,5 @@ public abstract class AbstractBasicCore extends BasicSimulationObject implements
     @Override
     public List<AbstractReorderBufferEntry> getOooEventQueue() {
         return oooEventQueue;
-    }
-
-    @Override
-    public CacheController getL1IController() {
-        return l1IController;
-    }
-
-    @Override
-    public void setL1IController(CacheController l1IController) {
-        this.l1IController = l1IController;
-        this.l1IController.setCore(this);
-    }
-
-    @Override
-    public CacheController getL1DController() {
-        return l1DController;
-    }
-
-    @Override
-    public void setL1DController(CacheController l1DController) {
-        this.l1DController = l1DController;
-        this.l1DController.setCore(this);
     }
 }
