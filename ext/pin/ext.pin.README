@@ -1,0 +1,4 @@
+Archimulator.ext.pin README
+
+This tool is useful for enabling trace-driven simulation in Archimulator. Users can use this tool to generate memory
+trace files for native applications with the aid of the Intel PIN tool.
