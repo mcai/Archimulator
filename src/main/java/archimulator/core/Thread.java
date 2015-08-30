@@ -116,28 +116,18 @@ public interface Thread extends SimulationObject, Reportable {
      *
      * @return the instruction translation lookaside buffer (iTLB)
      */
-    TranslationLookasideBuffer getItlb();
-
-    /**
-     * Set the instruction translation lookaside buffer (iTLB).
-     *
-     * @param itlb the instruction translation lookaside buffer (iTLB)
-     */
-    void setItlb(TranslationLookasideBuffer itlb);
+    default TranslationLookasideBuffer getItlb() {
+        return getCore().getProcessor().getMemoryHierarchy().getItlbs().get(this.getId());
+    }
 
     /**
      * Get the data translation lookaside buffer (dTLB).
      *
      * @return the data translation lookaside buffer (dTLB)
      */
-    TranslationLookasideBuffer getDtlb();
-
-    /**
-     * Set the data translation lookaside buffer (dTLB).
-     *
-     * @param dtlb the data translation lookaside buffer (dTLB)
-     */
-    void setDtlb(TranslationLookasideBuffer dtlb);
+    default TranslationLookasideBuffer getDtlb() {
+        return getCore().getProcessor().getMemoryHierarchy().getDtlbs().get(this.getId());
+    }
 
     /**
      * Get the parent core.

@@ -77,16 +77,9 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
         for (int i = 0; i < getExperiment().getNumCores(); i++) {
             Core core = new BasicCore(this, i);
 
-            core.setL1IController(memoryHierarchy.getL1IControllers().get(i));
-            core.setL1DController(memoryHierarchy.getL1DControllers().get(i));
-
             for (int j = 0; j < getExperiment().getNumThreadsPerCore(); j++) {
                 BasicThread thread = new BasicThread(core, j);
                 core.getThreads().add(thread);
-
-                thread.setItlb(memoryHierarchy.getItlbs().get(thread.getId()));
-
-                thread.setDtlb(memoryHierarchy.getDtlbs().get(thread.getId()));
             }
 
             this.cores.add(core);

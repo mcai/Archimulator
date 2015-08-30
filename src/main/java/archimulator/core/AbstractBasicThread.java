@@ -28,7 +28,6 @@ import archimulator.isa.RegisterDependencyType;
 import archimulator.isa.event.InstructionFunctionallyExecutedEvent;
 import archimulator.isa.event.SystemCallExecutedEvent;
 import archimulator.os.Context;
-import archimulator.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -88,9 +87,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
      * The load/store queue.
      */
     protected PipelineBuffer<LoadStoreQueueEntry> loadStoreQueue;
-
-    private TranslationLookasideBuffer itlb;
-    private TranslationLookasideBuffer dtlb;
 
     /**
      * The integer physical register file.
@@ -344,26 +340,6 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
     @Override
     public long getNumInstructions() {
         return numInstructions;
-    }
-
-    @Override
-    public TranslationLookasideBuffer getItlb() {
-        return itlb;
-    }
-
-    @Override
-    public void setItlb(TranslationLookasideBuffer itlb) {
-        this.itlb = itlb;
-    }
-
-    @Override
-    public TranslationLookasideBuffer getDtlb() {
-        return dtlb;
-    }
-
-    @Override
-    public void setDtlb(TranslationLookasideBuffer dtlb) {
-        this.dtlb = dtlb;
     }
 
     @Override

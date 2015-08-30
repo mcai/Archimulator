@@ -22,7 +22,8 @@ package archimulator.core;
 
 import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
-import archimulator.uncore.coherence.msi.controller.CacheController;
+import archimulator.uncore.coherence.msi.controller.L1DController;
+import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.util.action.Action;
 
 /**
@@ -119,26 +120,28 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      *
      * @return the L1I cache controller
      */
-    CacheController getL1IController();
+    default L1IController getL1IController() {
+        L1IController l1IController = getProcessor().getMemoryHierarchy().getL1IControllers().get(this.getNum());
 
-    /**
-     * Set the L1I cache controller.
-     *
-     * @param l1IController the L1I cache controller
-     */
-    void setL1IController(CacheController l1IController);
+        if(l1IController.getCore() == null) {
+            l1IController.setCore(this);
+        }
+
+        return l1IController;
+    }
 
     /**
      * Get the L1D cache controller.
      *
      * @return the L1D cache controller
      */
-    CacheController getL1DController();
+    default L1DController getL1DController() {
+        L1DController l1DController = getProcessor().getMemoryHierarchy().getL1DControllers().get(this.getNum());
 
-    /**
-     * Set the L1D cache controller.
-     *
-     * @param l1DController the L1D cache controller
-     */
-    void setL1DController(CacheController l1DController);
+        if(l1DController.getCore() == null) {
+            l1DController.setCore(this);
+        }
+
+        return l1DController;
+    }
 }

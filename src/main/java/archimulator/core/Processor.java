@@ -20,11 +20,7 @@
  */
 package archimulator.core;
 
-import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
-import archimulator.common.report.Reportable;
-import archimulator.os.Kernel;
-import archimulator.uncore.MemoryHierarchy;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +30,7 @@ import java.util.stream.Collectors;
  *
  * @author Min Cai
  */
-public interface Processor extends SimulationObject, Reportable {
+public interface Processor extends MemoryHierarchyProcessor {
     /**
      * Get the list of cores.
      *
@@ -52,23 +48,9 @@ public interface Processor extends SimulationObject, Reportable {
     }
 
     /**
-     * Get the kernel.
-     *
-     * @return the kernel
-     */
-    Kernel getKernel();
-
-    /**
      * Update the assignments of contexts to threads.
      */
     void updateContextToThreadAssignments();
-
-    /**
-     * Get the memory hierarchy.
-     *
-     * @return the memory hierarchy
-     */
-    MemoryHierarchy getMemoryHierarchy();
 
     /**
      * Get the number of instructions executed on all the threads.
