@@ -21,6 +21,11 @@
 package archimulator.core;
 
 import archimulator.core.functionalUnit.FunctionalUnitPool;
+import archimulator.uncore.MemoryAccessInitiatedEvent;
+import archimulator.uncore.MemoryHierarchyAccess;
+import archimulator.uncore.MemoryHierarchyAccessType;
+import archimulator.util.action.Action;
+import archimulator.util.math.Counter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -162,6 +167,163 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
         this.waitingStoreQueue.remove(reorderBufferEntry);
 
         reorderBufferEntry.setSquashed();
+    }
+
+    @Override
+    public boolean canIfetch(Thread thread, int virtualAddress) {
+        int physicalTag = this.getL1IController().getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.getL1IController().canAccess(MemoryHierarchyAccessType.IFETCH, physicalTag);
+    }
+
+    @Override
+    public boolean canLoad(Thread thread, int virtualAddress) {
+        int physicalTag = this.getL1DController().getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.getL1DController().canAccess(MemoryHierarchyAccessType.LOAD, physicalTag);
+    }
+
+    @Override
+    public boolean canStore(Thread thread, int virtualAddress) {
+        int physicalTag = this.getL1DController().getCache().getTag(thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress));
+        return this.getL1DController().canAccess(MemoryHierarchyAccessType.STORE, physicalTag);
+    }
+
+    @Override
+    public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+        final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
+        final int physicalTag = this.getL1IController().getCache().getTag(physicalAddress);
+
+        final Counter counterPending = new Counter(0);
+
+        counterPending.increment();
+
+        MemoryHierarchyAccess alias = this.getL1IController().findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.getL1IController().beginAccess(null, thread, MemoryHierarchyAccessType.IFETCH, virtualPc, physicalAddress, physicalTag, () -> {
+            counterPending.decrement();
+
+            if (counterPending.getValue() == 0) {
+                onCompletedCallback.apply();
+            }
+        });
+
+        if (alias == null) {
+            counterPending.increment();
+
+            thread.getItlb().access(access, () -> {
+                counterPending.decrement();
+
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            });
+
+            this.getL1IController().receiveIfetch(access, () -> getL1IController().endAccess(physicalTag));
+        }
+
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(thread, virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.IFETCH));
+    }
+
+    @Override
+    public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
+        final int physicalTag = this.getL1DController().getCache().getTag(physicalAddress);
+
+        final Counter counterPending = new Counter(0);
+
+        counterPending.increment();
+
+        MemoryHierarchyAccess alias = this.getL1DController().findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
+            public void apply() {
+                counterPending.decrement();
+
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            }
+        });
+
+        if (alias == null) {
+            counterPending.increment();
+
+            dynamicInstruction.getThread().getDtlb().access(access, () -> {
+                counterPending.decrement();
+
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            });
+
+            this.getL1DController().receiveLoad(access, () -> getL1DController().endAccess(physicalTag));
+        }
+
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.LOAD));
+    }
+
+    @Override
+    public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+        final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
+        final int physicalTag = this.getL1DController().getCache().getTag(physicalAddress);
+
+        final Counter counterPending = new Counter(0);
+
+        counterPending.increment();
+
+        MemoryHierarchyAccess alias = this.getL1DController().findAccess(physicalTag);
+        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
+            public void apply() {
+                counterPending.decrement();
+
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            }
+        });
+
+        if (alias == null) {
+            counterPending.increment();
+
+            dynamicInstruction.getThread().getDtlb().access(access, () -> {
+                counterPending.decrement();
+
+                if (counterPending.getValue() == 0) {
+                    onCompletedCallback.apply();
+                }
+            });
+
+            this.getL1DController().receiveStore(access, () -> getL1DController().endAccess(physicalTag));
+        }
+
+        this.getBlockingEventDispatcher().dispatch(new MemoryAccessInitiatedEvent(dynamicInstruction.getThread(), virtualPc, physicalAddress, physicalTag, MemoryHierarchyAccessType.STORE));
+    }
+
+    @Override
+    public boolean canIfetch(MemoryHierarchyThread thread, int virtualAddress) {
+        return canIfetch((Thread)thread, virtualAddress);
+    }
+
+    @Override
+    public boolean canLoad(MemoryHierarchyThread thread, int virtualAddress) {
+        return canLoad((Thread)thread, virtualAddress);
+    }
+
+    @Override
+    public boolean canStore(MemoryHierarchyThread thread, int virtualAddress) {
+        return canStore((Thread)thread, virtualAddress);
+    }
+
+    @Override
+    public void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+        ifetch((Thread)thread, virtualAddress, virtualPc, onCompletedCallback);
+    }
+
+    @Override
+    public void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+        load((DynamicInstruction)dynamicInstruction, virtualAddress, virtualPc, onCompletedCallback);
+    }
+
+    @Override
+    public void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+        store((DynamicInstruction)dynamicInstruction, virtualAddress, virtualPc, onCompletedCallback);
     }
 
     @Override

@@ -20,9 +20,7 @@
  */
 package archimulator.core;
 
-import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
-import archimulator.common.report.Reportable;
 import archimulator.core.bpred.BranchPredictor;
 import archimulator.isa.Mnemonic;
 import archimulator.os.Context;
@@ -35,7 +33,14 @@ import java.util.Map;
  *
  * @author Min Cai
  */
-public interface Thread extends SimulationObject, Reportable {
+public interface Thread extends MemoryHierarchyThread {
+    /**
+     * Get the parent core.
+     *
+     * @return the parent core
+     */
+    Core getCore();
+
     /**
      * Fast forward for one cycle.
      */
@@ -91,27 +96,6 @@ public interface Thread extends SimulationObject, Reportable {
     void updatePerCycleStats();
 
     /**
-     * Get the number of the thread.
-     *
-     * @return the number of the thread
-     */
-    int getNum();
-
-    /**
-     * Get the ID of the thread.
-     *
-     * @return the ID of the thread
-     */
-    int getId();
-
-    /**
-     * Get the name of the thread.
-     *
-     * @return the name of the thread
-     */
-    String getName();
-
-    /**
      * Get the instruction translation lookaside buffer (iTLB).
      *
      * @return the instruction translation lookaside buffer (iTLB)
@@ -128,13 +112,6 @@ public interface Thread extends SimulationObject, Reportable {
     default TranslationLookasideBuffer getDtlb() {
         return getCore().getProcessor().getMemoryHierarchy().getDtlbs().get(this.getId());
     }
-
-    /**
-     * Get the parent core.
-     *
-     * @return the parent core
-     */
-    Core getCore();
 
     /**
      * Get the branch predictor.

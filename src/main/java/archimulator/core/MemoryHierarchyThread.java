@@ -20,60 +20,40 @@
  */
 package archimulator.core;
 
-import archimulator.common.BasicSimulationObject;
+import archimulator.common.SimulationObject;
+import archimulator.common.report.Reportable;
 
 /**
- * Abstract memory hierarchy core.
+ * Thread.
  *
  * @author Min Cai
  */
-public abstract class AbstractMemoryHierarchyCore extends BasicSimulationObject implements MemoryHierarchyCore {
+public interface MemoryHierarchyThread extends SimulationObject, Reportable {
     /**
-     * The number of the core.
-     */
-    private int num;
-
-    /**
-     * The name of the core.
-     */
-    private String name;
-
-    /**
-     * The processor.
-     */
-    private Processor processor;
-
-    /**
-     * Create an abstract memory hierarchy core.
+     * Get the number of the thread.
      *
-     * @param processor the parent processor
-     * @param num       the number of the core
+     * @return the number of the thread
      */
-    public AbstractMemoryHierarchyCore(Processor processor, int num) {
-        super(processor);
+    int getNum();
 
-        this.num = num;
-        this.name = "c" + this.num;
+    /**
+     * Get the ID of the thread.
+     *
+     * @return the ID of the thread
+     */
+    int getId();
 
-        this.processor = processor;
-    }
+    /**
+     * Get the name of the thread.
+     *
+     * @return the name of the thread
+     */
+    String getName();
 
-    @Override
-    public void doMeasurementOneCycle() {
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getNum() {
-        return num;
-    }
-
-    @Override
-    public Processor getProcessor() {
-        return processor;
-    }
+    /**
+     * Get the parent core.
+     *
+     * @return the parent core
+     */
+    MemoryHierarchyCore getCore();
 }

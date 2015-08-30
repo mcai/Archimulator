@@ -39,7 +39,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can fetch the instruction at the specified address
      */
-    boolean canIfetch(Thread thread, int virtualAddress);
+    boolean canIfetch(MemoryHierarchyThread thread, int virtualAddress);
 
     /**
      * Get a value indicating whether the specified thread can perform a load at the specified address.
@@ -48,7 +48,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can perform a load at the specified address
      */
-    boolean canLoad(Thread thread, int virtualAddress);
+    boolean canLoad(MemoryHierarchyThread thread, int virtualAddress);
 
     /**
      * Get a value indicating whether the specified thread can perform a store at the specified address.
@@ -57,7 +57,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualAddress the virtual address
      * @return a value indicating whether the specified thread can perform a store at the specified address
      */
-    boolean canStore(Thread thread, int virtualAddress);
+    boolean canStore(MemoryHierarchyThread thread, int virtualAddress);
 
     /**
      * Act on when the specified thread fetch the instruction at the specified address.
@@ -67,7 +67,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the instruction fetch is completed
      */
-    void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a load at the specified address.
@@ -77,7 +77,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the load is completed
      */
-    void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a store at the specified address.
@@ -87,7 +87,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the store is completed
      */
-    void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
 
     /**
      * Do measurement for one cycle.

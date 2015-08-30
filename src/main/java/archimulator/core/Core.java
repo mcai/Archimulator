@@ -23,6 +23,7 @@ package archimulator.core;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.core.functionalUnit.FunctionalUnitPool;
+import archimulator.util.action.Action;
 
 import java.util.List;
 
@@ -32,6 +33,63 @@ import java.util.List;
  * @author Min Cai
  */
 public interface Core extends MemoryHierarchyCore, Reportable {
+    /**
+     * Get a value indicating whether the specified thread can fetch the instruction at the specified address.
+     *
+     * @param thread         the thread
+     * @param virtualAddress the virtual address
+     * @return a value indicating whether the specified thread can fetch the instruction at the specified address
+     */
+    boolean canIfetch(Thread thread, int virtualAddress);
+
+    /**
+     * Get a value indicating whether the specified thread can perform a load at the specified address.
+     *
+     * @param thread         the thread
+     * @param virtualAddress the virtual address
+     * @return a value indicating whether the specified thread can perform a load at the specified address
+     */
+    boolean canLoad(Thread thread, int virtualAddress);
+
+    /**
+     * Get a value indicating whether the specified thread can perform a store at the specified address.
+     *
+     * @param thread         the thread
+     * @param virtualAddress the virtual address
+     * @return a value indicating whether the specified thread can perform a store at the specified address
+     */
+    boolean canStore(Thread thread, int virtualAddress);
+
+    /**
+     * Act on when the specified thread fetch the instruction at the specified address.
+     *
+     * @param thread              the thread
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
+     * @param onCompletedCallback the callback action performed when the instruction fetch is completed
+     */
+    void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
+
+    /**
+     * Act on when the specified thread perform a load at the specified address.
+     *
+     * @param dynamicInstruction  the dynamic instruction
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
+     * @param onCompletedCallback the callback action performed when the load is completed
+     */
+    void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+
+    /**
+     * Act on when the specified thread perform a store at the specified address.
+     *
+     * @param dynamicInstruction  the dynamic instruction
+     * @param virtualAddress      the virtual address
+     * @param virtualPc           the virtual address of the program counter (PC)
+     * @param onCompletedCallback the callback action performed when the store is completed
+     */
+    void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+
     /**
      * Remove the entry from the queues.
      *
