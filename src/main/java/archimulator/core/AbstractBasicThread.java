@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Abstract basic core.
+ * Abstract basic thread.
  *
  * @author Min Cai
  */

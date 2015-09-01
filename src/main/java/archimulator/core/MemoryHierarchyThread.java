@@ -24,7 +24,7 @@ import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
 
 /**
- * Thread.
+ * Memory hierarchy thread.
  *
  * @author Min Cai
  */

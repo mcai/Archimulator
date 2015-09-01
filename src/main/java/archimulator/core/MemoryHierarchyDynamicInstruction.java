@@ -21,7 +21,7 @@
 package archimulator.core;
 
 /**
- * Dynamic instruction.
+ * Memory hierarchy dynamic instruction.
  *
  * @author Min Cai
  */
@@ -35,7 +35,7 @@ public class MemoryHierarchyDynamicInstruction {
     private boolean missedInL2;
 
     /**
-     * Create a dynamic instruction.
+     * Create a memory hierarchy dynamic instruction.
      *
      * @param thread            the thread
      * @param pc                the value of the program counter (PC)

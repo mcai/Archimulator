@@ -30,7 +30,7 @@ public class BasicMemoryHierarchyThread extends BasicSimulationObject implements
     private MemoryHierarchyCore core;
 
     /**
-     * Createa basic memory hierarchy thread.
+     * Create a basic memory hierarchy thread.
      *
      * @param core the parent core
      * @param num the number of the thread

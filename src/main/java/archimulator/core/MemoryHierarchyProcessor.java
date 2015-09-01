@@ -28,7 +28,7 @@ import archimulator.uncore.MemoryHierarchy;
 import java.util.List;
 
 /**
- * Processor.
+ * Memory hierarchy processor.
  *
  * @author Min Cai
  */
