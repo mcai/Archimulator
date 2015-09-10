@@ -49,15 +49,14 @@ Key Features
 	- Support both execution-driven and trace-driven memory subsystem simulation;
 	- Support complex simulation strategies, e.g., cycle count based, instruction count based, and hotspot oriented simulation;
 	- Support seamless switching between functional simulation and performance simulation mode;
-	- Support the software-controlled helper threaded data prefetching scheme: classification of good, bad and ugly HT requests.
+	- Support the helper thread based data prefetching scheme: classification of good, bad and ugly prefetch requests.
 
 - Archimulator provides the following **common infrastructure**:
 	- Scheduling and dispatching framework for modeling synchronous (cycle accurate) and asynchronous activities;
 	- Database/ORM supported configuration and statistics reporting of the simulated architectures, workloads and simulations;
 	- An easy-to-use logging mechanism.
 
-- Archimulator currently supports correct execution of all the **Olden benchmark suite** except incorrect output from "health".
-  Other benchmarks are being tested.
+- Archimulator currently supports correct execution of all the **Olden benchmark suite** except incorrect output from "health", plus some of CPU2006 benchmarks. Other benchmarks are being tested.
 
 System Requirements
 ------------------

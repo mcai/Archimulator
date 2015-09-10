@@ -1,6 +1,6 @@
 /**
  * ****************************************************************************
- * Copyright (c) 2010-2012 by Min Cai (min.cai.china@gmail.com).
+ * Copyright (c) 2010-2015 by Min Cai (min.cai.china@gmail.com).
  * <p>
  * This file is part of the PickaPack library.
  * <p>
