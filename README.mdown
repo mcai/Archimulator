@@ -1,4 +1,4 @@
-Archimulator 2015 README
+Archimulator README
 ========
 
 This README briefly describes what Archimulator is and how to setup & run Archimulator.
