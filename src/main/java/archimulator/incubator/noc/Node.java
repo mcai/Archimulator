@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Min Cai
  */
 public abstract class Node {
-    private Network<?, ?> network;
+    private Network<? extends Node, ? extends RoutingAlgorithm> network;
 
     private int id;
 
@@ -24,7 +24,7 @@ public abstract class Node {
 
     private Router router;
 
-    public Node(Network<?, ?> network, int id) {
+    public Node(Network<? extends Node, ? extends RoutingAlgorithm> network, int id) {
         this.network = network;
 
         this.id = id;
@@ -62,15 +62,15 @@ public abstract class Node {
         //TODO
     }
 
-    public void doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
-        //TODO
+    public Direction doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
+        return null; //TODO
     }
 
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
         return directions.get(0);
     }
 
-    public Network<?, ?> getNetwork() {
+    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
         return network;
     }
 

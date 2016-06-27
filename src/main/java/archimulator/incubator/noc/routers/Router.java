@@ -3,11 +3,9 @@ package archimulator.incubator.noc.routers;
 import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Node;
 import archimulator.incubator.noc.Packet;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import javaslang.collection.LinkedHashMap;
+import javaslang.collection.List;
+import javaslang.collection.Map;
 
 /**
  * Router.
@@ -34,14 +32,14 @@ public class Router {
     public Router(Node node) {
         this.node = node;
 
-        this.injectionBuffer = new ArrayList<>();
+        this.injectionBuffer = List.empty();
 
-        this.inputPorts = new EnumMap<>(Direction.class);
+        this.inputPorts = LinkedHashMap.empty();
         for (Direction direction : Direction.values()) {
             this.inputPorts.put(direction, new InputPort(this, direction));
         }
 
-        this.outputPorts = new EnumMap<>(Direction.class);
+        this.outputPorts = LinkedHashMap.empty();
         for (Direction direction : Direction.values()) {
             this.outputPorts.put(direction, new OutputPort(this, direction));
         }
@@ -103,5 +101,29 @@ public class Router {
 
     public List<Packet> getInjectionBuffer() {
         return injectionBuffer;
+    }
+
+    public Map<Direction, InputPort> getInputPorts() {
+        return inputPorts;
+    }
+
+    public Map<Direction, OutputPort> getOutputPorts() {
+        return outputPorts;
+    }
+
+    public RouteComputation getRouteComputation() {
+        return routeComputation;
+    }
+
+    public VirtualChannelAllocator getVirtualChannelAllocator() {
+        return virtualChannelAllocator;
+    }
+
+    public SwitchAllocator getSwitchAllocator() {
+        return switchAllocator;
+    }
+
+    public CrossbarSwitch getCrossbarSwitch() {
+        return crossbarSwitch;
     }
 }
