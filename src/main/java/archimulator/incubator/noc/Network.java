@@ -11,7 +11,7 @@ import java.util.*;
  * @author  Min Cai
  */
 public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
-    public static long currentPacketId;
+    long currentPacketId;
 
     private Experiment experiment;
 
@@ -58,26 +58,21 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private Map<? extends Packet, Long> totalPacketHopsPerType;
     private Map<? extends Packet, Long> maxPacketHopsPerType;
 
-    private EnumMap<FlitState, Long> numFlitPerStateDelaySamples;
-    private EnumMap<FlitState, Long> totalFlitPerStateDelays;
-    private EnumMap<FlitState, Long> maxFlitPerStateDelay;
+    private Map<FlitState, Long> numFlitPerStateDelaySamples;
+    private Map<FlitState, Long> totalFlitPerStateDelays;
+    private Map<FlitState, Long> maxFlitPerStateDelay;
 
-    private EnumMap<FlitState, Long> numHeadFlitPerStateDelaySamples;
-    private EnumMap<FlitState, Long> totalHeadFlitPerStateDelays;
-    private EnumMap<FlitState, Long> maxHeadFlitPerStateDelay;
+    private Map<FlitState, Long> numHeadFlitPerStateDelaySamples;
+    private Map<FlitState, Long> totalHeadFlitPerStateDelays;
+    private Map<FlitState, Long> maxHeadFlitPerStateDelay;
 
-    private EnumMap<FlitState, Long> numBodyFlitPerStateDelaySamples;
-    private EnumMap<FlitState, Long> totalBodyFlitPerStateDelays;
-    private EnumMap<FlitState, Long> maxBodyFlitPerStateDelay;
+    private Map<FlitState, Long> numBodyFlitPerStateDelaySamples;
+    private Map<FlitState, Long> totalBodyFlitPerStateDelays;
+    private Map<FlitState, Long> maxBodyFlitPerStateDelay;
 
-    private EnumMap<FlitState, Long> numTailFlitPerStateDelaySamples;
-    private EnumMap<FlitState, Long> totalTailFlitPerStateDelays;
-    private EnumMap<FlitState, Long> maxTailFlitPerStateDelay;
-
-
-    static {
-        currentPacketId = 0;
-    }
+    private Map<FlitState, Long> numTailFlitPerStateDelaySamples;
+    private Map<FlitState, Long> totalTailFlitPerStateDelays;
+    private Map<FlitState, Long> maxTailFlitPerStateDelay;
 
     public Network(
             Experiment experiment,
@@ -86,6 +81,8 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
             NodeFactory<NodeT> nodeFactory,
             RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
     ) {
+        this.currentPacketId = 0;
+
         this.experiment = experiment;
 
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
@@ -189,7 +186,53 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0; //TODO
     }
 
-    //TODO...
+    public double averagePacketHops() {
+        return 0.0; //TODO
+    }
+
+    public double payloadThroughput() {
+        return 0.0; //TODO
+    }
+
+    public double averagePayloadPacketDelay() {
+        return 0.0; //TODO
+    }
+
+    public double averagePayloadPacketHops() {
+        return 0.0; //TODO
+    }
+
+    public double throughputPerType(Class<? extends Packet> packetCls) {
+        return 0.0; //TODO
+    }
+
+    public double averagePacketDelayPerType(Class<? extends Packet> packetCls) {
+        return 0.0; //TODO
+    }
+
+    public double averagePacketHopsPerType(Class<? extends Packet> packetCls) {
+        return 0.0; //TODO
+    }
+
+    public double averageFlitPerStateDelay(FlitState state) {
+        return 0.0; //TODO
+    }
+
+    public double averageHeadFlitPerStateDelay(FlitState state) {
+        return 0.0; //TODO
+    }
+
+    public double averageBodyFlitPerStateDelay(FlitState state) {
+        return 0.0; //TODO
+    }
+
+    public double averageTailFlitPerStateDelay(FlitState state) {
+        return 0.0; //TODO
+    }
+
+    public void dumpState() {
+        //TODO
+    }
 
     public Experiment getExperiment() {
         return experiment;
