@@ -12,8 +12,12 @@ import archimulator.incubator.noc.traffics.PacketFactory;
 import archimulator.incubator.noc.traffics.TransposeTrafficGenerator;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.CycleAccurateEventQueue;
+import archimulator.util.serialization.JsonSerializationHelper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -39,7 +43,7 @@ public class Experiment {
     public void run() {
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        Network<? extends Node, ? extends RoutingAlgorithm> network = null;
+        Network<? extends Node, ? extends RoutingAlgorithm> network;
 
         switch (this.config.getRouting()) {
             case "xy":
@@ -97,25 +101,29 @@ public class Experiment {
 
         long endTime = DateHelper.toTick(new Date());
 
-        this.stats.put("  simulationTime", DurationFormatUtils.formatDurationHMS(endTime - beginTime));
-        this.stats.put("  totalCycles", cycleAccurateEventQueue.getCurrentCycle());
+        this.stats.put("simulationTime", DurationFormatUtils.formatDurationHMS(endTime - beginTime));
+        this.stats.put("totalCycles", cycleAccurateEventQueue.getCurrentCycle());
 
-        this.stats.put("  numPacketsReceived", network.getNumPacketsReceived());
-        this.stats.put("  numPacketsTransmitted", network.getNumPacketsTransmitted());
-        this.stats.put("  throughput", network.throughput());
-        this.stats.put("  averagePacketDelay", network.averagePacketDelay());
-        this.stats.put("  averagePacketHops", network.averagePacketHops());
-        this.stats.put("  maxPacketDelay", network.getMaxPacketDelay());
-        this.stats.put("  maxPacketHops", network.getMaxPacketHops());
+        this.stats.put("numPacketsReceived", network.getNumPacketsReceived());
+        this.stats.put("numPacketsTransmitted", network.getNumPacketsTransmitted());
+        this.stats.put("throughput", network.throughput());
+        this.stats.put("averagePacketDelay", network.averagePacketDelay());
+        this.stats.put("averagePacketHops", network.averagePacketHops());
+        this.stats.put("maxPacketDelay", network.getMaxPacketDelay());
+        this.stats.put("maxPacketHops", network.getMaxPacketHops());
 
-        this.stats.put("  numPayloadPacketsReceived", network.getNumPayloadPacketsReceived());
-        this.stats.put("  numPayloadPacketsTransmitted", network.getNumPayloadPacketsTransmitted());
-        this.stats.put("  payloadThroughput", network.payloadThroughput());
-        this.stats.put("  averagePayloadPacketDelay", network.averagePayloadPacketDelay());
-        this.stats.put("  averagePayloadPacketHops", network.averagePayloadPacketHops());
-        this.stats.put("  maxPayloadPacketDelay", network.getMaxPayloadPacketDelay());
-        this.stats.put("  maxPayloadPacketHops", network.getMaxPayloadPacketHops());
+        this.stats.put("numPayloadPacketsReceived", network.getNumPayloadPacketsReceived());
+        this.stats.put("numPayloadPacketsTransmitted", network.getNumPayloadPacketsTransmitted());
+        this.stats.put("payloadThroughput", network.payloadThroughput());
+        this.stats.put("averagePayloadPacketDelay", network.averagePayloadPacketDelay());
+        this.stats.put("averagePayloadPacketHops", network.averagePayloadPacketHops());
+        this.stats.put("maxPayloadPacketDelay", network.getMaxPayloadPacketDelay());
+        this.stats.put("maxPayloadPacketHops", network.getMaxPayloadPacketHops());
 
+        this.dumpConfigAndStats();
+    }
+
+    private void dumpConfigAndStats() {
         System.out.println();
 
         System.out.println("Config: ");
@@ -126,7 +134,30 @@ public class Experiment {
         System.out.println("Stats: ");
         for(String key : this.stats.keySet()) {
             Object value = this.stats.get(key);
-            System.out.println(String.format("%s: %s", key, value));
+            System.out.println(String.format("  %s: %s", key, value));
+        }
+
+        File resultDirFile = new File(config.getResultDir());
+
+        if (!resultDirFile.exists()) {
+            if (!resultDirFile.mkdirs()) {
+                throw new RuntimeException();
+            }
+        }
+
+        this.writeJsonFile(config, "config.json");
+        this.writeJsonFile(stats, "stats.json");
+    }
+
+    private void writeJsonFile(Object obj, String outputJsonFileName) {
+        File file = new File(config.getResultDir(), outputJsonFileName);
+
+        String json = JsonSerializationHelper.toJson(obj, true);
+
+        try {
+            FileUtils.writeStringToFile(file, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
