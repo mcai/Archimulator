@@ -384,6 +384,10 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return acceptPacket;
     }
 
+    public void setAcceptPacket(boolean acceptPacket) {
+        this.acceptPacket = acceptPacket;
+    }
+
     public long getNumPacketsReceived() {
         return numPacketsReceived;
     }
