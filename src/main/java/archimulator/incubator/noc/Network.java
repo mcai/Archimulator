@@ -1,9 +1,12 @@
 package archimulator.incubator.noc;
 
 import archimulator.incubator.noc.routers.FlitState;
+import archimulator.incubator.noc.routing.RoutingAlgorithm;
+import archimulator.incubator.noc.routing.RoutingAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
-
-import java.util.*;
+import javaslang.collection.LinkedHashMap;
+import javaslang.collection.List;
+import javaslang.collection.Map;
 
 /**
  * Network.
@@ -24,6 +27,8 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private NodeFactory<NodeT> nodeFactory;
 
     private RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory;
+
+    private RoutingAlgorithmT routingAlgorithm;
 
     private int width;
 
@@ -93,19 +98,21 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
         this.nodeFactory = nodeFactory;
 
-        this.routingAlgorithmFactory = routingAlgorithmFactory;
-
-        this.nodes = new ArrayList<>();
+        this.nodes = List.empty();
 
         for(int i = 0; i < this.numNodes; i++) {
-            this.nodes.add(this.nodeFactory.createNode(this, i));
+            this.nodes.append(this.nodeFactory.createNode(this, i));
         }
 
         if(this.width * this.width != this.numNodes) {
             throw new RuntimeException("Only 2D meshes are supported");
         }
 
-        this.inflightPackets = new ArrayList<>();
+        this.routingAlgorithmFactory = routingAlgorithmFactory;
+
+        this.routingAlgorithm = this.routingAlgorithmFactory.createRoutingAlgorithm();
+
+        this.inflightPackets = List.empty();
 
         this.acceptPacket = true;
 
@@ -127,30 +134,30 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.totalPayloadPacketHops = 0;
         this.maxPayloadPacketHops = 0;
 
-        this.numPacketsReceivedPerType = new HashMap<>();
-        this.numPacketsTransmittedPerType = new HashMap<>();
+        this.numPacketsReceivedPerType = LinkedHashMap.empty();
+        this.numPacketsTransmittedPerType = LinkedHashMap.empty();
 
-        this.totalPacketDelaysPerType = new HashMap<>();
-        this.maxPacketDelayPerType = new HashMap<>();
+        this.totalPacketDelaysPerType = LinkedHashMap.empty();
+        this.maxPacketDelayPerType = LinkedHashMap.empty();
 
-        this.totalPacketHopsPerType = new HashMap<>();
-        this.maxPacketHopsPerType = new HashMap<>();
+        this.totalPacketHopsPerType = LinkedHashMap.empty();
+        this.maxPacketHopsPerType = LinkedHashMap.empty();
 
-        this.numFlitPerStateDelaySamples = new EnumMap<>(FlitState.class);
-        this.totalFlitPerStateDelays = new EnumMap<>(FlitState.class);
-        this.maxFlitPerStateDelay = new EnumMap<>(FlitState.class);
+        this.numFlitPerStateDelaySamples = LinkedHashMap.empty();
+        this.totalFlitPerStateDelays = LinkedHashMap.empty();
+        this.maxFlitPerStateDelay = LinkedHashMap.empty();
 
-        this.numHeadFlitPerStateDelaySamples = new EnumMap<>(FlitState.class);
-        this.totalHeadFlitPerStateDelays = new EnumMap<>(FlitState.class);
-        this.maxHeadFlitPerStateDelay = new EnumMap<>(FlitState.class);
+        this.numHeadFlitPerStateDelaySamples = LinkedHashMap.empty();
+        this.totalHeadFlitPerStateDelays = LinkedHashMap.empty();
+        this.maxHeadFlitPerStateDelay = LinkedHashMap.empty();
 
-        this.numBodyFlitPerStateDelaySamples = new EnumMap<>(FlitState.class);
-        this.totalBodyFlitPerStateDelays = new EnumMap<>(FlitState.class);
-        this.maxBodyFlitPerStateDelay = new EnumMap<>(FlitState.class);
+        this.numBodyFlitPerStateDelaySamples = LinkedHashMap.empty();
+        this.totalBodyFlitPerStateDelays = LinkedHashMap.empty();
+        this.maxBodyFlitPerStateDelay = LinkedHashMap.empty();
 
-        this.numTailFlitPerStateDelaySamples = new EnumMap<>(FlitState.class);
-        this.totalTailFlitPerStateDelays = new EnumMap<>(FlitState.class);
-        this.maxTailFlitPerStateDelay = new EnumMap<>(FlitState.class);
+        this.numTailFlitPerStateDelaySamples = LinkedHashMap.empty();
+        this.totalTailFlitPerStateDelays = LinkedHashMap.empty();
+        this.maxTailFlitPerStateDelay = LinkedHashMap.empty();
     }
 
     public boolean isInWarmupPhase() {
@@ -250,15 +257,35 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return nodes;
     }
 
-    public int getWidth() {
-        return width;
-    }
-
     public NodeFactory<NodeT> getNodeFactory() {
         return nodeFactory;
     }
 
     public RoutingAlgorithmFactory<RoutingAlgorithmT> getRoutingAlgorithmFactory() {
         return routingAlgorithmFactory;
+    }
+
+    public RoutingAlgorithmT getRoutingAlgorithm() {
+        return routingAlgorithm;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public List<Packet> getInflightPackets() {
+        return inflightPackets;
+    }
+
+    public boolean isAcceptPacket() {
+        return acceptPacket;
+    }
+
+    public long getNumPacketsReceived() {
+        return numPacketsReceived;
+    }
+
+    public long getNumPacketsTransmitted() {
+        return numPacketsTransmitted;
     }
 }

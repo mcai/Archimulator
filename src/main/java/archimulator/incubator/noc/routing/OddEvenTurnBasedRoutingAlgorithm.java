@@ -1,0 +1,67 @@
+package archimulator.incubator.noc.routing;
+
+import archimulator.incubator.noc.Direction;
+import archimulator.incubator.noc.Node;
+import javaslang.collection.List;
+
+/**
+ * Odd-even turn based routing algorithm.
+ *
+ * @author Min Cai
+ */
+public class OddEvenTurnBasedRoutingAlgorithm implements RoutingAlgorithm {
+    @Override
+    public List<Direction> nextHop(Node node, int src, int dest, int parent) {
+        List<Direction> directions = List.empty();
+
+        int c0 = node.getX();
+        int c1 = node.getY();
+
+        int s0 = Node.getX(node.getNetwork(), src);
+        int s1 = Node.getY(node.getNetwork(), src);
+
+        int d0 = Node.getX(node.getNetwork(), dest);
+        int d1 = Node.getY(node.getNetwork(), dest);
+
+        int e0 = d0 - c0;
+        int e1 = -(d1 - c1);
+
+        if(e0 == 0) {
+            if(e1 > 0) {
+                directions.append(Direction.NORTH);
+            } else {
+                directions.append(Direction.SOUTH);
+            }
+        } else {
+            if(e0 > 0) {
+                if(e1 == 0) {
+                    directions.append(Direction.EAST);
+                } else {
+                    if(c0 % 2 == 1 || c0 == s0) {
+                        if(e1 > 0) {
+                            directions.append(Direction.NORTH);
+                        } else {
+                            directions.append(Direction.SOUTH);
+                        }
+                    }
+
+                    if(d0 % 2 == 1 || e0 != 1) {
+                        directions.append(Direction.EAST);
+                    }
+                }
+            } else {
+                directions.append(Direction.WEST);
+                if(c0 % 2 == 0) {
+                    if(e1 > 0) {
+                        directions.append(Direction.NORTH);
+                    }
+                    if(e1 < 0) {
+                        directions.append(Direction.SOUTH);
+                    }
+                }
+            }
+        }
+
+        return directions;
+    }
+}

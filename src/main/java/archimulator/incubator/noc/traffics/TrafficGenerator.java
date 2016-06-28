@@ -3,22 +3,23 @@ package archimulator.incubator.noc.traffics;
 import archimulator.incubator.noc.Network;
 import archimulator.incubator.noc.Node;
 import archimulator.incubator.noc.Packet;
-import archimulator.incubator.noc.RoutingAlgorithm;
+import archimulator.incubator.noc.routing.RoutingAlgorithm;
+import javaslang.collection.List;
 
 /**
  * Traffic generator.
  *
  * @author Min Cai
  */
-public class TrafficGenerator<PacketT extends Packet> {
-    private Network<? extends Node, ? extends RoutingAlgorithm> network;
+public abstract class TrafficGenerator<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm, PacketT extends Packet> {
+    private Network<NodeT, RoutingAlgorithmT> network;
     private double packetInjectionRate;
     private PacketFactory<PacketT> packetFactory;
     private int packetSize;
     private long maxPackets;
 
     public TrafficGenerator(
-            Network<? extends Node, ? extends RoutingAlgorithm> network,
+            Network<NodeT, RoutingAlgorithmT> network,
             double packetInjectionRate,
             PacketFactory<PacketT> packetFactory,
             int packetSize,
@@ -29,9 +30,41 @@ public class TrafficGenerator<PacketT extends Packet> {
         this.packetFactory = packetFactory;
         this.packetSize = packetSize;
         this.maxPackets = maxPackets;
+
+        this.network.getCycleAccurateEventQueue().getPerCycleEvents().add(this::generateTraffic);
     }
 
-    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
+    private void generateTraffic() {
+        for(Node node : this.getSrcNodes()) {
+            if(!this.network.isAcceptPacket() || this.maxPackets != -1 && this.network.getNumPacketsReceived() > this.maxPackets) {
+                break;
+            }
+
+            boolean valid = this.network.getExperiment().getRandom().nextDouble() <= this.packetInjectionRate;
+            if(valid) {
+                int src = node.getId();
+                int dest = this.dest(src);
+
+                if(src != dest) {
+                    this.injectPacketWithDelay(src, dest);
+                }
+            }
+        }
+    }
+
+    protected List<NodeT> getSrcNodes() {
+        return this.network.getNodes();
+    }
+
+    protected abstract int dest(int src);
+
+    protected void injectPacketWithDelay(int src, int dest) {
+        this.network.getCycleAccurateEventQueue().schedule(this, () -> {
+            this.network.receive(this.packetFactory.create(this.network, src, dest, this.packetSize));
+        }, 1);
+    }
+
+    public Network<NodeT, RoutingAlgorithmT> getNetwork() {
         return network;
     }
 

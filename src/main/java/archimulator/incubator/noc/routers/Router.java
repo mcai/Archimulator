@@ -76,7 +76,7 @@ public class Router {
                         if(outputPort.getDirection() != Direction.LOCAL) {
                             flit.setState(FlitState.LINK_TRAVERSAL);
 
-                            int nextHop = this.node.getNeighbors().get(outputPort.getDirection());
+                            int nextHop = this.node.getNeighbors().get(outputPort.getDirection()).get();
                             Direction ip = outputPort.getDirection().getReflexDirection();
                             int ivc = outputVirtualChannel.getId();
 

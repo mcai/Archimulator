@@ -2,10 +2,10 @@ package archimulator.incubator.noc;
 
 import archimulator.incubator.noc.routers.InputVirtualChannel;
 import archimulator.incubator.noc.routers.Router;
-
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import archimulator.incubator.noc.routing.RoutingAlgorithm;
+import javaslang.collection.LinkedHashMap;
+import javaslang.collection.List;
+import javaslang.collection.Map;
 
 /**
  * Node.
@@ -29,10 +29,10 @@ public abstract class Node {
 
         this.id = id;
 
-        this.x = this.id % this.network.getWidth();
-        this.y = (this.id - this.id % this.network.getWidth()) / this.network.getWidth();
+        this.x = getX(network, id);
+        this.y = getY(network, id);
 
-        this.neighbors = new EnumMap<>(Direction.class);
+        this.neighbors = LinkedHashMap.empty();
 
         if (this.id / this.network.getWidth() > 0) {
             this.neighbors.put(Direction.NORTH, this.id - this.network.getWidth());
@@ -53,17 +53,41 @@ public abstract class Node {
         this.router = new Router(this);
     }
 
+    public static int getX(Network<? extends Node, ? extends RoutingAlgorithm> network, int id) {
+        return id % network.getWidth();
+    }
+
+    public static int getY(Network<? extends Node, ? extends RoutingAlgorithm> network, int id) {
+        return (id - id % network.getWidth()) / network.getWidth();
+    }
+
     @Override
     public String toString() {
         return String.format("Node{id=%d, x=%d, y=%d, neighbors=%s}", id, x, y, neighbors);
     }
 
     public void handleDestArrived(Packet packet, InputVirtualChannel inputVirtualChannel) {
-        //TODO
+        packet.memorize(this.id);
+
+        packet.setEndCycle(this.network.getCycleAccurateEventQueue().getCurrentCycle());
+
+        this.network.getInflightPackets().remove(packet);
+        this.network.logPacketTransmitted(packet);
+
+        if(packet.getOnCompletedCallback() != null) {
+            packet.getOnCompletedCallback().apply();
+        }
     }
 
     public Direction doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
-        return null; //TODO
+        int parent = !packet.getMemory().isEmpty() ? packet.getMemory().get(packet.getMemory().size() - 1)._1() : -1;
+
+        packet.memorize(this.id);
+
+        List<Direction> directions =
+                this.network.getRoutingAlgorithm().nextHop(this, packet.getSrc(), packet.getDest(), parent);
+
+        return this.select(packet.getSrc(), packet.getDest(), inputVirtualChannel.getId(), directions);
     }
 
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {

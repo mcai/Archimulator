@@ -1,4 +1,4 @@
-package archimulator.incubator.noc;
+package archimulator.incubator.noc.routing;
 
 /**
  * Routing algorithm factory.

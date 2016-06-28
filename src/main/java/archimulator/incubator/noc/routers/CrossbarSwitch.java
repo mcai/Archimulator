@@ -31,7 +31,7 @@ public class CrossbarSwitch {
 
                             if(inputPort.getDirection() != Direction.LOCAL) {
                                 Node parent = this.router.getNode().getNetwork().getNodes().get(
-                                        this.router.getNode().getNeighbors().get(inputPort.getDirection())
+                                        this.router.getNode().getNeighbors().get(inputPort.getDirection()).get()
                                 );
 
                                 OutputVirtualChannel outputVirtualChannelAtParent =
