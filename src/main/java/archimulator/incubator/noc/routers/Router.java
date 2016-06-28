@@ -67,27 +67,110 @@ public class Router {
     }
 
     private void stageLinkTraversal() {
-        //TODO
+        for(OutputPort outputPort : this.outputPorts.values()) {
+            for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
+                InputVirtualChannel inputVirtualChannel = outputVirtualChannel.getInputVirtualChannel();
+                if(inputVirtualChannel != null && outputVirtualChannel.getCredits() > 0) {
+                    Flit flit = inputVirtualChannel.getInputBuffer().peek();
+                    if(flit != null && flit.getState() == FlitState.SWITCH_TRAVERSAL) {
+                        if(outputPort.getDirection() != Direction.LOCAL) {
+                            flit.setState(FlitState.LINK_TRAVERSAL);
+
+                            int nextHop = this.node.getNeighbors().get(outputPort.getDirection());
+                            Direction ip = outputPort.getDirection().getReflexDirection();
+                            int ivc = outputVirtualChannel.getId();
+
+                            this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> {
+                                nextHopArrived(flit, nextHop, ip, ivc);
+                            }, this.node.getNetwork().getExperiment().getConfig().getLinkDelay());
+                        }
+
+                        inputVirtualChannel.getInputBuffer().pop();
+
+                        if(outputPort.getDirection() != Direction.LOCAL) {
+                            outputVirtualChannel.setCredits(outputVirtualChannel.getCredits() - 1);
+                        } else {
+                            flit.setState(FlitState.DESTINATION_ARRIVED);
+                        }
+
+                        if(flit.isTail()) {
+                            inputVirtualChannel.setOutputVirtualChannel(null);
+                            outputVirtualChannel.setInputVirtualChannel(null);
+
+                            if(outputPort.getDirection() == Direction.LOCAL) {
+                                this.node.handleDestArrived(flit.getPacket(), inputVirtualChannel);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void linkTransfer(Flit flit, int nextHop, Direction ip, int ivc) {
-        //TODO
+    private void nextHopArrived(Flit flit, int nextHop, Direction ip, int ivc) {
+        InputBuffer inputBuffer =
+                this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).get().getVirtualChannels().get(ivc).getInputBuffer();
+
+        if(inputBuffer.size() + 1 <= this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()) {
+            flit.setState(FlitState.INPUT_BUFFER);
+            this.node.getNetwork().getNodes().get(nextHop).getRouter().insertFlit(flit, ip, ivc);
+        }
+        else {
+            this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> this.nextHopArrived(flit, nextHop, ip, ivc), 1);
+        }
     }
 
     private void localPacketInjection() {
-        //TODO
+        while (true) {
+            boolean requestInserted = false;
+
+            for(int ivc = 0; ivc < this.node.getNetwork().getExperiment().getConfig().getNumVirtualChannels(); ivc++) {
+                if(this.injectionBuffer.isEmpty()) {
+                    continue;
+                }
+
+                Packet packet = this.injectionBuffer.get(0);
+
+                int numFlits = (int) Math.ceil((double)(packet.getSize()) / this.node.getNetwork().getExperiment().getConfig().getLinkWidth());
+
+                InputBuffer inputBuffer = this.inputPorts.get(Direction.LOCAL).get().getVirtualChannels().get(ivc).getInputBuffer();
+
+                if(inputBuffer.size() + numFlits <= this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()) {
+                    for(int i = 0; i < numFlits; i++) {
+                        Flit flit = new Flit(packet, i, i == 0, i == numFlits - 1);
+                        this.insertFlit(flit, Direction.LOCAL, ivc);
+                    }
+
+                    this.injectionBuffer.remove(packet);
+                    requestInserted = true;
+                    break;
+                }
+            }
+
+            if(!requestInserted) {
+                break;
+            }
+        }
     }
 
     public boolean injectPacket(Packet packet) {
-        return false; //TODO
+        if(this.injectionBuffer.size() < this.node.getNetwork().getExperiment().getConfig().getMaxInjectionBufferSize()) {
+            this.injectionBuffer.append(packet);
+            return true;
+        }
+
+        return false;
     }
 
     public void insertFlit(Flit flit, Direction ip, int ivc) {
-        //TODO
+        this.inputPorts.get(ip).get().getVirtualChannels().get(ivc).getInputBuffer().append(flit);
+
+        flit.setNode(this.node);
     }
 
     public int freeSlots(Direction ip, int ivc) {
-        return -1; //TODO
+        return this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()
+                - this.inputPorts.get(ip).get().getVirtualChannels().get(ivc).getInputBuffer().size();
     }
 
     @Override
