@@ -2,7 +2,9 @@ package archimulator.incubator.noc.routing;
 
 import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Node;
-import javaslang.collection.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * XY routing algorithm.
@@ -12,22 +14,22 @@ import javaslang.collection.List;
 public class XYRoutingAlgorithm implements RoutingAlgorithm {
     @Override
     public List<Direction> nextHop(Node node, int src, int dest, int parent) {
-        List<Direction> directions = List.empty();
+        List<Direction> directions = new ArrayList<>();
 
         int destX = Node.getX(node.getNetwork(), dest);
         int destY = Node.getY(node.getNetwork(), dest);
 
         if(destX != node.getX()) {
             if(destX > node.getX()) {
-                directions.append(Direction.EAST);
+                directions.add(Direction.EAST);
             } else {
-                directions.append(Direction.WEST);
+                directions.add(Direction.WEST);
             }
         } else {
             if(destY > node.getY()) {
-                directions.append(Direction.SOUTH);
+                directions.add(Direction.SOUTH);
             } else {
-                directions.append(Direction.NORTH);
+                directions.add(Direction.NORTH);
             }
         }
 

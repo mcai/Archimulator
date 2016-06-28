@@ -7,9 +7,9 @@ import archimulator.incubator.noc.Packet;
 import archimulator.incubator.noc.routers.InputVirtualChannel;
 import archimulator.incubator.noc.routers.Router;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
-import javaslang.Function1;
-import javaslang.Tuple2;
-import javaslang.collection.List;
+import archimulator.util.Pair;
+
+import java.util.List;
 
 public class ACONode extends Node {
     private ACORoutingTable routingTable;
@@ -84,7 +84,7 @@ public class ACONode extends Node {
                 this.getNetwork().getExperiment().getConfig().getAntPacketSize(),
                 null);
 
-        newPacket.getMemory().appendAll(packet.getMemory());
+        newPacket.getMemory().addAll(packet.getMemory());
 
         this.getNetwork().getCycleAccurateEventQueue().schedule(
                 this, () -> this.getNetwork().receive(newPacket), 1
@@ -92,12 +92,19 @@ public class ACONode extends Node {
     }
 
     private Direction backwardAntPacket(BackwardAntPacket packet) {
-        int i = packet.getMemory().lastIndexWhere(x -> x._1() == this.getId());
+        int i;
 
-        int prev = packet.getMemory().get(i - 1)._1();
+        for(i = packet.getMemory().size() - 1; i > 0; i--) {
+            Pair<Integer, Long> entry = packet.getMemory().get(i);
+            if(entry.getFirst() == this.getId()) {
+                break;
+            }
+        }
+
+        int prev = packet.getMemory().get(i - 1).getFirst();
 
         for (Direction direction : this.getNeighbors().keySet()) {
-            int neighbor = this.getNeighbors().get(direction).get();
+            int neighbor = this.getNeighbors().get(direction);
             if (neighbor == prev) {
                 return direction;
             }
@@ -107,26 +114,43 @@ public class ACONode extends Node {
     }
 
     private void updateRoutingTable(BackwardAntPacket packet, InputVirtualChannel inputVirtualChannel) {
-        int i = packet.getMemory().indexWhere(x -> x._1() == this.getId());
+        int i;
 
-        for (int dest : packet.getMemory().slice(i + 1, packet.getMemory().size() - 1).map(Tuple2::_1)) {
+        for(i = 0; i < packet.getMemory().size() ; i++) {
+            Pair<Integer, Long> entry = packet.getMemory().get(i);
+            if(entry.getFirst() == this.getId()) {
+                break;
+            }
+        }
+
+        for(int j = i + 1; j < packet.getMemory().size(); j++) {
+            int dest = packet.getMemory().get(j).getFirst();
             this.routingTable.update(dest, inputVirtualChannel.getInputPort().getDirection());
         }
     }
 
     @Override
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
-        return directions.maxBy((Function1<Direction, Double>) direction -> {
-            Pheromone pheromone = this.routingTable.getPheromones().get(dest).get().get(direction).get();
-            Router neighborRouter = this.getNetwork().getNodes().get(ACONode.this.getNeighbors().get(direction).get()).getRouter();
+        double maxProbability = -1.0;
+        Direction bestDirection = null;
+
+        for(Direction direction : directions) {
+            Pheromone pheromone = this.routingTable.getPheromones().get(dest).get(direction);
+            Router neighborRouter = this.getNetwork().getNodes().get(ACONode.this.getNeighbors().get(direction)).getRouter();
             int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
 
             double alpha = this.getNetwork().getExperiment().getConfig().getAcoSelectionAlpha();
             double qTotal = this.getNetwork().getExperiment().getConfig().getMaxInputBufferSize();
             int n = this.getNeighbors().size();
 
-            return (pheromone.getValue() + alpha * ((double) (freeSlots) / qTotal)) / (1 + alpha * (n - 1));
-        }).get();
+            double probability = (pheromone.getValue() + alpha * ((double) (freeSlots) / qTotal)) / (1 + alpha * (n - 1));
+            if(probability > maxProbability) {
+                maxProbability = probability;
+                bestDirection = direction;
+            }
+        }
+
+        return bestDirection;
     }
 
     public ACORoutingTable getRoutingTable() {

@@ -7,10 +7,10 @@ import archimulator.incubator.noc.selection.aco.ForwardAntPacket;
 import archimulator.incubator.noc.traffics.PacketFactory;
 import archimulator.incubator.noc.traffics.TransposeTrafficGenerator;
 import archimulator.util.event.CycleAccurateEventQueue;
-import javaslang.collection.LinkedHashMap;
-import javaslang.collection.Map;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Experiment.
@@ -24,7 +24,7 @@ public class Experiment {
 
     public Experiment() {
         this.config = new Config();
-        this.stats = LinkedHashMap.empty();
+        this.stats = new TreeMap<>();
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
     }
 
@@ -107,7 +107,7 @@ public class Experiment {
         this.stats.put("max_payload_packet_hops", network.getMaxPayloadPacketHops());
 
         for(String key : this.stats.keySet()) {
-            Object value = this.stats.get(key).get();
+            Object value = this.stats.get(key);
             System.out.println(String.format("%s: %s", key, value));
         }
     }

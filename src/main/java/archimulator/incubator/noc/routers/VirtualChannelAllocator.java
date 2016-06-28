@@ -1,8 +1,9 @@
 package archimulator.incubator.noc.routers;
 
-import javaslang.collection.LinkedHashMap;
-import javaslang.collection.List;
-import javaslang.collection.Map;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Virtual channel allocator.
@@ -16,10 +17,13 @@ public class VirtualChannelAllocator {
     public VirtualChannelAllocator(Router router) {
         this.router = router;
 
-        List<InputVirtualChannel> inputVirtualChannels =
-                this.router.getInputPorts().values().map(InputPort::getVirtualChannels).reduce(List::appendAll);
+        List<InputVirtualChannel> inputVirtualChannels = new ArrayList<>();
 
-        this.arbiters = LinkedHashMap.empty();
+        for(InputPort inputPort : this.router.getInputPorts().values()) {
+            inputVirtualChannels.addAll(inputPort.getVirtualChannels());
+        }
+
+        this.arbiters = new LinkedHashMap<>();
 
         for(OutputPort outputPort : this.router.getOutputPorts().values()) {
             for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
@@ -32,7 +36,7 @@ public class VirtualChannelAllocator {
         for(OutputPort outputPort : this.router.getOutputPorts().values()) {
             for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
                 if(outputVirtualChannel.getInputVirtualChannel() == null) {
-                    InputVirtualChannel winnerInputVirtualChannel = this.arbiters.get(outputVirtualChannel).get().next();
+                    InputVirtualChannel winnerInputVirtualChannel = this.arbiters.get(outputVirtualChannel).next();
 
                     if(winnerInputVirtualChannel != null) {
                         Flit flit = winnerInputVirtualChannel.getInputBuffer().peek();

@@ -1,6 +1,6 @@
 package archimulator.incubator.noc.util;
 
-import javaslang.collection.List;
+import java.util.List;
 
 /**
  * Round robin arbiter.

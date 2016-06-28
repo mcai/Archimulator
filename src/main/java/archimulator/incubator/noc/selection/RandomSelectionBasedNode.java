@@ -4,7 +4,8 @@ import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Network;
 import archimulator.incubator.noc.Node;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
-import javaslang.collection.List;
+
+import java.util.List;
 
 /**
  * Random selection based node.

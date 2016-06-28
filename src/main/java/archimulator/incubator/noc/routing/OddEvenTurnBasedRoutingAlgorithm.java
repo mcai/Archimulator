@@ -2,7 +2,9 @@ package archimulator.incubator.noc.routing;
 
 import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Node;
-import javaslang.collection.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Odd-even turn based routing algorithm.
@@ -12,7 +14,7 @@ import javaslang.collection.List;
 public class OddEvenTurnBasedRoutingAlgorithm implements RoutingAlgorithm {
     @Override
     public List<Direction> nextHop(Node node, int src, int dest, int parent) {
-        List<Direction> directions = List.empty();
+        List<Direction> directions = new ArrayList<>();
 
         int c0 = node.getX();
         int c1 = node.getY();
@@ -28,35 +30,35 @@ public class OddEvenTurnBasedRoutingAlgorithm implements RoutingAlgorithm {
 
         if(e0 == 0) {
             if(e1 > 0) {
-                directions.append(Direction.NORTH);
+                directions.add(Direction.NORTH);
             } else {
-                directions.append(Direction.SOUTH);
+                directions.add(Direction.SOUTH);
             }
         } else {
             if(e0 > 0) {
                 if(e1 == 0) {
-                    directions.append(Direction.EAST);
+                    directions.add(Direction.EAST);
                 } else {
                     if(c0 % 2 == 1 || c0 == s0) {
                         if(e1 > 0) {
-                            directions.append(Direction.NORTH);
+                            directions.add(Direction.NORTH);
                         } else {
-                            directions.append(Direction.SOUTH);
+                            directions.add(Direction.SOUTH);
                         }
                     }
 
                     if(d0 % 2 == 1 || e0 != 1) {
-                        directions.append(Direction.EAST);
+                        directions.add(Direction.EAST);
                     }
                 }
             } else {
-                directions.append(Direction.WEST);
+                directions.add(Direction.WEST);
                 if(c0 % 2 == 0) {
                     if(e1 > 0) {
-                        directions.append(Direction.NORTH);
+                        directions.add(Direction.NORTH);
                     }
                     if(e1 < 0) {
-                        directions.append(Direction.SOUTH);
+                        directions.add(Direction.SOUTH);
                     }
                 }
             }

@@ -1,9 +1,11 @@
 package archimulator.incubator.noc;
 
 import archimulator.incubator.noc.routers.Flit;
+import archimulator.util.Pair;
 import archimulator.util.action.Action;
-import javaslang.Tuple2;
-import javaslang.collection.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Packet.
@@ -25,7 +27,7 @@ public abstract class Packet {
 
     private Action onCompletedCallback;
 
-    private List<Tuple2<Integer, Long>> memory;
+    private List<Pair<Integer, Long>> memory;
 
     private List<Flit> flits;
 
@@ -53,9 +55,9 @@ public abstract class Packet {
 
         this.onCompletedCallback = onCompletedCallback;
 
-        this.memory = List.empty();
+        this.memory = new ArrayList<>();
 
-        this.flits = List.empty();
+        this.flits = new ArrayList<>();
     }
 
     @Override
@@ -69,11 +71,11 @@ public abstract class Packet {
     }
 
     public void memorize(int currentNodeId) {
-        if(this.memory.map(Tuple2::_1).contains(currentNodeId)) {
+        if(this.memory.stream().filter(x -> x.getFirst() == currentNodeId).count() > 0) {
             throw new IllegalArgumentException(String.format("%d", currentNodeId));
         }
 
-        this.memory.append(new Tuple2<>(currentNodeId, this.network.getCycleAccurateEventQueue().getCurrentCycle()));
+        this.memory.add(new Pair<>(currentNodeId, this.network.getCycleAccurateEventQueue().getCurrentCycle()));
     }
 
     public int hops() {
@@ -118,7 +120,7 @@ public abstract class Packet {
         return onCompletedCallback;
     }
 
-    public List<Tuple2<Integer, Long>> getMemory() {
+    public List<Pair<Integer, Long>> getMemory() {
         return memory;
     }
 

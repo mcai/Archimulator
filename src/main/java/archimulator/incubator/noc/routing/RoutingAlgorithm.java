@@ -2,7 +2,8 @@ package archimulator.incubator.noc.routing;
 
 import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Node;
-import javaslang.collection.List;
+
+import java.util.List;
 
 /**
  * Routing algorithm.

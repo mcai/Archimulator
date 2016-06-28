@@ -1,6 +1,7 @@
 package archimulator.incubator.noc.routers;
 
-import javaslang.collection.List;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Input buffer.
@@ -14,7 +15,7 @@ public class InputBuffer {
 
     public InputBuffer(InputVirtualChannel inputVirtualChannel) {
         this.inputVirtualChannel = inputVirtualChannel;
-        this.flits = List.empty();
+        this.flits = new ArrayList<>();
     }
 
     public void append(Flit flit) {
@@ -23,7 +24,7 @@ public class InputBuffer {
             throw new IllegalArgumentException();
         }
 
-        this.flits.append(flit);
+        this.flits.add(flit);
     }
 
     public Flit peek() {
@@ -32,7 +33,7 @@ public class InputBuffer {
 
     public void pop() {
         if(!this.flits.isEmpty()) {
-            this.flits.removeAt(0);
+            this.flits.remove(0);
         }
     }
 

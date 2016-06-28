@@ -3,9 +3,10 @@ package archimulator.incubator.noc;
 import archimulator.incubator.noc.routers.InputVirtualChannel;
 import archimulator.incubator.noc.routers.Router;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
-import javaslang.collection.LinkedHashMap;
-import javaslang.collection.List;
-import javaslang.collection.Map;
+
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Node.
@@ -32,7 +33,7 @@ public abstract class Node {
         this.x = getX(network, id);
         this.y = getY(network, id);
 
-        this.neighbors = LinkedHashMap.empty();
+        this.neighbors = new EnumMap<>(Direction.class);
 
         if (this.id / this.network.getWidth() > 0) {
             this.neighbors.put(Direction.NORTH, this.id - this.network.getWidth());
@@ -80,7 +81,7 @@ public abstract class Node {
     }
 
     public Direction doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
-        int parent = !packet.getMemory().isEmpty() ? packet.getMemory().get(packet.getMemory().size() - 1)._1() : -1;
+        int parent = !packet.getMemory().isEmpty() ? packet.getMemory().get(packet.getMemory().size() - 1).getFirst() : -1;
 
         packet.memorize(this.id);
 

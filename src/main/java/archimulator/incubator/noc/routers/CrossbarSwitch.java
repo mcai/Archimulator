@@ -31,11 +31,11 @@ public class CrossbarSwitch {
 
                             if(inputPort.getDirection() != Direction.LOCAL) {
                                 Node parent = this.router.getNode().getNetwork().getNodes().get(
-                                        this.router.getNode().getNeighbors().get(inputPort.getDirection()).get()
+                                        this.router.getNode().getNeighbors().get(inputPort.getDirection())
                                 );
 
                                 OutputVirtualChannel outputVirtualChannelAtParent =
-                                        parent.getRouter().getOutputPorts().get(inputPort.getDirection().getReflexDirection()).get()
+                                        parent.getRouter().getOutputPorts().get(inputPort.getDirection().getReflexDirection())
                                                 .getVirtualChannels().get(inputVirtualChannel.getId());
 
                                 outputVirtualChannelAtParent.setCredits(outputVirtualChannelAtParent.getCredits() + 1);

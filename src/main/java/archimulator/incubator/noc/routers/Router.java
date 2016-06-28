@@ -3,9 +3,11 @@ package archimulator.incubator.noc.routers;
 import archimulator.incubator.noc.Direction;
 import archimulator.incubator.noc.Node;
 import archimulator.incubator.noc.Packet;
-import javaslang.collection.LinkedHashMap;
-import javaslang.collection.List;
-import javaslang.collection.Map;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Router.
@@ -32,14 +34,14 @@ public class Router {
     public Router(Node node) {
         this.node = node;
 
-        this.injectionBuffer = List.empty();
+        this.injectionBuffer = new ArrayList<>();
 
-        this.inputPorts = LinkedHashMap.empty();
+        this.inputPorts = new TreeMap<>();
         for (Direction direction : Direction.values()) {
             this.inputPorts.put(direction, new InputPort(this, direction));
         }
 
-        this.outputPorts = LinkedHashMap.empty();
+        this.outputPorts = new TreeMap<>();
         for (Direction direction : Direction.values()) {
             this.outputPorts.put(direction, new OutputPort(this, direction));
         }
@@ -76,7 +78,7 @@ public class Router {
                         if(outputPort.getDirection() != Direction.LOCAL) {
                             flit.setState(FlitState.LINK_TRAVERSAL);
 
-                            int nextHop = this.node.getNeighbors().get(outputPort.getDirection()).get();
+                            int nextHop = this.node.getNeighbors().get(outputPort.getDirection());
                             Direction ip = outputPort.getDirection().getReflexDirection();
                             int ivc = outputVirtualChannel.getId();
 
@@ -109,7 +111,7 @@ public class Router {
 
     private void nextHopArrived(Flit flit, int nextHop, Direction ip, int ivc) {
         InputBuffer inputBuffer =
-                this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).get().getVirtualChannels().get(ivc).getInputBuffer();
+                this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).getVirtualChannels().get(ivc).getInputBuffer();
 
         if(inputBuffer.size() + 1 <= this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()) {
             flit.setState(FlitState.INPUT_BUFFER);
@@ -133,7 +135,7 @@ public class Router {
 
                 int numFlits = (int) Math.ceil((double)(packet.getSize()) / this.node.getNetwork().getExperiment().getConfig().getLinkWidth());
 
-                InputBuffer inputBuffer = this.inputPorts.get(Direction.LOCAL).get().getVirtualChannels().get(ivc).getInputBuffer();
+                InputBuffer inputBuffer = this.inputPorts.get(Direction.LOCAL).getVirtualChannels().get(ivc).getInputBuffer();
 
                 if(inputBuffer.size() + numFlits <= this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()) {
                     for(int i = 0; i < numFlits; i++) {
@@ -155,7 +157,7 @@ public class Router {
 
     public boolean injectPacket(Packet packet) {
         if(this.injectionBuffer.size() < this.node.getNetwork().getExperiment().getConfig().getMaxInjectionBufferSize()) {
-            this.injectionBuffer.append(packet);
+            this.injectionBuffer.add(packet);
             return true;
         }
 
@@ -163,14 +165,14 @@ public class Router {
     }
 
     public void insertFlit(Flit flit, Direction ip, int ivc) {
-        this.inputPorts.get(ip).get().getVirtualChannels().get(ivc).getInputBuffer().append(flit);
+        this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().append(flit);
 
         flit.setNode(this.node);
     }
 
     public int freeSlots(Direction ip, int ivc) {
         return this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()
-                - this.inputPorts.get(ip).get().getVirtualChannels().get(ivc).getInputBuffer().size();
+                - this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().size();
     }
 
     @Override

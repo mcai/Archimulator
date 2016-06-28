@@ -27,7 +27,7 @@ public class Flit {
 
     public Flit(Packet packet, int num, boolean head, boolean tail) {
         this.packet = packet;
-        this.packet.getFlits().append(this);
+        this.packet.getFlits().add(this);
 
         this.num = num;
 

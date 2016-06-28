@@ -1,7 +1,8 @@
 package archimulator.incubator.noc.routers;
 
 import archimulator.incubator.noc.util.RoundRobinArbiter;
-import javaslang.collection.List;
+
+import java.util.List;
 
 /**
  * Switch arbiter.

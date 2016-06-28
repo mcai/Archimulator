@@ -5,7 +5,9 @@ import archimulator.incubator.noc.Network;
 import archimulator.incubator.noc.Node;
 import archimulator.incubator.noc.routers.Router;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
-import javaslang.collection.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Buffer level selection based node.
@@ -19,19 +21,20 @@ public class BufferLevelSelectionBasedNode extends Node {
 
     @Override
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
-        List<Direction> bestDirections = List.empty();
+        List<Direction> bestDirections = new ArrayList<>();
 
         double maxFreeSlots = -1.0;
 
         for(Direction direction : directions) {
-            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction).get()).getRouter();
+            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
             int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
 
             if(freeSlots > maxFreeSlots) {
                 maxFreeSlots = freeSlots;
-                bestDirections = List.of(direction);
+                bestDirections.clear();
+                bestDirections.add(direction);
             } else if(freeSlots == maxFreeSlots) {
-                bestDirections.append(direction);
+                bestDirections.add(direction);
             }
         }
 

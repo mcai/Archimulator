@@ -1,7 +1,9 @@
 package archimulator.incubator.noc.routers;
 
 import archimulator.incubator.noc.Direction;
-import javaslang.collection.List;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Input port.
@@ -20,10 +22,10 @@ public class InputPort {
 
         this.direction = direction;
 
-        this.virtualChannels = List.empty();
+        this.virtualChannels = new ArrayList<>();
 
         for (int i = 0; i < this.router.getNode().getNetwork().getExperiment().getConfig().getNumVirtualChannels(); i++) {
-            this.virtualChannels.append(new InputVirtualChannel(this, i));
+            this.virtualChannels.add(new InputVirtualChannel(this, i));
         }
     }
 
