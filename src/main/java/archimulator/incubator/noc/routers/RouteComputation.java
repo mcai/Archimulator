@@ -19,7 +19,7 @@ public class RouteComputation {
             for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
                 Flit flit = inputVirtualChannel.getInputBuffer().peek();
 
-                if(flit != null && flit.getState() == FlitState.INPUT_BUFFER) {
+                if(flit != null && flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
                     if(flit.getPacket().getDest() == this.router.getNode().getId()) {
                         inputVirtualChannel.setRoute(Direction.LOCAL);
                     }

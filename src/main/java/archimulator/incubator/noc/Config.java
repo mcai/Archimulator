@@ -16,8 +16,6 @@ public class Config {
 
     private int numNodes;
 
-    private long warmupCycles;
-
     private long maxCycles;
 
     private long maxPackets;
@@ -56,7 +54,6 @@ public class Config {
         this.resultDir = "results/";
 
         this.numNodes = 8 * 8;
-        this.warmupCycles = 2000;
         this.maxCycles = 20000;
         this.maxPackets = -1;
         this.routing = "odd_even";
@@ -117,14 +114,6 @@ public class Config {
 
     public void setNumNodes(int numNodes) {
         this.numNodes = numNodes;
-    }
-
-    public long getWarmupCycles() {
-        return warmupCycles;
-    }
-
-    public void setWarmupCycles(long warmupCycles) {
-        this.warmupCycles = warmupCycles;
     }
 
     public long getMaxCycles() {

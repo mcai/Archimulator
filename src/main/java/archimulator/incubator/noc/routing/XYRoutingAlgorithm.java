@@ -33,6 +33,14 @@ public class XYRoutingAlgorithm implements RoutingAlgorithm {
             }
         }
 
+        System.out.println(String.format("[%d] node#%d::next_hop(dest=%d, parent=%d, neighbors=%s) = %s",
+                node.getNetwork().getCycleAccurateEventQueue().getCurrentCycle(),
+                node.getId(),
+                dest,
+                parent,
+                node.getNeighbors(),
+                directions));
+
         return directions;
     }
 }

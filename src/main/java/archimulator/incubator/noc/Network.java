@@ -5,10 +5,7 @@ import archimulator.incubator.noc.routing.RoutingAlgorithm;
 import archimulator.incubator.noc.routing.RoutingAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Network.
@@ -124,30 +121,21 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.totalPayloadPacketHops = 0;
         this.maxPayloadPacketHops = 0;
 
-        this.numPacketsReceivedPerType = new TreeMap<>();
-        this.numPacketsTransmittedPerType = new TreeMap<>();
+        this.numPacketsReceivedPerType = new HashMap<>();
+        this.numPacketsTransmittedPerType = new HashMap<>();
 
-        this.totalPacketDelaysPerType = new TreeMap<>();
-        this.maxPacketDelayPerType = new TreeMap<>();
+        this.totalPacketDelaysPerType = new HashMap<>();
+        this.maxPacketDelayPerType = new HashMap<>();
 
-        this.totalPacketHopsPerType = new TreeMap<>();
-        this.maxPacketHopsPerType = new TreeMap<>();
+        this.totalPacketHopsPerType = new HashMap<>();
+        this.maxPacketHopsPerType = new HashMap<>();
 
-        this.numFlitPerStateDelaySamples = new TreeMap<>();
-        this.totalFlitPerStateDelays = new TreeMap<>();
-        this.maxFlitPerStateDelay = new TreeMap<>();
-    }
-
-    public boolean isInWarmupPhase() {
-        return this.experiment.getConfig().getWarmupCycles() > 0
-                && this.cycleAccurateEventQueue.getCurrentCycle() < this.experiment.getConfig().getWarmupCycles();
+        this.numFlitPerStateDelaySamples = new HashMap<>();
+        this.totalFlitPerStateDelays = new HashMap<>();
+        this.maxFlitPerStateDelay = new HashMap<>();
     }
 
     public void logPacketReceived(Packet packet) {
-        if(this.isInWarmupPhase()) {
-            return;
-        }
-
         this.numPacketsReceived++;
 
         if(packet.hasPayload()) {
@@ -165,10 +153,6 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     }
 
     public void logPacketTransmitted(Packet packet) {
-        if(this.isInWarmupPhase()) {
-            return;
-        }
-
         this.numPacketsTransmitted++;
 
         if(packet.hasPayload()) {
@@ -229,10 +213,6 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     }
 
     public void logFlitPerStateDelay(boolean head, boolean tail, FlitState state, int delay) {
-        if(this.isInWarmupPhase()) {
-            return;
-        }
-
         if(!this.numFlitPerStateDelaySamples.containsKey(state)) {
             this.numFlitPerStateDelaySamples.put(state, 0L);
         }

@@ -82,10 +82,6 @@ public class Experiment {
 //                -1
 //        );
 
-        while (this.config.getWarmupCycles() > 0 && cycleAccurateEventQueue.getCurrentCycle() < this.config.getWarmupCycles()) {
-            cycleAccurateEventQueue.advanceOneCycle();
-        }
-
         while ((this.config.getMaxCycles() == -1 || cycleAccurateEventQueue.getCurrentCycle() < this.config.getMaxCycles())
         && (this.config.getMaxPackets() == -1 || network.getNumPacketsReceived() < this.config.getMaxPackets())) {
             cycleAccurateEventQueue.advanceOneCycle();
