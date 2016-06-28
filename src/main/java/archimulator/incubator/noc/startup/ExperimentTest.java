@@ -1,14 +1,16 @@
 package archimulator.incubator.noc.startup;
 
 import archimulator.incubator.noc.Experiment;
+import org.junit.Test;
 
 /**
  * Experiment tester.
  *
  * @author Min Cai
  */
-public class ExperimentTester {
-    public static void main(String[] args) {
+public class ExperimentTest {
+    @Test
+    public void test() {
         double dataPacketInjectionRate = 0.060;
         double antPacketInjectionRate = 0.001;
         String traffic = "transpose";
