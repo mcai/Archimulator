@@ -71,8 +71,10 @@ public abstract class Packet {
     }
 
     public void memorize(int currentNodeId) {
-        if(this.memory.stream().filter(x -> x.getFirst() == currentNodeId).count() > 0) {
-            throw new IllegalArgumentException(String.format("%d", currentNodeId));
+        for(Pair<Integer, Long> entry : this.memory) {
+            if(entry.getFirst() == currentNodeId) {
+                throw new IllegalArgumentException(String.format("%d", currentNodeId));
+            }
         }
 
         this.memory.add(new Pair<>(currentNodeId, this.network.getCycleAccurateEventQueue().getCurrentCycle()));

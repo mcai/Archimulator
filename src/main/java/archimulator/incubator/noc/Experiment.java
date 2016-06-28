@@ -1,9 +1,8 @@
 package archimulator.incubator.noc;
 
-import archimulator.incubator.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
-import archimulator.incubator.noc.selection.aco.ACONode;
-import archimulator.incubator.noc.selection.aco.ForwardAntPacket;
+import archimulator.incubator.noc.routing.XYRoutingAlgorithm;
+import archimulator.incubator.noc.selection.RandomSelectionBasedNode;
 import archimulator.incubator.noc.traffics.PacketFactory;
 import archimulator.incubator.noc.traffics.TransposeTrafficGenerator;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -31,18 +30,31 @@ public class Experiment {
     public void run() {
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
+//        Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
+//                new Network<>(
+//                        this,
+//                        cycleAccurateEventQueue,
+//                        this.config.getNumNodes(),
+//                        new NodeFactory<ACONode>() {
+//                            @Override
+//                            public ACONode createNode(Network<ACONode, ?> network, int i) {
+//                                return new ACONode(network, i);
+//                            }
+//                        },
+//                        OddEvenTurnBasedRoutingAlgorithm::new);
+
+        Network<RandomSelectionBasedNode, XYRoutingAlgorithm> network =
                 new Network<>(
                         this,
                         cycleAccurateEventQueue,
                         this.config.getNumNodes(),
-                        new NodeFactory<ACONode>() {
+                        new NodeFactory<RandomSelectionBasedNode>() {
                             @Override
-                            public ACONode createNode(Network<ACONode, ?> network, int i) {
-                                return new ACONode(network, i);
+                            public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network, int i) {
+                                return new RandomSelectionBasedNode(network, i);
                             }
                         },
-                        OddEvenTurnBasedRoutingAlgorithm::new);
+                        XYRoutingAlgorithm::new);
 
         new TransposeTrafficGenerator<>(
                 network,
@@ -57,18 +69,18 @@ public class Experiment {
                 this.config.getMaxPackets()
         );
 
-        new TransposeTrafficGenerator<>(
-                network,
-                this.config.getAntPacketInjectionRate(),
-                 new PacketFactory<ForwardAntPacket>() {
-                    @Override
-                    public ForwardAntPacket create(Network<? extends Node, ? extends RoutingAlgorithm> network, int src, int dest, int size) {
-                        return new ForwardAntPacket(network, src, dest, size, () -> {});
-                    }
-                },
-                this.config.getAntPacketSize(),
-                -1
-        );
+//        new TransposeTrafficGenerator<>(
+//                network,
+//                this.config.getAntPacketInjectionRate(),
+//                 new PacketFactory<ForwardAntPacket>() {
+//                    @Override
+//                    public ForwardAntPacket create(Network<? extends Node, ? extends RoutingAlgorithm> network, int src, int dest, int size) {
+//                        return new ForwardAntPacket(network, src, dest, size, () -> {});
+//                    }
+//                },
+//                this.config.getAntPacketSize(),
+//                -1
+//        );
 
         while (this.config.getWarmupCycles() > 0 && cycleAccurateEventQueue.getCurrentCycle() < this.config.getWarmupCycles()) {
             cycleAccurateEventQueue.advanceOneCycle();
