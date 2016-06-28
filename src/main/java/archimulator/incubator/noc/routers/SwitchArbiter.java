@@ -1,6 +1,6 @@
 package archimulator.incubator.noc.routers;
 
-import archimulator.incubator.noc.utils.RoundRobinArbiter;
+import archimulator.incubator.noc.util.RoundRobinArbiter;
 import javaslang.collection.List;
 
 /**

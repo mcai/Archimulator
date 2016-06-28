@@ -1,4 +1,4 @@
-package archimulator.incubator.noc.utils;
+package archimulator.incubator.noc.util;
 
 import javaslang.collection.List;
 
