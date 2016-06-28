@@ -18,6 +18,8 @@ public class Experiment {
         this.config = new Config();
         this.stats = new HashMap<>();
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
+
+        //TODO
     }
 
     public Config getConfig() {

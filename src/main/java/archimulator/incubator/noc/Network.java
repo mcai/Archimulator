@@ -54,30 +54,18 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private long totalPayloadPacketHops;
     private long maxPayloadPacketHops;
 
-    private Map<? extends Packet, Long> numPacketsReceivedPerType;
-    private Map<? extends Packet, Long> numPacketsTransmittedPerType;
+    private Map<Class<? extends Packet>, Long> numPacketsReceivedPerType;
+    private Map<Class<? extends Packet>, Long> numPacketsTransmittedPerType;
 
-    private Map<? extends Packet, Long> totalPacketDelaysPerType;
-    private Map<? extends Packet, Long> maxPacketDelayPerType;
+    private Map<Class<? extends Packet>, Long> totalPacketDelaysPerType;
+    private Map<Class<? extends Packet>, Long> maxPacketDelayPerType;
 
-    private Map<? extends Packet, Long> totalPacketHopsPerType;
-    private Map<? extends Packet, Long> maxPacketHopsPerType;
+    private Map<Class<? extends Packet>, Long> totalPacketHopsPerType;
+    private Map<Class<? extends Packet>, Long> maxPacketHopsPerType;
 
     private Map<FlitState, Long> numFlitPerStateDelaySamples;
     private Map<FlitState, Long> totalFlitPerStateDelays;
     private Map<FlitState, Long> maxFlitPerStateDelay;
-
-    private Map<FlitState, Long> numHeadFlitPerStateDelaySamples;
-    private Map<FlitState, Long> totalHeadFlitPerStateDelays;
-    private Map<FlitState, Long> maxHeadFlitPerStateDelay;
-
-    private Map<FlitState, Long> numBodyFlitPerStateDelaySamples;
-    private Map<FlitState, Long> totalBodyFlitPerStateDelays;
-    private Map<FlitState, Long> maxBodyFlitPerStateDelay;
-
-    private Map<FlitState, Long> numTailFlitPerStateDelaySamples;
-    private Map<FlitState, Long> totalTailFlitPerStateDelays;
-    private Map<FlitState, Long> maxTailFlitPerStateDelay;
 
     public Network(
             Experiment experiment,
@@ -146,18 +134,6 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.numFlitPerStateDelaySamples = LinkedHashMap.empty();
         this.totalFlitPerStateDelays = LinkedHashMap.empty();
         this.maxFlitPerStateDelay = LinkedHashMap.empty();
-
-        this.numHeadFlitPerStateDelaySamples = LinkedHashMap.empty();
-        this.totalHeadFlitPerStateDelays = LinkedHashMap.empty();
-        this.maxHeadFlitPerStateDelay = LinkedHashMap.empty();
-
-        this.numBodyFlitPerStateDelaySamples = LinkedHashMap.empty();
-        this.totalBodyFlitPerStateDelays = LinkedHashMap.empty();
-        this.maxBodyFlitPerStateDelay = LinkedHashMap.empty();
-
-        this.numTailFlitPerStateDelaySamples = LinkedHashMap.empty();
-        this.totalTailFlitPerStateDelays = LinkedHashMap.empty();
-        this.maxTailFlitPerStateDelay = LinkedHashMap.empty();
     }
 
     public boolean isInWarmupPhase() {
@@ -166,79 +142,206 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     }
 
     public void logPacketReceived(Packet packet) {
-        //TODO
+        if(this.isInWarmupPhase()) {
+            return;
+        }
+
+        this.numPacketsReceived++;
+
+        if(packet.hasPayload()) {
+            this.numPayloadPacketsReceived++;
+        }
+
+        Class<? extends Packet> packetCls = packet.getClass();
+
+        if(!this.numPacketsReceivedPerType.containsKey(packetCls)) {
+            this.numPacketsReceivedPerType.put(packetCls, 0L);
+        }
+
+        this.numPacketsReceivedPerType.put(packetCls,
+                this.numPacketsReceivedPerType.get(packetCls).get() + 1);
     }
 
     public void logPacketTransmitted(Packet packet) {
-        //TODO
+        if(this.isInWarmupPhase()) {
+            return;
+        }
+
+        this.numPacketsTransmitted++;
+
+        if(packet.hasPayload()) {
+            this.numPayloadPacketsTransmitted++;
+        }
+
+        Class<? extends Packet> packetCls = packet.getClass();
+
+        if(!this.numPacketsTransmittedPerType.containsKey(packetCls)) {
+            this.numPacketsTransmittedPerType.put(packetCls, 0L);
+        }
+
+        this.numPacketsTransmittedPerType.put(packetCls,
+                this.numPacketsTransmittedPerType.get(packetCls).get() + 1);
+
+        this.totalPacketDelays += packet.delay();
+        this.totalPacketHops += packet.hops();
+
+        if(packet.hasPayload()) {
+            this.totalPayloadPacketDelays += packet.delay();
+            this.totalPayloadPacketHops += packet.hops();
+        }
+
+        if(!this.totalPacketDelaysPerType.containsKey(packetCls)) {
+            this.totalPacketDelaysPerType.put(packetCls, 0L);
+        }
+
+        if(!this.totalPacketHopsPerType.containsKey(packetCls)) {
+            this.totalPacketHopsPerType.put(packetCls, 0L);
+        }
+
+        this.totalPacketDelaysPerType.put(packetCls,
+                this.totalPacketDelaysPerType.get(packetCls).get() + packet.delay());
+
+        this.totalPacketHopsPerType.put(packetCls,
+                this.totalPacketHopsPerType.get(packetCls).get() + packet.hops());
+
+        this.maxPacketDelay = Math.max(this.maxPacketDelay, packet.delay());
+        this.maxPacketHops = Math.max(this.maxPacketHops, packet.hops());
+
+        if(packet.hasPayload()) {
+            this.maxPayloadPacketDelay = Math.max(this.maxPayloadPacketDelay, packet.delay());
+            this.maxPayloadPacketHops = Math.max(this.maxPayloadPacketHops, packet.hops());
+        }
+
+        if(!this.maxPacketDelayPerType.containsKey(packetCls)) {
+            this.maxPacketDelayPerType.put(packetCls, 0L);
+        }
+
+        if(!this.maxPacketHopsPerType.containsKey(packetCls)) {
+            this.maxPacketHopsPerType.put(packetCls, 0L);
+        }
+
+        this.maxPacketDelayPerType.put(packetCls,
+                Math.max(this.maxPacketDelayPerType.get(packetCls).get(), packet.delay()));
+        this.maxPacketHopsPerType.put(packetCls,
+                Math.max(this.maxPacketHopsPerType.get(packetCls).get(), packet.hops()));
     }
 
     public void logFlitPerStateDelay(boolean head, boolean tail, FlitState state, int delay) {
-        //TODO
+        if(this.isInWarmupPhase()) {
+            return;
+        }
+
+        if(!this.numFlitPerStateDelaySamples.containsKey(state)) {
+            this.numFlitPerStateDelaySamples.put(state, 0L);
+        }
+
+        this.numFlitPerStateDelaySamples.put(state, this.numFlitPerStateDelaySamples.get(state).get() + 1);
+
+        if(!this.totalFlitPerStateDelays.containsKey(state)) {
+            this.totalFlitPerStateDelays.put(state, 0L);
+        }
+
+        this.totalFlitPerStateDelays.put(state, this.totalFlitPerStateDelays.get(state).get() + delay);
+
+        if(!this.maxFlitPerStateDelay.containsKey(state)) {
+            this.maxFlitPerStateDelay.put(state, 0L);
+        }
+
+        this.maxFlitPerStateDelay.put(state, Math.max(this.maxFlitPerStateDelay.get(state).get(), delay));
     }
 
-    public void receive(Packet packet) {
-        //TODO
+    public boolean receive(Packet packet) {
+        if(!this.nodes.get(packet.getSrc()).getRouter().injectPacket(packet)) {
+            this.cycleAccurateEventQueue.schedule(this, () -> receive(packet), 1);
+            return false;
+        }
+
+        this.inflightPackets.append(packet);
+        this.logPacketReceived(packet);
+
+        return true;
     }
 
     public int randDest(int src) {
-        return -1; //TODO
+        while (true) {
+            int i = this.experiment.getRandom().nextInt(this.numNodes - 1);
+            if(i != src) {
+                return i;
+            }
+        }
     }
 
     public double throughput() {
-        return 0.0; //TODO
+        return (double) this.numPacketsTransmitted / this.cycleAccurateEventQueue.getCurrentCycle() / this.numNodes;
     }
 
     public double averagePacketDelay() {
-        return 0.0; //TODO
+        if(this.numPacketsTransmitted > 0) {
+            return (double) this.totalPacketDelays / this.numPacketsTransmitted;
+        }
+
+        return 0.0;
     }
 
     public double averagePacketHops() {
-        return 0.0; //TODO
+        if(this.numPacketsTransmitted > 0) {
+            return (double) this.totalPacketHops / this.numPacketsTransmitted;
+        }
+
+        return 0.0;
     }
 
     public double payloadThroughput() {
-        return 0.0; //TODO
+        return (double) this.numPayloadPacketsTransmitted / this.cycleAccurateEventQueue.getCurrentCycle() / this.numNodes;
     }
 
     public double averagePayloadPacketDelay() {
-        return 0.0; //TODO
+        if(this.numPayloadPacketsTransmitted > 0) {
+            return (double) this.totalPayloadPacketDelays / this.numPayloadPacketsTransmitted;
+        }
+
+        return 0.0;
     }
 
     public double averagePayloadPacketHops() {
-        return 0.0; //TODO
+        if(this.numPayloadPacketsTransmitted > 0) {
+            return (double) this.totalPayloadPacketHops / this.numPayloadPacketsTransmitted;
+        }
+
+        return 0.0;
     }
 
     public double throughputPerType(Class<? extends Packet> packetCls) {
-        return 0.0; //TODO
+        return (double) this.numPacketsTransmittedPerType.get(packetCls).get()
+                / this.cycleAccurateEventQueue.getCurrentCycle()
+                / this.numNodes;
     }
 
     public double averagePacketDelayPerType(Class<? extends Packet> packetCls) {
-        return 0.0; //TODO
+        if(this.numPacketsTransmittedPerType.get(packetCls).get() > 0) {
+            return (double) this.totalPacketDelaysPerType.get(packetCls).get()
+                    / this.numPacketsTransmittedPerType.get(packetCls).get();
+        }
+
+        return 0.0;
     }
 
     public double averagePacketHopsPerType(Class<? extends Packet> packetCls) {
-        return 0.0; //TODO
+        if(this.numPacketsTransmittedPerType.get(packetCls).get() > 0) {
+            return (double) this.totalPacketHopsPerType.get(packetCls).get()
+                    / this.numPacketsTransmittedPerType.get(packetCls).get();
+        }
+
+        return 0.0;
     }
 
     public double averageFlitPerStateDelay(FlitState state) {
-        return 0.0; //TODO
-    }
+        if(this.numFlitPerStateDelaySamples.get(state).get() > 0) {
+            return (double) this.totalFlitPerStateDelays.get(state).get()
+                    / this.numFlitPerStateDelaySamples.get(state).get();
+        }
 
-    public double averageHeadFlitPerStateDelay(FlitState state) {
-        return 0.0; //TODO
-    }
-
-    public double averageBodyFlitPerStateDelay(FlitState state) {
-        return 0.0; //TODO
-    }
-
-    public double averageTailFlitPerStateDelay(FlitState state) {
-        return 0.0; //TODO
-    }
-
-    public void dumpState() {
-        //TODO
+        return 0.0;
     }
 
     public Experiment getExperiment() {
@@ -287,5 +390,29 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     public long getNumPacketsTransmitted() {
         return numPacketsTransmitted;
+    }
+
+    public long getMaxPacketDelay() {
+        return maxPacketDelay;
+    }
+
+    public long getMaxPacketHops() {
+        return maxPacketHops;
+    }
+
+    public long getNumPayloadPacketsReceived() {
+        return numPayloadPacketsReceived;
+    }
+
+    public long getNumPayloadPacketsTransmitted() {
+        return numPayloadPacketsTransmitted;
+    }
+
+    public long getMaxPayloadPacketDelay() {
+        return maxPayloadPacketDelay;
+    }
+
+    public long getMaxPayloadPacketHops() {
+        return maxPayloadPacketHops;
     }
 }
