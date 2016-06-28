@@ -10,12 +10,11 @@ import archimulator.incubator.noc.selection.aco.ACONode;
 import archimulator.incubator.noc.selection.aco.ForwardAntPacket;
 import archimulator.incubator.noc.traffics.PacketFactory;
 import archimulator.incubator.noc.traffics.TransposeTrafficGenerator;
+import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.CycleAccurateEventQueue;
+import org.apache.commons.lang.time.DurationFormatUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Experiment.
@@ -29,7 +28,7 @@ public class Experiment {
 
     public Experiment() {
         this.config = new Config();
-        this.stats = new TreeMap<>();
+        this.stats = new LinkedHashMap<>();
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
     }
 
@@ -81,6 +80,8 @@ public class Experiment {
                 this.config.getMaxPackets()
         );
 
+        long beginTime = DateHelper.toTick(new Date());
+
         while ((this.config.getMaxCycles() == -1 || cycleAccurateEventQueue.getCurrentCycle() < this.config.getMaxCycles())
         && (this.config.getMaxPackets() == -1 || network.getNumPacketsReceived() < this.config.getMaxPackets())) {
             cycleAccurateEventQueue.advanceOneCycle();
@@ -94,25 +95,35 @@ public class Experiment {
             }
         }
 
-//        this.stats.put("simulation_time", time() - time_start);
-        this.stats.put("total_cycles", cycleAccurateEventQueue.getCurrentCycle());
+        long endTime = DateHelper.toTick(new Date());
 
-        this.stats.put("num_packets_received", network.getNumPacketsReceived());
-        this.stats.put("num_packets_transmitted", network.getNumPacketsTransmitted());
-        this.stats.put("throughput", network.throughput());
-        this.stats.put("average_packet_delay", network.averagePacketDelay());
-        this.stats.put("average_packet_hops", network.averagePacketHops());
-        this.stats.put("max_packet_delay", network.getMaxPacketDelay());
-        this.stats.put("max_packet_hops", network.getMaxPacketHops());
+        this.stats.put("  simulationTime", DurationFormatUtils.formatDurationHMS(endTime - beginTime));
+        this.stats.put("  totalCycles", cycleAccurateEventQueue.getCurrentCycle());
 
-        this.stats.put("num_payload_packets_received", network.getNumPayloadPacketsReceived());
-        this.stats.put("num_payload_packets_transmitted", network.getNumPayloadPacketsTransmitted());
-        this.stats.put("payload_throughput", network.payloadThroughput());
-        this.stats.put("average_payload_packet_delay", network.averagePayloadPacketDelay());
-        this.stats.put("average_payload_packet_hops", network.averagePayloadPacketHops());
-        this.stats.put("max_payload_packet_delay", network.getMaxPayloadPacketDelay());
-        this.stats.put("max_payload_packet_hops", network.getMaxPayloadPacketHops());
+        this.stats.put("  numPacketsReceived", network.getNumPacketsReceived());
+        this.stats.put("  numPacketsTransmitted", network.getNumPacketsTransmitted());
+        this.stats.put("  throughput", network.throughput());
+        this.stats.put("  averagePacketDelay", network.averagePacketDelay());
+        this.stats.put("  averagePacketHops", network.averagePacketHops());
+        this.stats.put("  maxPacketDelay", network.getMaxPacketDelay());
+        this.stats.put("  maxPacketHops", network.getMaxPacketHops());
 
+        this.stats.put("  numPayloadPacketsReceived", network.getNumPayloadPacketsReceived());
+        this.stats.put("  numPayloadPacketsTransmitted", network.getNumPayloadPacketsTransmitted());
+        this.stats.put("  payloadThroughput", network.payloadThroughput());
+        this.stats.put("  averagePayloadPacketDelay", network.averagePayloadPacketDelay());
+        this.stats.put("  averagePayloadPacketHops", network.averagePayloadPacketHops());
+        this.stats.put("  maxPayloadPacketDelay", network.getMaxPayloadPacketDelay());
+        this.stats.put("  maxPayloadPacketHops", network.getMaxPayloadPacketHops());
+
+        System.out.println();
+
+        System.out.println("Config: ");
+        this.config.dump();
+
+        System.out.println();
+
+        System.out.println("Stats: ");
         for(String key : this.stats.keySet()) {
             Object value = this.stats.get(key);
             System.out.println(String.format("%s: %s", key, value));

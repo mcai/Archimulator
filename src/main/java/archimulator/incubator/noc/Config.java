@@ -243,4 +243,28 @@ public class Config {
     public void setReinforcementFactor(double reinforcementFactor) {
         this.reinforcementFactor = reinforcementFactor;
     }
+
+    public void dump() {
+        System.out.println(String.format("  %s: %s", "enableDebugging", enableDebugging));
+        System.out.println(String.format("  %s: %s", "noDrain", noDrain));
+        System.out.println(String.format("  %s: %s", "randSeed", randSeed));
+        System.out.println(String.format("  %s: %s", "resultDir", resultDir));
+        System.out.println(String.format("  %s: %s", "numNodes", numNodes));
+        System.out.println(String.format("  %s: %s", "maxCycles", maxCycles));
+        System.out.println(String.format("  %s: %s", "maxPackets", maxPackets));
+        System.out.println(String.format("  %s: %s", "routing", routing));
+        System.out.println(String.format("  %s: %s", "selection", selection));
+        System.out.println(String.format("  %s: %s", "traffic", traffic));
+        System.out.println(String.format("  %s: %s", "maxInjectionBufferSize", maxInjectionBufferSize));
+        System.out.println(String.format("  %s: %s", "maxInputBufferSize", maxInputBufferSize));
+        System.out.println(String.format("  %s: %s", "numVirtualChannels", numVirtualChannels));
+        System.out.println(String.format("  %s: %s", "linkWidth", linkWidth));
+        System.out.println(String.format("  %s: %s", "linkDelay", linkDelay));
+        System.out.println(String.format("  %s: %s", "dataPacketSize", dataPacketSize));
+        System.out.println(String.format("  %s: %s", "dataPacketInjectionRate", dataPacketInjectionRate));
+        System.out.println(String.format("  %s: %s", "antPacketSize", antPacketSize));
+        System.out.println(String.format("  %s: %s", "antPacketInjectionRate", antPacketInjectionRate));
+        System.out.println(String.format("  %s: %s", "acoSelectionAlpha", acoSelectionAlpha));
+        System.out.println(String.format("  %s: %s", "reinforcementFactor", reinforcementFactor));
+    }
 }
