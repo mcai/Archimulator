@@ -51,7 +51,7 @@ public class Config {
 
         this.noDrain = false;
 
-        this.randSeed = -1;
+        this.randSeed = 13;
 
         this.resultDir = "results/";
 

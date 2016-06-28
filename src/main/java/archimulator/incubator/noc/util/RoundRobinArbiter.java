@@ -23,12 +23,12 @@ public abstract class RoundRobinArbiter<ResourceT, RequesterT> {
     private int lastServicedRequesterIndex = -1;
 
     public RequesterT next() {
-        for (int i = lastServicedRequesterIndex, count = 0;  count < requesters.size(); i++, count++) {
+        for (int i = lastServicedRequesterIndex + 1, count = 0;  count < requesters.size(); i++, count++) {
             if(!this.resourceAvailable(resource)) {
                 return null;
             }
 
-            RequesterT requester = requesters.get(i);
+            RequesterT requester = requesters.get(i % requesters.size());
 
             if(this.requesterHasRequests(requester)) {
                 lastServicedRequesterIndex = i;
