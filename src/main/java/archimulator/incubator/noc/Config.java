@@ -47,7 +47,7 @@ public class Config {
     public Config() {
         this.enableDebugging = false;
 
-        this.noDrain = false;
+        this.noDrain = true;
 
         this.randSeed = 13;
 
@@ -61,7 +61,7 @@ public class Config {
         this.traffic = "uniform";
 
         this.maxInjectionBufferSize = 32;
-        this.maxInputBufferSize = 20;
+        this.maxInputBufferSize = 4;
         this.numVirtualChannels = 4;
         this.linkWidth = 4;
         this.linkDelay = 1;
