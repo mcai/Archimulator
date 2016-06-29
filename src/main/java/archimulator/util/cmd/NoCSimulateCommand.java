@@ -1,6 +1,6 @@
 package archimulator.util.cmd;
 
-import archimulator.incubator.noc.startup.Run;
+import archimulator.uncore.net.noc.startup.Run;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandNames = "noc_simulate", separators = "=")
