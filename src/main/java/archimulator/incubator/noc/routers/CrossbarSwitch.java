@@ -24,7 +24,7 @@ public class CrossbarSwitch {
 
                 for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
                     if(inputVirtualChannel.getOutputVirtualChannel() != null
-                            && inputVirtualChannel.getOutputVirtualChannel().getOutputPort() != outputPort) {
+                            && inputVirtualChannel.getOutputVirtualChannel().getOutputPort() == outputPort) {
                         Flit flit = inputVirtualChannel.getInputBuffer().peek();
                         if(flit != null && flit.getState() == FlitState.SWITCH_ALLOCATION) {
                             flit.setState(FlitState.SWITCH_TRAVERSAL);

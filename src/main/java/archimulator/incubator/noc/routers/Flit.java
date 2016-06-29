@@ -42,6 +42,14 @@ public class Flit {
         this.prevStateTimestamp = this.timestamp = this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle();
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "Flit{packet.id=%d, num=%d, head=%s, tail=%s, node.id=%s, state=%s, timestamp=%d}",
+                packet.getId(), num, head, tail, node.getId(), state, timestamp
+        );
+    }
+
     public Packet getPacket() {
         return packet;
     }
@@ -72,7 +80,7 @@ public class Flit {
 
     public void setState(FlitState state) {
         if(state == this.state) {
-            throw new IllegalArgumentException(String.format("%s", state));
+            throw new IllegalArgumentException(String.format("Flit is already in the %s state", state));
         }
 
         this.packet.getNetwork().logFlitPerStateDelay(

@@ -22,9 +22,12 @@ public class RouteComputation {
                 if(flit != null && flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
                     if(flit.getPacket().getDest() == this.router.getNode().getId()) {
                         inputVirtualChannel.setRoute(Direction.LOCAL);
-                    }
-                    else {
-                        inputVirtualChannel.setRoute(this.router.getNode().doRouteCalculation(flit.getPacket(), inputVirtualChannel));
+                    } else {
+                        inputVirtualChannel.setRoute(
+                                this.router.getNode().doRouteCalculation(
+                                        flit.getPacket(), inputVirtualChannel
+                                )
+                        );
                     }
 
                     flit.setState(FlitState.ROUTE_CALCULATION);

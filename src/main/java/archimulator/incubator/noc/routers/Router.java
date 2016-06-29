@@ -116,8 +116,7 @@ public class Router {
         if(inputBuffer.size() + 1 <= this.node.getNetwork().getExperiment().getConfig().getMaxInputBufferSize()) {
             flit.setState(FlitState.INPUT_BUFFER);
             this.node.getNetwork().getNodes().get(nextHop).getRouter().insertFlit(flit, ip, ivc);
-        }
-        else {
+        } else {
             this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> this.nextHopArrived(flit, nextHop, ip, ivc), 1);
         }
     }
