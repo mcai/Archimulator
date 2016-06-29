@@ -2,7 +2,7 @@
   "enableDebugging": false,
   "noDrain": true,
   "randSeed": 13,
-  "resultDir": "test_results/",
+  "resultDir": "test_results/aco/",
   "numNodes": 64,
   "maxCycles": 20000,
   "maxPackets": -1,
@@ -18,6 +18,6 @@
   "dataPacketInjectionRate": 0.06,
   "antPacketSize": 4,
   "antPacketInjectionRate": 0.001,
-  "acoSelectionAlpha": 0.45,
-  "reinforcementFactor": 0.001
+  "acoSelectionAlpha": 0.4,
+  "reinforcementFactor": 0.016
 }
