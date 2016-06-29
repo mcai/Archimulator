@@ -76,10 +76,26 @@ public class Analyze {
 
             generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
+                    String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_packet_delay.pdf", traffic),
+                    "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                    "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                    "Average_Packet_Delay_(cycles)"
+            );
+
+            generatePlot(
+                    String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_packet_hops.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
                     "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
                     "Average_Packet_Hops"
+            );
+
+            generatePlot(
+                    String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
+                    String.format("results/trafficsAndDataPacketInjectionRates/t_%s_payload_throughput.pdf", traffic),
+                    "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                    "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                    "Payload_Throughput_(packets/cycle/node)"
             );
 
             generatePlot(
@@ -115,10 +131,26 @@ public class Analyze {
 
         generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
+                "results/antPacketInjectionRates/t_transpose_average_packet_delay.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                "Average_Packet_Delay_(cycles)"
+        );
+
+        generatePlot(
+                "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_average_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
                 "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
                 "Average_Packet_Hops"
+        );
+
+        generatePlot(
+                "results/antPacketInjectionRates/t_transpose.csv",
+                "results/antPacketInjectionRates/t_transpose_payload_throughput.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                "Payload_Throughput_(packets/cycle/node)"
         );
 
         generatePlot(
@@ -153,10 +185,26 @@ public class Analyze {
 
         generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
+                "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_packet_delay.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                "Average_Packet_Delay_(cycles)"
+        );
+
+        generatePlot(
+                "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
                 "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
                 "Average_Packet_Hops"
+        );
+
+        generatePlot(
+                "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
+                "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_payload_throughput.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+                "Payload_Throughput_(packets/cycle/node)"
         );
 
         generatePlot(
