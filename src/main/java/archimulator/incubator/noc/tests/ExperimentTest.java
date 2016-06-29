@@ -1,4 +1,4 @@
-package archimulator.incubator.noc.startup;
+package archimulator.incubator.noc.tests;
 
 import archimulator.incubator.noc.Experiment;
 import org.junit.Test;

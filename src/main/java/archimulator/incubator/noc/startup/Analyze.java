@@ -25,9 +25,14 @@ public class Analyze {
         fields.add(new CSVField("Data Packet Injection Rate (packets/cycle/node)", CSVFields::getDataPacketInjectionRate));
         fields.add(new CSVField("Routing Algorithm", CSVFields::getRouting));
         fields.add(new CSVField("Selection Policy", CSVFields::getSelection));
+        fields.add(new CSVField("Routing+Selection", CSVFields::getRoutingAndSelection));
         fields.add(new CSVField("Ant Packet Injection Rate (packets/cycle/node)", CSVFields::getAntPacketInjectionRate));
         fields.add(new CSVField("Alpha", CSVFields::getAcoSelectionAlpha));
         fields.add(new CSVField("Reinforcement Factor", CSVFields::getReinforcementFactor));
+        fields.add(new CSVField("Routing+Selection/Alpha/Reinforcement Factor",
+                CSVFields::getRoutingAndSelectionAndAcoSelectionAlphaAndReinforcementFactor));
+        fields.add(new CSVField("Routing+Selection/Ant Packet Injection Rate/Alpha/Reinforcement Factor",
+                CSVFields::getRoutingAndSelectionAndAntPacketInjectionRateAndAcoSelectionAlphaAndReinforcementFactor));
         fields.add(new CSVField("Simulation Time", CSVFields::getSimulationTime));
         fields.add(new CSVField("Total Cycles", CSVFields::getTotalCycles));
         fields.add(new CSVField("Packets Transmitted", CSVFields::getNumPacketsTransmitted));

@@ -25,21 +25,78 @@ public class CSVFields {
         return experiment.getConfig().getSelection();
     }
 
-    public static String getAntPacketInjectionRate(Experiment experiment) {
-        return String.format("%s", experiment.getConfig().getAntPacketInjectionRate());
-    }
-
-    public static String getAcoSelectionAlpha(Experiment experiment) {
+    public static String getRoutingAndSelection(Experiment experiment) {
         return String.format(
-                "%s",
-                experiment.getConfig().getAcoSelectionAlpha()
+                "%s+%s",
+                getRouting(experiment),
+                getSelection(experiment)
         );
     }
 
+    public static String getAntPacketInjectionRate(Experiment experiment) {
+        if(experiment.getConfig().getSelection().equals("aco")) {
+            return String.format("%s", experiment.getConfig().getAntPacketInjectionRate());
+        }
+
+        return "";
+    }
+
+    public static String getAcoSelectionAlpha(Experiment experiment) {
+        if(experiment.getConfig().getSelection().equals("aco")) {
+            return String.format(
+                    "%s",
+                    experiment.getConfig().getAcoSelectionAlpha()
+            );
+        }
+
+        return "";
+    }
+
     public static String getReinforcementFactor(Experiment experiment) {
+        if(experiment.getConfig().getSelection().equals("aco")) {
+            return String.format(
+                    "%s",
+                    experiment.getConfig().getReinforcementFactor()
+            );
+        }
+
+        return "";
+    }
+
+    public static String getRoutingAndSelectionAndAcoSelectionAlphaAndReinforcementFactor(Experiment experiment) {
+        if(experiment.getConfig().getSelection().equals("aco")) {
+            return String.format(
+                    "%s+%s/a=%s/rf=%s",
+                    getRouting(experiment),
+                    getSelection(experiment),
+                    getAcoSelectionAlpha(experiment),
+                    getReinforcementFactor(experiment)
+            );
+        }
+
         return String.format(
-                "%s",
-                experiment.getConfig().getReinforcementFactor()
+                "%s+%s",
+                getRouting(experiment),
+                getSelection(experiment)
+        );
+    }
+
+    public static String getRoutingAndSelectionAndAntPacketInjectionRateAndAcoSelectionAlphaAndReinforcementFactor(Experiment experiment) {
+        if(experiment.getConfig().getSelection().equals("aco")) {
+            return String.format(
+                    "%s+%s/aj=%s/a=%s/rf=%s",
+                    getRouting(experiment),
+                    getSelection(experiment),
+                    getAntPacketInjectionRate(experiment),
+                    getAcoSelectionAlpha(experiment),
+                    getReinforcementFactor(experiment)
+            );
+        }
+
+        return String.format(
+                "%s+%s",
+                getRouting(experiment),
+                getSelection(experiment)
         );
     }
 

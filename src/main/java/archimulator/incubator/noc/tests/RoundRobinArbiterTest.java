@@ -1,4 +1,4 @@
-package archimulator.incubator.noc.startup;
+package archimulator.incubator.noc.tests;
 
 import archimulator.incubator.noc.util.RoundRobinArbiter;
 import org.junit.Test;
