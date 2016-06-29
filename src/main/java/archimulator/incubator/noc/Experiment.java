@@ -38,8 +38,12 @@ public class Experiment {
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
     }
 
-    public static void runExperiments(List<Experiment> experiments) {
-        experiments.forEach(Experiment::run);
+    public static void runExperiments(List<Experiment> experiments, boolean parallel) {
+        if(parallel) {
+            experiments.parallelStream().forEach(Experiment::run);
+        } else {
+            experiments.forEach(Experiment::run);
+        }
     }
 
     public void run() {

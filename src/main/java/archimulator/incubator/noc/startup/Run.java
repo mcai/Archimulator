@@ -10,11 +10,11 @@ import archimulator.incubator.noc.Experiment;
 public class Run {
     public static void main(String[] args) {
         for(String traffic : Common.trafficsAndDataPacketInjectionRates.keySet()) {
-            Experiment.runExperiments(Common.trafficsAndDataPacketInjectionRates.get(traffic));
+            Experiment.runExperiments(Common.trafficsAndDataPacketInjectionRates.get(traffic), true);
         }
 
-        Experiment.runExperiments(Common.antPacketInjectionRates);
+        Experiment.runExperiments(Common.antPacketInjectionRates, true);
 
-        Experiment.runExperiments(Common.acoSelectionAlphasAndReinforcementFactors);
+        Experiment.runExperiments(Common.acoSelectionAlphasAndReinforcementFactors, true);
     }
 }
