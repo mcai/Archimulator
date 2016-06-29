@@ -53,6 +53,11 @@ public class NoCNet extends BasicSimulationObject implements Net {
 
         numNodes++;
 
+        int width = (int) Math.sqrt(numNodes);
+        if (width * width != numNodes) {
+            numNodes = (width + 1) * (width + 1);
+        }
+
         Config config = new Config();
         config.setNumNodes(numNodes);
         config.setMaxInputBufferSize(memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
@@ -99,5 +104,9 @@ public class NoCNet extends BasicSimulationObject implements Net {
     @Override
     public String getName() {
         return "net";
+    }
+
+    public Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> getNetwork() {
+        return network;
     }
 }

@@ -264,6 +264,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.getProcessor().getMemoryHierarchy().getMemoryController().dumpStats(rootReportNode);
 
+        ((NoCMemoryHierarchy)this.getProcessor().getMemoryHierarchy()).dumpStats(rootReportNode);
+
         this.getLatencyTrackingHelper().dumpStats(rootReportNode);
         this.getStackDistanceProfilingHelper().dumpStats(rootReportNode);
         this.getReuseDistancePredictionHelper().dumpStats(rootReportNode);

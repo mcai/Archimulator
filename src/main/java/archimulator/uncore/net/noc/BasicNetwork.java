@@ -9,6 +9,7 @@ import archimulator.util.event.CycleAccurateEventQueue;
  *
  * @param <NodeT> the node type
  * @param <RoutingAlgorithmT> the routing algorithm type
+ * @author Min Cai
  */
 public class BasicNetwork<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> extends Network<NodeT, RoutingAlgorithmT> {
     public BasicNetwork(NoCSettings settings, CycleAccurateEventQueue cycleAccurateEventQueue, int numNodes, NodeFactory<NodeT> nodeFactory, RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory) {
