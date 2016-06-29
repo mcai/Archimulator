@@ -42,7 +42,7 @@ import archimulator.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.uncore.mlp.BLPProfilingHelper;
 import archimulator.uncore.mlp.MLPProfilingHelper;
-import archimulator.uncore.net.basic.BasicMemoryHierarchy;
+import archimulator.uncore.net.noc.NoCMemoryHierarchy;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.Reference;
 import archimulator.util.collection.tree.NodeHelper;
@@ -396,7 +396,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
     public MemoryHierarchy prepareMemoryHierarchy() {
         //TODO: switch type
 //        return new SimpleMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
-        return new BasicMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+//        return new BasicMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
+        return new NoCMemoryHierarchy(this.getExperiment(), this, this.getBlockingEventDispatcher(), this.getCycleAccurateEventQueue());
     }
 
     /**

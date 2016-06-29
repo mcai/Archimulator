@@ -12,10 +12,10 @@ import java.util.*;
  *
  * @author  Min Cai
  */
-public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
+public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
     long currentPacketId;
 
-    private Experiment experiment;
+    private NoCSettings settings;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
@@ -67,7 +67,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private Map<FlitState, Long> maxFlitPerStateDelay;
 
     public Network(
-            Experiment experiment,
+            NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
             NodeFactory<NodeT> nodeFactory,
@@ -75,7 +75,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     ) {
         this.currentPacketId = 0;
 
-        this.experiment = experiment;
+        this.settings = settings;
 
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -134,6 +134,8 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.totalFlitPerStateDelays = new HashMap<>();
         this.maxFlitPerStateDelay = new HashMap<>();
     }
+
+    public abstract boolean simulateAtCurrentCycle();
 
     public void logPacketReceived(Packet packet) {
         this.numPacketsReceived++;
@@ -246,7 +248,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     public int randDest(int src) {
         while (true) {
-            int i = this.experiment.getRandom().nextInt(this.numNodes);
+            int i = this.settings.getRandom().nextInt(this.numNodes);
             if(i != src) {
                 return i;
             }
@@ -326,8 +328,8 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
-    public Experiment getExperiment() {
-        return experiment;
+    public NoCSettings getSettings() {
+        return settings;
     }
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {

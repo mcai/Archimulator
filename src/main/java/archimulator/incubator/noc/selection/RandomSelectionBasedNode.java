@@ -19,6 +19,6 @@ public class RandomSelectionBasedNode extends Node {
 
     @Override
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
-        return directions.get(this.getNetwork().getExperiment().getRandom().nextInt(directions.size()));
+        return directions.get(this.getNetwork().getSettings().getRandom().nextInt(directions.size()));
     }
 }

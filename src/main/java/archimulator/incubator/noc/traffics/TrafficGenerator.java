@@ -41,7 +41,7 @@ public abstract class TrafficGenerator<NodeT extends Node, RoutingAlgorithmT ext
                 break;
             }
 
-            boolean valid = this.network.getExperiment().getRandom().nextDouble() <= this.packetInjectionRate;
+            boolean valid = this.network.getSettings().getRandom().nextDouble() <= this.packetInjectionRate;
             if(valid) {
                 int src = node.getId();
                 int dest = this.dest(src);

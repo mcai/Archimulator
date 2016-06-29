@@ -27,7 +27,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class Experiment {
+public class Experiment implements NoCSettings {
     private Config config;
     private Map<String, Object> stats;
     private Random random;
@@ -209,7 +209,7 @@ public class Experiment {
 
     private Network<? extends Node, ? extends RoutingAlgorithm> aco(CycleAccurateEventQueue cycleAccurateEventQueue) {
         Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
-                new Network<>(
+                new BasicNetwork<>(
                         this,
                         cycleAccurateEventQueue,
                         this.config.getNumNodes(),
@@ -255,7 +255,7 @@ public class Experiment {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> random(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new Network<>(
+        return new BasicNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -269,7 +269,7 @@ public class Experiment {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new Network<>(
+        return new BasicNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -283,7 +283,7 @@ public class Experiment {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new Network<>(
+        return new BasicNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -297,7 +297,7 @@ public class Experiment {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> xy(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new Network<>(
+        return new BasicNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -310,6 +310,7 @@ public class Experiment {
                 XYRoutingAlgorithm::new);
     }
 
+    @Override
     public Config getConfig() {
         return config;
     }
@@ -318,6 +319,7 @@ public class Experiment {
         return stats;
     }
 
+    @Override
     public Random getRandom() {
         return random;
     }

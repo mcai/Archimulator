@@ -37,12 +37,12 @@ public class ACORoutingTable {
             if(pheromone.getDirection() == direction) {
                 pheromone.setValue(
                         pheromone.getValue()
-                                + this.node.getNetwork().getExperiment().getConfig().getReinforcementFactor() * (1 - pheromone.getValue())
+                                + this.node.getNetwork().getSettings().getConfig().getReinforcementFactor() * (1 - pheromone.getValue())
                 );
             } else {
                 pheromone.setValue(
                         pheromone.getValue()
-                                - this.node.getNetwork().getExperiment().getConfig().getReinforcementFactor() * pheromone.getValue()
+                                - this.node.getNetwork().getSettings().getConfig().getReinforcementFactor() * pheromone.getValue()
                 );
             }
         }
