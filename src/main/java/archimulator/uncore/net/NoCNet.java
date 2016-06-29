@@ -12,6 +12,8 @@ import archimulator.uncore.net.noc.selection.aco.ACONode;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
+import archimulator.uncore.net.noc.selection.aco.ForwardAntPacket;
+import archimulator.uncore.net.noc.traffics.TransposeTrafficGenerator;
 import archimulator.util.action.Action;
 
 import java.util.HashMap;
@@ -87,6 +89,14 @@ public class NoCNet extends BasicSimulationObject implements Net {
                 return memoryHierarchy.getSimulation().getType() != SimulationType.FAST_FORWARD;
             }
         };
+
+        new TransposeTrafficGenerator<>(
+                network,
+                config.getAntPacketInjectionRate(),
+                (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                config.getAntPacketSize(),
+                -1
+        );
     }
 
     @Override
