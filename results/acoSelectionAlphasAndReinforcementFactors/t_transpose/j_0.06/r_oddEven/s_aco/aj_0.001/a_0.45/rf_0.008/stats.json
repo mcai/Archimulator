@@ -1,0 +1,18 @@
+{
+  "simulationTime": "0:00:11.504",
+  "totalCycles": 20000,
+  "numPacketsReceived": 69687,
+  "numPacketsTransmitted": 69436,
+  "throughput": 0.054246875,
+  "averagePacketDelay": 70.53534189757474,
+  "averagePacketHops": 6.999654357969929,
+  "maxPacketDelay": 475,
+  "maxPacketHops": 15,
+  "numPayloadPacketsReceived": 67364,
+  "numPayloadPacketsTransmitted": 67117,
+  "payloadThroughput": 0.05243515625,
+  "averagePayloadPacketDelay": 70.96437564253468,
+  "averagePayloadPacketHops": 6.9991358374182395,
+  "maxPayloadPacketDelay": 475,
+  "maxPayloadPacketHops": 15
+}

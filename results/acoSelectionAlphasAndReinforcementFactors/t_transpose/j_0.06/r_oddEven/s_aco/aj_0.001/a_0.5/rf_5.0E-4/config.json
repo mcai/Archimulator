@@ -1,0 +1,23 @@
+{
+  "enableDebugging": false,
+  "noDrain": true,
+  "randSeed": 13,
+  "resultDir": "results/acoSelectionAlphasAndReinforcementFactors/t_transpose/j_0.06/r_oddEven/s_aco/aj_0.001/a_0.5/rf_5.0E-4/",
+  "numNodes": 64,
+  "maxCycles": 20000,
+  "maxPackets": -1,
+  "routing": "oddEven",
+  "selection": "aco",
+  "traffic": "transpose",
+  "maxInjectionBufferSize": 32,
+  "maxInputBufferSize": 4,
+  "numVirtualChannels": 4,
+  "linkWidth": 4,
+  "linkDelay": 1,
+  "dataPacketSize": 16,
+  "dataPacketInjectionRate": 0.06,
+  "antPacketSize": 4,
+  "antPacketInjectionRate": 0.001,
+  "acoSelectionAlpha": 0.5,
+  "reinforcementFactor": 5.0E-4
+}
