@@ -16,6 +16,7 @@ public class ExperimentTest {
         String traffic = "transpose";
 
         Experiment experiment = new Experiment();
+        experiment.getConfig().setResultDir("test_results/");
         experiment.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experiment.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
         experiment.getConfig().setTraffic(traffic);
