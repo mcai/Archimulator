@@ -1,9 +1,5 @@
 # TODOs
 
-* Fix performance degradation in ACO based selection.
-
-* Plots.
-
-* Flit per state delays.
+* Fix performance degradation.
 
 * Helper thread programs, N-body problem code integration.
