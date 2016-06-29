@@ -318,7 +318,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     }
 
     public double averageFlitPerStateDelay(FlitState state) {
-        if(this.numFlitPerStateDelaySamples.get(state) > 0) {
+        if(this.numFlitPerStateDelaySamples.containsKey(state) && this.numFlitPerStateDelaySamples.get(state) > 0) {
             return (double) this.totalFlitPerStateDelays.get(state)
                     / this.numFlitPerStateDelaySamples.get(state);
         }

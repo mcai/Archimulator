@@ -142,8 +142,11 @@ public class Experiment {
         for(FlitState state : FlitState.values()) {
             this.stats.put(String.format("averageFlitPerStateDelay::%s", state),
                     network.averageFlitPerStateDelay(state));
+        }
+
+        for(FlitState state : FlitState.values()) {
             this.stats.put(String.format("maxFlitPerStateDelay::%s", state),
-                    network.getMaxFlitPerStateDelay().get(state));
+                    network.getMaxFlitPerStateDelay().containsKey(state) ? network.getMaxFlitPerStateDelay().get(state) : "0.0");
         }
 
         this.dumpConfigAndStats();
