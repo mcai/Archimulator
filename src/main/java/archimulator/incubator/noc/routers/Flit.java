@@ -71,7 +71,20 @@ public class Flit {
     }
 
     public void setState(FlitState state) {
+        if(state == this.state) {
+            throw new IllegalArgumentException(String.format("%s", state));
+        }
+
+        this.packet.getNetwork().logFlitPerStateDelay(
+                this.head,
+                this.tail,
+                this.state,
+                (int) (this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle() - this.prevStateTimestamp)
+        );
+
         this.state = state;
+
+        this.prevStateTimestamp = this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle();
     }
 
     public long getPrevStateTimestamp() {

@@ -1,5 +1,6 @@
 package archimulator.incubator.noc;
 
+import archimulator.incubator.noc.routers.FlitState;
 import archimulator.incubator.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
 import archimulator.incubator.noc.routing.RoutingAlgorithm;
 import archimulator.incubator.noc.routing.XYRoutingAlgorithm;
@@ -137,6 +138,13 @@ public class Experiment {
         this.stats.put("averagePayloadPacketHops", network.averagePayloadPacketHops());
         this.stats.put("maxPayloadPacketDelay", network.getMaxPayloadPacketDelay());
         this.stats.put("maxPayloadPacketHops", network.getMaxPayloadPacketHops());
+
+        for(FlitState state : FlitState.values()) {
+            this.stats.put(String.format("averageFlitPerStateDelay::%s", state),
+                    network.averageFlitPerStateDelay(state));
+            this.stats.put(String.format("maxFlitPerStateDelay::%s", state),
+                    network.getMaxFlitPerStateDelay().get(state));
+        }
 
         this.dumpConfigAndStats();
     }

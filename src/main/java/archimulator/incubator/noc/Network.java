@@ -401,4 +401,24 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     public long getMaxPayloadPacketHops() {
         return maxPayloadPacketHops;
     }
+
+    public Map<Class<? extends Packet>, Long> getNumPacketsReceivedPerType() {
+        return numPacketsReceivedPerType;
+    }
+
+    public Map<Class<? extends Packet>, Long> getNumPacketsTransmittedPerType() {
+        return numPacketsTransmittedPerType;
+    }
+
+    public Map<Class<? extends Packet>, Long> getMaxPacketDelayPerType() {
+        return maxPacketDelayPerType;
+    }
+
+    public Map<Class<? extends Packet>, Long> getMaxPacketHopsPerType() {
+        return maxPacketHopsPerType;
+    }
+
+    public Map<FlitState, Long> getMaxFlitPerStateDelay() {
+        return maxFlitPerStateDelay;
+    }
 }
