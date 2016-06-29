@@ -1,5 +1,5 @@
 {
-  "simulationTime": "0:00:09.397",
+  "simulationTime": "0:00:16.721",
   "totalCycles": 20000,
   "numPacketsReceived": 38534,
   "numPacketsTransmitted": 38441,
@@ -14,5 +14,19 @@
   "averagePayloadPacketDelay": 38.26690252594886,
   "averagePayloadPacketHops": 6.305403085247522,
   "maxPayloadPacketDelay": 87,
-  "maxPayloadPacketHops": 15
+  "maxPayloadPacketHops": 15,
+  "averageFlitPerStateDelay::INPUT_BUFFER": 2.2201070975011614,
+  "averageFlitPerStateDelay::ROUTE_CALCULATION": 1.0073566362131035,
+  "averageFlitPerStateDelay::VIRTUAL_CHANNEL_ALLOCATION": 1.0439075630252102,
+  "averageFlitPerStateDelay::SWITCH_ALLOCATION": 1.0,
+  "averageFlitPerStateDelay::SWITCH_TRAVERSAL": 1.0,
+  "averageFlitPerStateDelay::LINK_TRAVERSAL": 1.0002546251807165,
+  "averageFlitPerStateDelay::DESTINATION_ARRIVED": 0.0,
+  "maxFlitPerStateDelay::INPUT_BUFFER": 22,
+  "maxFlitPerStateDelay::ROUTE_CALCULATION": 14,
+  "maxFlitPerStateDelay::VIRTUAL_CHANNEL_ALLOCATION": 5,
+  "maxFlitPerStateDelay::SWITCH_ALLOCATION": 1,
+  "maxFlitPerStateDelay::SWITCH_TRAVERSAL": 1,
+  "maxFlitPerStateDelay::LINK_TRAVERSAL": 9,
+  "maxFlitPerStateDelay::DESTINATION_ARRIVED": 0.0
 }
