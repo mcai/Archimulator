@@ -47,7 +47,7 @@ public abstract class Packet {
         int numFlits = (int) Math.ceil((double)(this.size) / this.network.getExperiment().getConfig().getLinkWidth());
         if(numFlits > this.network.getExperiment().getConfig().getMaxInputBufferSize()) {
             throw new IllegalArgumentException(
-                    String.format("Number of flits (%d) in a packet cannot be greater than max input buffer size: %d",
+                    String.format("Number of flits (%d) in a packet cannot be greater than max input buffer size (%d)",
                             numFlits, this.network.getExperiment().getConfig().getMaxInputBufferSize()
                     )
             );

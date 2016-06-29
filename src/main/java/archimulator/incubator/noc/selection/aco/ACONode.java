@@ -136,7 +136,7 @@ public class ACONode extends Node {
 
         for(Direction direction : directions) {
             Pheromone pheromone = this.routingTable.getPheromones().get(dest).get(direction);
-            Router neighborRouter = this.getNetwork().getNodes().get(ACONode.this.getNeighbors().get(direction)).getRouter();
+            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
             int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
 
             double alpha = this.getNetwork().getExperiment().getConfig().getAcoSelectionAlpha();

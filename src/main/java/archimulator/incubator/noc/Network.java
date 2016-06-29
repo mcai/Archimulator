@@ -85,7 +85,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
         this.nodeFactory = nodeFactory;
 
-        this.nodes = new ArrayList<NodeT>();
+        this.nodes = new ArrayList<>();
 
         for(int i = 0; i < this.numNodes; i++) {
             this.nodes.add(this.nodeFactory.createNode(this, i));
@@ -246,7 +246,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     public int randDest(int src) {
         while (true) {
-            int i = this.experiment.getRandom().nextInt(this.numNodes - 1);
+            int i = this.experiment.getRandom().nextInt(this.numNodes);
             if(i != src) {
                 return i;
             }
