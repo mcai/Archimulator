@@ -23,7 +23,6 @@ package archimulator.util.cmd;
 import archimulator.common.*;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.dram.MemoryControllerType;
-import archimulator.uncore.net.simple.routing.RoutingAlgorithmType;
 import archimulator.util.serialization.JsonSerializationHelper;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -85,9 +84,6 @@ public class SimulateCommand {
     @Parameter(names = "-l2Repl", description = "L2 cache replacement policy type")
     private CacheReplacementPolicyType l2ReplacementPolicyType = CacheReplacementPolicyType.LRU;
 
-    @Parameter(names = "-routing", description = "On-chip interconnect routing algorithm type")
-    private RoutingAlgorithmType routingAlgorithmType = RoutingAlgorithmType.BASIC_STATIC;
-
     @Parameter(names = "-mcType", description = "Memory controller type")
     private MemoryControllerType memoryControllerType = MemoryControllerType.FIXED_LATENCY;
 
@@ -98,7 +94,7 @@ public class SimulateCommand {
         List<ContextMapping> contextMappings = new ArrayList<>();
         contextMappings.add(new ContextMapping(0, executable, arguments));
 
-        Experiment experiment = new Experiment(experimentType, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, routingAlgorithmType, memoryControllerType, numMaxInstructions, contextMappings);
+        Experiment experiment = new Experiment(experimentType, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, memoryControllerType, numMaxInstructions, contextMappings);
         experiment.run();
 
         if (experiment.getState() == ExperimentState.COMPLETED) {

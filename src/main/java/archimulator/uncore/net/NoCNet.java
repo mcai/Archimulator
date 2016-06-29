@@ -1,4 +1,4 @@
-package archimulator.uncore.net.noc;
+package archimulator.uncore.net;
 
 import archimulator.common.BasicSimulationObject;
 import archimulator.common.SimulationObject;
@@ -12,7 +12,6 @@ import archimulator.incubator.noc.selection.aco.ACONode;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
-import archimulator.uncore.net.Net;
 import archimulator.util.action.Action;
 
 import java.util.HashMap;
