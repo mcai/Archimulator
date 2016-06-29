@@ -6,6 +6,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Round robin arbiter test.
+ */
 public class RoundRobinArbiterTest {
     private class Resource {
     }

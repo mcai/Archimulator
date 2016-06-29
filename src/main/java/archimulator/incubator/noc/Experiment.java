@@ -161,6 +161,19 @@ public class Experiment {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public void loadStats() {
+        File file = new File(config.getResultDir(), "stats.json");
+
+        try {
+            String json = FileUtils.readFileToString(file);
+
+            stats = JsonSerializationHelper.fromJson(Map.class, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Network<? extends Node, ? extends RoutingAlgorithm> aco(CycleAccurateEventQueue cycleAccurateEventQueue) {
         Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
                 new Network<>(

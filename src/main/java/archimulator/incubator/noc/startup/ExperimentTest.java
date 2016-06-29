@@ -4,7 +4,7 @@ import archimulator.incubator.noc.Experiment;
 import org.junit.Test;
 
 /**
- * Experiment tester.
+ * Experiment test.
  *
  * @author Min Cai
  */
