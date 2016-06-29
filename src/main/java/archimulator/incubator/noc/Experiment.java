@@ -8,8 +8,9 @@ import archimulator.incubator.noc.selection.NeighborOnPathSelectionBasedNode;
 import archimulator.incubator.noc.selection.RandomSelectionBasedNode;
 import archimulator.incubator.noc.selection.aco.ACONode;
 import archimulator.incubator.noc.selection.aco.ForwardAntPacket;
-import archimulator.incubator.noc.traffics.PacketFactory;
+import archimulator.incubator.noc.traffics.HotspotTrafficGenerator;
 import archimulator.incubator.noc.traffics.TransposeTrafficGenerator;
+import archimulator.incubator.noc.traffics.UniformTrafficGenerator;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.serialization.JsonSerializationHelper;
@@ -71,18 +72,35 @@ public class Experiment {
                 throw new IllegalArgumentException();
         }
 
-        new TransposeTrafficGenerator<>(
-                network,
-                this.config.getDataPacketInjectionRate(),
-                new PacketFactory<DataPacket>() {
-                    @Override
-                    public DataPacket create(Network<? extends Node, ? extends RoutingAlgorithm> network, int src, int dest, int size) {
-                        return new DataPacket(network, src, dest, size, () -> {});
-                    }
-                },
-                this.config.getDataPacketSize(),
-                this.config.getMaxPackets()
-        );
+        switch (this.config.getTraffic()) {
+            case "uniform":
+                new UniformTrafficGenerator<>(
+                        network,
+                        this.config.getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.config.getDataPacketSize(),
+                        this.config.getMaxPackets()
+                );
+                break;
+            case "transpose":
+                new TransposeTrafficGenerator<>(
+                        network,
+                        this.config.getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.config.getDataPacketSize(),
+                        this.config.getMaxPackets()
+                );
+                break;
+            case "hotspot":
+                new HotspotTrafficGenerator<>(
+                        network,
+                        this.config.getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.config.getDataPacketSize(),
+                        this.config.getMaxPackets()
+                );
+                break;
+        }
 
         long beginTime = DateHelper.toTick(new Date());
 
@@ -188,18 +206,35 @@ public class Experiment {
                         },
                         OddEvenTurnBasedRoutingAlgorithm::new);
 
-        new TransposeTrafficGenerator<>(
-                network,
-                this.config.getAntPacketInjectionRate(),
-                 new PacketFactory<ForwardAntPacket>() {
-                    @Override
-                    public ForwardAntPacket create(Network<? extends Node, ? extends RoutingAlgorithm> network, int src, int dest, int size) {
-                        return new ForwardAntPacket(network, src, dest, size, () -> {});
-                    }
-                },
-                this.config.getAntPacketSize(),
-                -1
-        );
+        switch (this.config.getTraffic()) {
+            case "uniform":
+                new UniformTrafficGenerator<>(
+                        network,
+                        this.config.getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        this.config.getAntPacketSize(),
+                        -1
+                );
+                break;
+            case "transpose":
+                new TransposeTrafficGenerator<>(
+                        network,
+                        this.config.getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        this.config.getAntPacketSize(),
+                        -1
+                );
+                break;
+            case "hotspot":
+                new HotspotTrafficGenerator<>(
+                        network,
+                        this.config.getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        this.config.getAntPacketSize(),
+                        -1
+                );
+                break;
+        }
 
         return network;
     }
