@@ -3,6 +3,7 @@ package archimulator.uncore.net.noc;
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.uncore.net.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
+import archimulator.uncore.net.noc.routing.RoutingAlgorithmFactory;
 import archimulator.uncore.net.noc.routing.XYRoutingAlgorithm;
 import archimulator.uncore.net.noc.selection.BufferLevelSelectionBasedNode;
 import archimulator.uncore.net.noc.selection.NeighborOnPathSelectionBasedNode;
@@ -28,6 +29,31 @@ import java.util.*;
  * @author Min Cai
  */
 public class Experiment implements NoCSettings {
+    /**
+     * Standalone network.
+     *
+     * @param <NodeT> the node type
+     * @param <RoutingAlgorithmT> the routing algorithm type
+     * @author Min Cai
+     */
+    private class StandaloneNetwork<NodeT extends Node,  RoutingAlgorithmT extends RoutingAlgorithm>
+            extends Network<NodeT, RoutingAlgorithmT> {
+        private StandaloneNetwork(
+                NoCSettings settings,
+                CycleAccurateEventQueue cycleAccurateEventQueue,
+                int numNodes,
+                NodeFactory<NodeT> nodeFactory,
+                RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
+        ) {
+            super(settings, cycleAccurateEventQueue, numNodes, nodeFactory, routingAlgorithmFactory);
+        }
+
+        @Override
+        public boolean simulateAtCurrentCycle() {
+            return true;
+        }
+    }
+
     private Config config;
     private Map<String, Object> stats;
     private Random random;
@@ -209,7 +235,7 @@ public class Experiment implements NoCSettings {
 
     private Network<? extends Node, ? extends RoutingAlgorithm> aco(CycleAccurateEventQueue cycleAccurateEventQueue) {
         Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
-                new BasicNetwork<>(
+                new StandaloneNetwork<>(
                         this,
                         cycleAccurateEventQueue,
                         this.config.getNumNodes(),
@@ -255,7 +281,7 @@ public class Experiment implements NoCSettings {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> random(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new BasicNetwork<>(
+        return new StandaloneNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -269,7 +295,7 @@ public class Experiment implements NoCSettings {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new BasicNetwork<>(
+        return new StandaloneNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -283,7 +309,7 @@ public class Experiment implements NoCSettings {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new BasicNetwork<>(
+        return new StandaloneNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
@@ -297,7 +323,7 @@ public class Experiment implements NoCSettings {
     }
 
     private Network<? extends Node, ? extends RoutingAlgorithm> xy(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new BasicNetwork<>(
+        return new StandaloneNetwork<>(
                 this,
                 cycleAccurateEventQueue,
                 this.config.getNumNodes(),
