@@ -155,9 +155,9 @@ public class Kernel extends BasicSimulationObject implements SimulationObject {
             throw new IllegalArgumentException();
         }
 
-        for (int coreNum = 0; coreNum < this.getExperiment().getNumCores(); coreNum++) {
-            for (int threadNum = 0; threadNum < this.getExperiment().getNumThreadsPerCore(); threadNum++) {
-                int threadId = coreNum * this.getExperiment().getNumThreadsPerCore() + threadNum;
+        for (int coreNum = 0; coreNum < this.getExperiment().getConfig().getNumCores(); coreNum++) {
+            for (int threadNum = 0; threadNum < this.getExperiment().getConfig().getNumThreadsPerCore(); threadNum++) {
+                int threadId = coreNum * this.getExperiment().getConfig().getNumThreadsPerCore() + threadNum;
 
                 boolean hasMapped = false;
 

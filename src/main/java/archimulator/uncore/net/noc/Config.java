@@ -6,8 +6,6 @@ package archimulator.uncore.net.noc;
  * @author Min Cai
  */
 public class Config {
-    private boolean enableDebugging;
-
     private boolean noDrain;
 
     private int randSeed;
@@ -45,8 +43,6 @@ public class Config {
     private double reinforcementFactor;
 
     public Config() {
-        this.enableDebugging = false;
-
         this.noDrain = true;
 
         this.randSeed = 13;
@@ -74,14 +70,6 @@ public class Config {
 
         this.acoSelectionAlpha = 0.5;
         this.reinforcementFactor = 0.05;
-    }
-
-    public boolean isEnableDebugging() {
-        return enableDebugging;
-    }
-
-    public void setEnableDebugging(boolean enableDebugging) {
-        this.enableDebugging = enableDebugging;
     }
 
     public boolean isNoDrain() {
@@ -245,7 +233,6 @@ public class Config {
     }
 
     public void dump() {
-        System.out.println(String.format("  %s: %s", "enableDebugging", enableDebugging));
         System.out.println(String.format("  %s: %s", "noDrain", noDrain));
         System.out.println(String.format("  %s: %s", "randSeed", randSeed));
         System.out.println(String.format("  %s: %s", "resultDir", resultDir));

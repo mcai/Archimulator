@@ -32,8 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static archimulator.util.StorageUnitHelper.displaySizeToByteCount;
 
 /**
  * Simulate command.
@@ -64,19 +64,19 @@ public class SimulateCommand {
     private int numThreadsPerCore = 2;
 
     @Parameter(names = "-l1ISize", description = "L1 instruction cache size(B,KB,MB,GB)")
-    private String l1ISize = "64KB";
+    private String l1ISize = "64 KB";
 
     @Parameter(names = "-l1IAssoc", description = "L1 instruction cache associativity")
     private int l1IAssociativity = 4;
 
     @Parameter(names = "-l1DSize", description = "L1 data cache size(B,KB,MB,GB)")
-    private String l1DSize = "64KB";
+    private String l1DSize = "64 KB";
 
     @Parameter(names = "-l1DAssoc", description = "L1 data cache associativity")
     private int l1DAssociativity = 4;
 
     @Parameter(names = "-l2Size", description = "L2 cache size(B,KB,MB,GB)")
-    private String l2Size = "512KB";
+    private String l2Size = "512 KB";
 
     @Parameter(names = "-l2Assoc", description = "L2 cache associativity")
     private int l2Associativity = 16;
@@ -91,10 +91,35 @@ public class SimulateCommand {
      * Run the simulate command.
      */
     public void run() {
+        ExperimentConfig config = new ExperimentConfig();
+
+        config.setType(experimentType);
+        config.setOutputDirectory(outputDirectory);
+
+        config.setNumCores(numCores);
+        config.setNumThreadsPerCore(numThreadsPerCore);
+
+        config.setL1ISize((int) displaySizeToByteCount(l1ISize));
+        config.setL1IAssociativity(l1IAssociativity);
+
+        config.setL1DSize((int) displaySizeToByteCount(l1DSize));
+        config.setL1DAssociativity(l1DAssociativity);
+
+        config.setL2Size((int) displaySizeToByteCount(l2Size));
+        config.setL2Associativity(l2Associativity);
+        config.setL2ReplacementPolicyType(l2ReplacementPolicyType);
+
+        config.setMemoryControllerType(memoryControllerType);
+
+        config.setNumMaxInstructions(numMaxInstructions);
+
         List<ContextMapping> contextMappings = new ArrayList<>();
         contextMappings.add(new ContextMapping(0, executable, arguments));
 
-        Experiment experiment = new Experiment(experimentType, outputDirectory, false, -1, numCores, numThreadsPerCore, (int) displaySizeToByteCount(l1ISize), l1IAssociativity, (int) displaySizeToByteCount(l1DSize), l1DAssociativity, (int) displaySizeToByteCount(l2Size), l2Associativity, l2ReplacementPolicyType, memoryControllerType, numMaxInstructions, contextMappings);
+        Experiment experiment = new Experiment(
+                config, contextMappings
+        );
+
         experiment.run();
 
         if (experiment.getState() == ExperimentState.COMPLETED) {
@@ -120,35 +145,5 @@ public class SimulateCommand {
                 System.out.println("Experiment statistics has been written to " + file.getPath());
             }
         }
-    }
-
-    /**
-     * Convert from display size to byte count.
-     *
-     * @param displaySize the display size
-     * @return the byte count
-     */
-    private long displaySizeToByteCount(String displaySize) {
-        displaySize = displaySize.trim();
-        displaySize = displaySize.replaceAll(",", ".");
-        try {
-            return Long.parseLong(displaySize);
-        } catch (NumberFormatException ignored) {
-        }
-        final Matcher m = Pattern.compile("([\\d.,]+)\\s*(\\w)").matcher(displaySize);
-        m.find();
-        int scale = 1;
-        switch (m.group(2).charAt(0)) {
-            case 'G':
-                scale *= 1024;
-            case 'M':
-                scale *= 1024;
-            case 'K':
-                scale *= 1024;
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-        return Math.round(Double.parseDouble(m.group(1)) * scale);
     }
 }

@@ -175,7 +175,7 @@ public class MLPAwareCachePartitioningHelper extends CachePartitioningHelper {
     private void freeInvalidL2HitsPerCycle() {
         for (Map<Integer, PendingL2Hit> pendingL2HitsPerThread : this.pendingL2Hits.values()) {
             List<Integer> tagsToFree = pendingL2HitsPerThread.values().stream()
-                    .filter(pendingL2Hit -> pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getReorderBufferCapacity()
+                    .filter(pendingL2Hit -> pendingL2Hit.getNumCommittedInstructionsSinceAccess() >= this.getL2Controller().getExperiment().getConfig().getReorderBufferCapacity()
                             || pendingL2Hit.getNumCyclesElapsedSinceAccess() >= memoryLatencyMeter.getAverageLatency())
                     .map(pendingL2Hit -> pendingL2Hit.getAccess().getPhysicalTag()).collect(Collectors.toList());
 

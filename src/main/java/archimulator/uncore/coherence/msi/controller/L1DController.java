@@ -43,26 +43,30 @@ public class L1DController extends CacheController {
 
     @Override
     public int getNumReadPorts() {
-        return getExperiment().getL1DNumReadPorts();
+        return getExperiment().getConfig().getL1DNumReadPorts();
     }
 
     @Override
     public int getNumWritePorts() {
-        return getExperiment().getL1DNumWritePorts();
+        return getExperiment().getConfig().getL1DNumWritePorts();
     }
 
     @Override
     public CacheGeometry getGeometry() {
-        return new CacheGeometry(getExperiment().getL1DSize(), getExperiment().getL1DAssociativity(), getExperiment().getL1DLineSize());
+        return new CacheGeometry(
+                getExperiment().getConfig().getL1DSize(),
+                getExperiment().getConfig().getL1DAssociativity(),
+                getExperiment().getConfig().getL1DLineSize()
+        );
     }
 
     @Override
     public int getHitLatency() {
-        return getExperiment().getL1DHitLatency();
+        return getExperiment().getConfig().getL1DHitLatency();
     }
 
     @Override
     public CacheReplacementPolicyType getReplacementPolicyType() {
-        return getExperiment().getL1DReplacementPolicyType();
+        return getExperiment().getConfig().getL1DReplacementPolicyType();
     }
 }

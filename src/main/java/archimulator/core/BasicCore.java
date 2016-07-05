@@ -62,14 +62,14 @@ public class BasicCore extends AbstractBasicCore {
                         return true;
                     }
                 },
-                Thread::registerRenameOne, getExperiment().getDecodeWidth()
+                Thread::registerRenameOne, getExperiment().getConfig().getDecodeWidth()
         );
 
         this.dispatchScheduler = new RoundRobinScheduler<>(
                 this.threads,
                 thread -> thread.getContext() != null,
                 Thread::dispatchOne,
-                getExperiment().getDecodeWidth()
+                getExperiment().getConfig().getDecodeWidth()
         );
     }
 
@@ -109,7 +109,7 @@ public class BasicCore extends AbstractBasicCore {
 
     @Override
     protected void issue() {
-        Reference<Integer> quant = new Reference<>(getExperiment().getIssueWidth());
+        Reference<Integer> quant = new Reference<>(getExperiment().getConfig().getIssueWidth());
 
         this.issueInstructionQueue(quant);
         this.issueLoadQueue(quant);

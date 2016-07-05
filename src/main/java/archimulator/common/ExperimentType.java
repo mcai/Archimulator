@@ -39,5 +39,23 @@ public enum ExperimentType {
     /**
      * Two-phase "fast forward and measurement" experiment.
      */
-    TWO_PHASE
+    TWO_PHASE;
+
+    /**
+     * Get the measurement simulation title prefix from the specified experiment type.
+     *
+     * @return the measurement simulation title prefix from the specified experiment type
+     */
+    public String getMeasurementTitlePrefix() {
+        switch (this) {
+            case TWO_PHASE:
+                return "twoPhase/phase1";
+            case FUNCTIONAL:
+                return "functional";
+            case DETAILED:
+                return "detailed";
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

@@ -43,7 +43,10 @@ public class StaticPartitionedLRUPolicy<StateT extends Serializable> extends Par
      * @param cache the parent evictable cache
      */
     public StaticPartitionedLRUPolicy(EvictableCache<StateT> cache) {
-        this(cache, cache.getExperiment().getNumMainThreadWaysInStaticPartitionedLRUPolicy());
+        this(
+                cache,
+                cache.getExperiment().getConfig().getNumMainThreadWaysInStaticPartitionedLRUPolicy()
+        );
     }
 
     /**

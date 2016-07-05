@@ -122,7 +122,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
      * @return the line size
      */
     public int getLineSize() {
-        return getExperiment().getMemoryControllerLineSize();
+        return getExperiment().getConfig().getMemoryControllerLineSize();
     }
 
     @Override

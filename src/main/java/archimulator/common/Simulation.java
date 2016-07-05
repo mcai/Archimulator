@@ -153,7 +153,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.type = type;
 
-        File cwdFile = new File(this.getExperiment().getOutputDirectory());
+        File cwdFile = new File(this.getExperiment().getConfig().getOutputDirectory());
         if (!cwdFile.exists() && !cwdFile.mkdirs()) {
             throw new RuntimeException();
         }
@@ -181,7 +181,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         this.delinquentLoadIdentificationHelper = new DelinquentLoadIdentificationHelper(this);
 
-        if (getExperiment().getDynamicSpeculativePrecomputationEnabled()) {
+        if (getExperiment().getConfig().isDynamicSpeculativePrecomputationEnabled()) {
             this.dynamicSpeculativePrecomputationHelper = new DynamicSpeculativePrecomputationHelper(this);
         }
 

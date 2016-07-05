@@ -70,7 +70,9 @@ public class FromRoiDetailedSimulation extends Simulation {
      */
     @Override
     public boolean canDoMeasurementOneCycle() {
-        return this.getExperiment().getNumMaxInstructions() == -1 || this.getProcessor().getCores().get(0).getThreads().get(0).getNumInstructions() < this.getExperiment().getNumMaxInstructions();
+        return this.getExperiment().getConfig().getNumMaxInstructions() == -1
+                || this.getProcessor().getCores().get(0).getThreads().get(0).getNumInstructions()
+                    < this.getExperiment().getConfig().getNumMaxInstructions();
     }
 
     /**

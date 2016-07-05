@@ -58,9 +58,9 @@ public class TranslationLookasideBuffer implements Named, Reportable {
                 parent,
                 name,
                 new CacheGeometry(
-                        parent.getExperiment().getTlbSize(),
-                        parent.getExperiment().getTlbAssociativity(),
-                        parent.getExperiment().getTlbLineSize()
+                        parent.getExperiment().getConfig().getTlbSize(),
+                        parent.getExperiment().getConfig().getTlbAssociativity(),
+                        parent.getExperiment().getConfig().getTlbLineSize()
                 ),
                 CacheReplacementPolicyType.LRU,
                 args -> new BooleanValueProvider()
@@ -179,7 +179,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
      * @return the hit latency
      */
     public int getHitLatency() {
-        return getCache().getExperiment().getTlbHitLatency();
+        return getCache().getExperiment().getConfig().getTlbHitLatency();
     }
 
     /**
@@ -188,7 +188,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
      * @return the miss latency
      */
     public int getMissLatency() {
-        return getCache().getExperiment().getTlbMissLatency();
+        return getCache().getExperiment().getConfig().getTlbMissLatency();
     }
 
     /**

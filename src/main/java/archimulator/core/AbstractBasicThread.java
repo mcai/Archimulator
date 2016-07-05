@@ -188,11 +188,11 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
         this.core = core;
 
         this.num = num;
-        this.id = this.core.getNum() * getExperiment().getNumThreadsPerCore() + this.num;
+        this.id = this.core.getNum() * getExperiment().getConfig().getNumThreadsPerCore() + this.num;
 
         this.name = "c" + this.core.getNum() + "t" + this.num;
 
-        switch (getExperiment().getBranchPredictorType()) {
+        switch (getExperiment().getConfig().getBranchPredictorType()) {
             case PERFECT:
                 this.branchPredictor = new PerfectBranchPredictor(this, this.name + "/branchPredictor");
                 break;
@@ -215,9 +215,18 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
                 throw new IllegalArgumentException();
         }
 
-        this.intPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/intPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
-        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/fpPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
-        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(this.name + "/miscPhysicalRegisterFile", getExperiment().getPhysicalRegisterFileCapacity());
+        this.intPhysicalRegisterFile = new PhysicalRegisterFile(
+                this.name + "/intPhysicalRegisterFile",
+                getExperiment().getConfig().getPhysicalRegisterFileCapacity()
+        );
+        this.fpPhysicalRegisterFile = new PhysicalRegisterFile(
+                this.name + "/fpPhysicalRegisterFile",
+                getExperiment().getConfig().getPhysicalRegisterFileCapacity()
+        );
+        this.miscPhysicalRegisterFile = new PhysicalRegisterFile(
+                this.name + "/miscPhysicalRegisterFile",
+                getExperiment().getConfig().getPhysicalRegisterFileCapacity()
+        );
 
         this.renameTable = new RegisterRenameTable(this.name + "/renameTable");
 
@@ -242,9 +251,15 @@ public abstract class AbstractBasicThread extends BasicSimulationObject implemen
             this.renameTable.put(dep, physReg);
         }
 
-        this.decodeBuffer = new PipelineBuffer<>(getExperiment().getDecodeBufferCapacity());
-        this.reorderBuffer = new PipelineBuffer<>(getExperiment().getReorderBufferCapacity());
-        this.loadStoreQueue = new PipelineBuffer<>(getExperiment().getLoadStoreQueueCapacity());
+        this.decodeBuffer = new PipelineBuffer<>(
+                getExperiment().getConfig().getDecodeBufferCapacity()
+        );
+        this.reorderBuffer = new PipelineBuffer<>(
+                getExperiment().getConfig().getReorderBufferCapacity()
+        );
+        this.loadStoreQueue = new PipelineBuffer<>(
+                getExperiment().getConfig().getLoadStoreQueueCapacity()
+        );
 
         this.executedMnemonics = new TreeMap<>();
         this.executedSystemCalls = new TreeMap<>();

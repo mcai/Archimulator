@@ -551,8 +551,8 @@ public class DynamicSpeculativePrecomputationHelper {
             final PrecomputationContext newContext = new PrecomputationContext(dynamicSpeculativePrecomputationHelper, context, newRegs, slice.getTriggerPc());
 
             if (this.thread.getCore().getProcessor().getKernel().map(newContext, candidateThreadId -> {
-                int candidateCoreNum = candidateThreadId / thread.getCore().getProcessor().getExperiment().getNumThreadsPerCore();
-                int parentCoreNum = newContext.getParent().getThreadId() / thread.getCore().getProcessor().getExperiment().getNumThreadsPerCore();
+                int candidateCoreNum = candidateThreadId / thread.getCore().getProcessor().getExperiment().getConfig().getNumThreadsPerCore();
+                int parentCoreNum = newContext.getParent().getThreadId() / thread.getCore().getProcessor().getExperiment().getConfig().getNumThreadsPerCore();
                 return candidateCoreNum != parentCoreNum;
             })) {
                 context.getKernel().getContexts().add(newContext);

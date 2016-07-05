@@ -55,6 +55,6 @@ public class FixedLatencyMemoryController extends MemoryController {
      * @return the fixed latency
      */
     public int getLatency() {
-        return getExperiment().getFixedLatencyMemoryControllerLatency();
+        return getExperiment().getConfig().getFixedLatencyMemoryControllerLatency();
     }
 }

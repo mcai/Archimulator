@@ -80,13 +80,13 @@ public class TwoLevelBranchPredictor extends DynamicBranchPredictor {
         this(
                 thread,
                 name,
-                thread.getExperiment().getTwoLevelBranchPredictorL1Size(),
-                thread.getExperiment().getTwoLevelBranchPredictorL2Size(),
-                thread.getExperiment().getTwoLevelBranchPredictorShiftWidth(),
-                thread.getExperiment().getTwoLevelBranchPredictorXor(),
-                thread.getExperiment().getTwoLevelBranchPredictorBranchTargetBufferNumSets(),
-                thread.getExperiment().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(),
-                thread.getExperiment().getTwoLevelBranchPredictorReturnAddressStackSize()
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorL1Size(),
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorL2Size(),
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorShiftWidth(),
+                thread.getExperiment().getConfig().isTwoLevelBranchPredictorXor(),
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorBranchTargetBufferNumSets(),
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorBranchTargetBufferAssociativity(),
+                thread.getExperiment().getConfig().getTwoLevelBranchPredictorReturnAddressStackSize()
         );
     }
 

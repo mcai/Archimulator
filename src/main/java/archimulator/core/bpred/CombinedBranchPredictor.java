@@ -47,15 +47,15 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
                 thread,
                 name,
                 BranchPredictorType.COMBINED,
-                thread.getExperiment().getCombinedBranchPredictorBranchTargetBufferNumSets(),
-                thread.getExperiment().getCombinedBranchPredictorBranchTargetBufferAssociativity(),
-                thread.getExperiment().getCombinedBranchPredictorReturnAddressStackSize()
+                thread.getExperiment().getConfig().getCombinedBranchPredictorBranchTargetBufferNumSets(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorBranchTargetBufferAssociativity(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorReturnAddressStackSize()
         );
 
         this.bimod = new TwoBitBranchPredictor(
                 thread,
                 name + "/bimod",
-                thread.getExperiment().getCombinedBranchPredictorBimodSize(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorBimodSize(),
                 0,
                 0,
                 0
@@ -63,7 +63,7 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
         this.meta = new TwoBitBranchPredictor(
                 thread,
                 name + "/meta",
-                thread.getExperiment().getCombinedBranchPredictorMetaSize(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorMetaSize(),
                 0,
                 0,
                 0
@@ -71,10 +71,10 @@ public class CombinedBranchPredictor extends DynamicBranchPredictor {
         this.twoLevel = new TwoLevelBranchPredictor(
                 thread,
                 name + "/twoLevel",
-                thread.getExperiment().getCombinedBranchPredictorL1Size(),
-                thread.getExperiment().getCombinedBranchPredictorL2Size(),
-                thread.getExperiment().getCombinedBranchPredictorShiftWidth(),
-                thread.getExperiment().getCombinedBranchPredictorXor(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorL1Size(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorL2Size(),
+                thread.getExperiment().getConfig().getCombinedBranchPredictorShiftWidth(),
+                thread.getExperiment().getConfig().isCombinedBranchPredictorXor(),
                 0,
                 0,
                 0

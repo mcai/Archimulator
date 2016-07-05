@@ -59,8 +59,8 @@ public abstract class CachePartitioningHelper implements Partitioner {
     public CachePartitioningHelper(final EvictableCache<?> cache) {
         this.cache = cache;
 
-//        this.numThreads = cache.getExperiment().getNumThreadsPerCore() * this.l2Controller.getExperiment().getNumCores();
-        this.numThreads = this.cache.getExperiment().getNumCores();
+//        this.numThreads = cache.getExperiment().getConfig().getNumThreadsPerCore() * this.l2Controller.getExperiment().getConfig().getNumCores();
+        this.numThreads = this.cache.getExperiment().getConfig().getNumCores();
 
         this.partition = new ArrayList<>();
 
@@ -99,8 +99,8 @@ public abstract class CachePartitioningHelper implements Partitioner {
      * @return a value indicating whether cache partitioning is needed or not
      */
     public static boolean canPartition(SimulationObject simulationObject) {
-        return simulationObject.getExperiment().getNumCores() == 2
-                && simulationObject.getExperiment().getNumThreadsPerCore() == 2
+        return simulationObject.getExperiment().getConfig().getNumCores() == 2
+                && simulationObject.getExperiment().getConfig().getNumThreadsPerCore() == 2
                 && simulationObject.getSimulation().getProcessor().getCores().get(1).getThreads().get(0).getContext() != null;
     }
 

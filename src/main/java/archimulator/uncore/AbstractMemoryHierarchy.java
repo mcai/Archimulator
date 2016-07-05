@@ -64,7 +64,7 @@ public abstract class AbstractMemoryHierarchy extends BasicSimulationObject impl
     public AbstractMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        switch (getExperiment().getMemoryControllerType()) {
+        switch (getExperiment().getConfig().getMemoryControllerType()) {
             case SIMPLE:
                 this.memoryController = new SimpleMemoryController(this);
                 break;
@@ -85,7 +85,7 @@ public abstract class AbstractMemoryHierarchy extends BasicSimulationObject impl
         this.itlbs = new ArrayList<>();
         this.dtlbs = new ArrayList<>();
 
-        for (int i = 0; i < getExperiment().getNumCores(); i++) {
+        for (int i = 0; i < getExperiment().getConfig().getNumCores(); i++) {
             L1IController l1IController = new L1IController(this, "c" + i + "/icache");
             l1IController.setNext(this.l2Controller);
             this.l1IControllers.add(l1IController);
@@ -94,7 +94,7 @@ public abstract class AbstractMemoryHierarchy extends BasicSimulationObject impl
             l1DController.setNext(this.l2Controller);
             this.l1DControllers.add(l1DController);
 
-            for (int j = 0; j < getExperiment().getNumThreadsPerCore(); j++) {
+            for (int j = 0; j < getExperiment().getConfig().getNumThreadsPerCore(); j++) {
                 this.itlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/itlb"));
                 this.dtlbs.add(new TranslationLookasideBuffer(this, "c" + i + "t" + j + "/dtlb"));
             }

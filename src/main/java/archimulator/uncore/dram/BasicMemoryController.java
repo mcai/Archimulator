@@ -332,7 +332,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the "to DRAM" latency
      */
     public int getToDramLatency() {
-        return getExperiment().getBasicMemoryControllerToDramLatency();
+        return getExperiment().getConfig().getBasicMemoryControllerToDramLatency();
     }
 
     /**
@@ -341,7 +341,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the "from DRAM" latency
      */
     public int getFromDramLatency() {
-        return getExperiment().getBasicMemoryControllerFromDramLatency();
+        return getExperiment().getConfig().getBasicMemoryControllerFromDramLatency();
     }
 
     /**
@@ -350,7 +350,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the precharge latency
      */
     public int getPrechargeLatency() {
-        return getExperiment().getBasicMemoryControllerPrechargeLatency();
+        return getExperiment().getConfig().getBasicMemoryControllerPrechargeLatency();
     }
 
     /**
@@ -359,7 +359,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the closed latency
      */
     public int getClosedLatency() {
-        return getExperiment().getBasicMemoryControllerClosedLatency();
+        return getExperiment().getConfig().getBasicMemoryControllerClosedLatency();
     }
 
     /**
@@ -368,7 +368,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the conflict latency
      */
     public int getConflictLatency() {
-        return getExperiment().getBasicMemoryControllerConflictLatency();
+        return getExperiment().getConfig().getBasicMemoryControllerConflictLatency();
     }
 
     /**
@@ -377,7 +377,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the bus width
      */
     public int getBusWidth() {
-        return getExperiment().getBasicMemoryControllerBusWidth();
+        return getExperiment().getConfig().getBasicMemoryControllerBusWidth();
     }
 
     /**
@@ -386,7 +386,7 @@ public class BasicMemoryController extends MemoryController {
      * @return the number of banks
      */
     public int getNumBanks() {
-        return getExperiment().getBasicMemoryControllerNumBanks();
+        return getExperiment().getConfig().getBasicMemoryControllerNumBanks();
     }
 
     /**
@@ -395,6 +395,6 @@ public class BasicMemoryController extends MemoryController {
      * @return the size of a row
      */
     public int getRowSize() {
-        return getExperiment().getBasicMemoryControllerRowSize();
+        return getExperiment().getConfig().getBasicMemoryControllerRowSize();
     }
 }

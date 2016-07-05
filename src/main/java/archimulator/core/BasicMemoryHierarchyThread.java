@@ -41,7 +41,7 @@ public class BasicMemoryHierarchyThread extends BasicSimulationObject implements
         this.core = core;
 
         this.num = num;
-        this.id = this.core.getNum() * getExperiment().getNumThreadsPerCore() + this.num;
+        this.id = this.core.getNum() * getExperiment().getConfig().getNumThreadsPerCore() + this.num;
 
         this.name = "c" + this.core.getNum() + "t" + this.num;
 
