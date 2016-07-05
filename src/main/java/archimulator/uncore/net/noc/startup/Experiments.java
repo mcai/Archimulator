@@ -5,11 +5,11 @@ import archimulator.uncore.net.noc.Experiment;
 import java.util.*;
 
 /**
- * Common.
+ * Experiments.
  *
  * @author Min Cai
  */
-public class Common {
+public class Experiments {
     private static Map<String, List<Experiment>> testTrafficsAndDataPacketInjectionRates() {
         List<String> traffics = new ArrayList<>();
         traffics.add("uniform");

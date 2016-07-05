@@ -61,10 +61,10 @@ public class Analyze {
     }
 
     public static void analyzeTrafficsAndDataPacketInjectionRates() {
-        for (String traffic : Common.trafficsAndDataPacketInjectionRates.keySet()) {
-            Common.trafficsAndDataPacketInjectionRates.get(traffic).forEach(Experiment::loadStats);
+        for (String traffic : Experiments.trafficsAndDataPacketInjectionRates.keySet()) {
+            Experiments.trafficsAndDataPacketInjectionRates.get(traffic).forEach(Experiment::loadStats);
             toCsv(String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
-                    Common.trafficsAndDataPacketInjectionRates.get(traffic), fields);
+                    Experiments.trafficsAndDataPacketInjectionRates.get(traffic), fields);
 
             generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
@@ -117,9 +117,9 @@ public class Analyze {
     }
 
     public static void analyzeAntPacketInjectionRates() {
-        Common.antPacketInjectionRates.forEach(Experiment::loadStats);
+        Experiments.antPacketInjectionRates.forEach(Experiment::loadStats);
         toCsv("results/antPacketInjectionRates/t_transpose.csv",
-                Common.antPacketInjectionRates, fields);
+                Experiments.antPacketInjectionRates, fields);
 
         generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
@@ -171,9 +171,9 @@ public class Analyze {
     }
 
     public static void analyzeAcoSelectionAlphasAndReinforcementFactors() {
-        Common.acoSelectionAlphasAndReinforcementFactors.forEach(Experiment::loadStats);
+        Experiments.acoSelectionAlphasAndReinforcementFactors.forEach(Experiment::loadStats);
         toCsv("results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
-                Common.acoSelectionAlphasAndReinforcementFactors, fields);
+                Experiments.acoSelectionAlphasAndReinforcementFactors, fields);
 
         generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",

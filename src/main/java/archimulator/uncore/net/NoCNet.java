@@ -20,12 +20,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class NoCNet extends BasicSimulationObject implements Net {
+public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
     private MemoryHierarchy memoryHierarchy;
 
     private Map<SimulationObject, Integer> devicesToNodeIds;
 
-    private final Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network;
+    private Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network;
+
+    private Config config;
+
+    private Random random;
 
     public NoCNet(MemoryHierarchy memoryHierarchy) {
         super(memoryHierarchy);
@@ -60,28 +64,16 @@ public class NoCNet extends BasicSimulationObject implements Net {
             numNodes = (width + 1) * (width + 1);
         }
 
-        Config config = new Config();
-        config.setNumNodes(numNodes);
-        config.setMaxInputBufferSize(memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
+        this.config = new Config();
+        this.config.setNumNodes(numNodes);
+        this.config.setMaxInputBufferSize(this.memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
 
-        Random random = config.getRandSeed() != -1 ? new Random(config.getRandSeed()) : new Random();
+        this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
 
-        NoCSettings noCSettings = new NoCSettings() {
-            @Override
-            public Config getConfig() {
-                return config;
-            }
-
-            @Override
-            public Random getRandom() {
-                return random;
-            }
-        };
-
-        network = new Network<ACONode, OddEvenTurnBasedRoutingAlgorithm>(
-                noCSettings,
-                memoryHierarchy.getCycleAccurateEventQueue(),
-                config.getNumNodes(),
+        this.network = new Network<ACONode, OddEvenTurnBasedRoutingAlgorithm>(
+                this,
+                this.memoryHierarchy.getCycleAccurateEventQueue(),
+                this.config.getNumNodes(),
                 ACONode::new,
                 OddEvenTurnBasedRoutingAlgorithm::new) {
             @Override
@@ -91,10 +83,10 @@ public class NoCNet extends BasicSimulationObject implements Net {
         };
 
         new TransposeTrafficGenerator<>(
-                network,
-                config.getAntPacketInjectionRate(),
+                this.network,
+                this.config.getAntPacketInjectionRate(),
                 (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
-                config.getAntPacketSize(),
+                this.config.getAntPacketSize(),
                 -1
         );
     }
@@ -132,5 +124,15 @@ public class NoCNet extends BasicSimulationObject implements Net {
      */
     public Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> getNetwork() {
         return network;
+    }
+
+    @Override
+    public Config getConfig() {
+        return config;
+    }
+
+    @Override
+    public Random getRandom() {
+        return random;
     }
 }

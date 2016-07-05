@@ -9,12 +9,12 @@ import archimulator.uncore.net.noc.Experiment;
  */
 public class Run {
     public static void main(String[] args) {
-        for(String traffic : Common.trafficsAndDataPacketInjectionRates.keySet()) {
-            Experiment.runExperiments(Common.trafficsAndDataPacketInjectionRates.get(traffic), true);
+        for(String traffic : Experiments.trafficsAndDataPacketInjectionRates.keySet()) {
+            Experiment.runExperiments(Experiments.trafficsAndDataPacketInjectionRates.get(traffic), true);
         }
 
-        Experiment.runExperiments(Common.antPacketInjectionRates, true);
+        Experiment.runExperiments(Experiments.antPacketInjectionRates, true);
 
-        Experiment.runExperiments(Common.acoSelectionAlphasAndReinforcementFactors, true);
+        Experiment.runExperiments(Experiments.acoSelectionAlphasAndReinforcementFactors, true);
     }
 }
