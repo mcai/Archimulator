@@ -1,15 +1,7 @@
 package archimulator.uncore.net.noc;
 
 import archimulator.uncore.net.noc.routers.FlitState;
-import archimulator.uncore.net.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
-import archimulator.uncore.net.noc.routing.RoutingAlgorithmFactory;
-import archimulator.uncore.net.noc.routing.XYRoutingAlgorithm;
-import archimulator.uncore.net.noc.selection.BufferLevelSelectionBasedNode;
-import archimulator.uncore.net.noc.selection.NeighborOnPathSelectionBasedNode;
-import archimulator.uncore.net.noc.selection.RandomSelectionBasedNode;
-import archimulator.uncore.net.noc.selection.aco.ACONode;
-import archimulator.uncore.net.noc.selection.aco.ForwardAntPacket;
 import archimulator.uncore.net.noc.traffics.HotspotTrafficGenerator;
 import archimulator.uncore.net.noc.traffics.TransposeTrafficGenerator;
 import archimulator.uncore.net.noc.traffics.UniformTrafficGenerator;
@@ -29,31 +21,6 @@ import java.util.*;
  * @author Min Cai
  */
 public class Experiment implements NoCSettings {
-    /**
-     * Standalone network.
-     *
-     * @param <NodeT> the node type
-     * @param <RoutingAlgorithmT> the routing algorithm type
-     * @author Min Cai
-     */
-    private class StandaloneNetwork<NodeT extends Node,  RoutingAlgorithmT extends RoutingAlgorithm>
-            extends Network<NodeT, RoutingAlgorithmT> {
-        private StandaloneNetwork(
-                NoCSettings settings,
-                CycleAccurateEventQueue cycleAccurateEventQueue,
-                int numNodes,
-                NodeFactory<NodeT> nodeFactory,
-                RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
-        ) {
-            super(settings, cycleAccurateEventQueue, numNodes, nodeFactory, routingAlgorithmFactory);
-        }
-
-        @Override
-        public boolean simulateAtCurrentCycle() {
-            return true;
-        }
-    }
-
     private Config config;
     private Map<String, Object> stats;
     private Random random;
@@ -79,21 +46,21 @@ public class Experiment implements NoCSettings {
 
         switch (this.config.getRouting()) {
             case "xy":
-                network = xy(cycleAccurateEventQueue);
+                network = NetworkFactory.xy(this, cycleAccurateEventQueue);
                 break;
             case "oddEven":
                 switch (this.config.getSelection()) {
                     case "random":
-                        network = random(cycleAccurateEventQueue);
+                        network = NetworkFactory.random(this, cycleAccurateEventQueue);
                         break;
                     case "bufferLevel":
-                        network = bufferLevel(cycleAccurateEventQueue);
+                        network = NetworkFactory.bufferLevel(this, cycleAccurateEventQueue);
                         break;
                     case "neighborOnPath":
-                        network = neighborOnPath(cycleAccurateEventQueue);
+                        network = NetworkFactory.neighborOnPath(this, cycleAccurateEventQueue);
                         break;
                     case "aco":
-                        network = aco(cycleAccurateEventQueue);
+                        network = NetworkFactory.aco(this, cycleAccurateEventQueue);
                         break;
                     default:
                         throw new IllegalArgumentException();
@@ -231,109 +198,6 @@ public class Experiment implements NoCSettings {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Network<? extends Node, ? extends RoutingAlgorithm> aco(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network =
-                new StandaloneNetwork<>(
-                        this,
-                        cycleAccurateEventQueue,
-                        this.config.getNumNodes(),
-                        new NodeFactory<ACONode>() {
-                            @Override
-                            public ACONode createNode(Network<ACONode, ?> network, int i) {
-                                return new ACONode(network, i);
-                            }
-                        },
-                        OddEvenTurnBasedRoutingAlgorithm::new);
-
-        switch (this.config.getTraffic()) {
-            case "uniform":
-                new UniformTrafficGenerator<>(
-                        network,
-                        this.config.getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
-                        this.config.getAntPacketSize(),
-                        -1
-                );
-                break;
-            case "transpose":
-                new TransposeTrafficGenerator<>(
-                        network,
-                        this.config.getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
-                        this.config.getAntPacketSize(),
-                        -1
-                );
-                break;
-            case "hotspot":
-                new HotspotTrafficGenerator<>(
-                        network,
-                        this.config.getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
-                        this.config.getAntPacketSize(),
-                        -1
-                );
-                break;
-        }
-
-        return network;
-    }
-
-    private Network<? extends Node, ? extends RoutingAlgorithm> random(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new StandaloneNetwork<>(
-                this,
-                cycleAccurateEventQueue,
-                this.config.getNumNodes(),
-                new NodeFactory<RandomSelectionBasedNode>() {
-                    @Override
-                    public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network1, int i) {
-                        return new RandomSelectionBasedNode(network1, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
-    }
-
-    private Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new StandaloneNetwork<>(
-                this,
-                cycleAccurateEventQueue,
-                this.config.getNumNodes(),
-                new NodeFactory<BufferLevelSelectionBasedNode>() {
-                    @Override
-                    public BufferLevelSelectionBasedNode createNode(Network<BufferLevelSelectionBasedNode, ?> network1, int i) {
-                        return new BufferLevelSelectionBasedNode(network1, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
-    }
-
-    private Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new StandaloneNetwork<>(
-                this,
-                cycleAccurateEventQueue,
-                this.config.getNumNodes(),
-                new NodeFactory<NeighborOnPathSelectionBasedNode>() {
-                    @Override
-                    public NeighborOnPathSelectionBasedNode createNode(Network<NeighborOnPathSelectionBasedNode, ?> network1, int i) {
-                        return new NeighborOnPathSelectionBasedNode(network1, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
-    }
-
-    private Network<? extends Node, ? extends RoutingAlgorithm> xy(CycleAccurateEventQueue cycleAccurateEventQueue) {
-        return new StandaloneNetwork<>(
-                this,
-                cycleAccurateEventQueue,
-                this.config.getNumNodes(),
-                new NodeFactory<RandomSelectionBasedNode>() {
-                    @Override
-                    public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network1, int i) {
-                        return new RandomSelectionBasedNode(network1, i);
-                    }
-                },
-                XYRoutingAlgorithm::new);
     }
 
     @Override

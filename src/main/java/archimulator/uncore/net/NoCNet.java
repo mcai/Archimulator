@@ -116,6 +116,20 @@ public class NoCNet extends BasicSimulationObject implements Net {
         return "net";
     }
 
+    /**
+     * Get the memory hierarchy.
+     *
+     * @return the memory hierarchy
+     */
+    public MemoryHierarchy getMemoryHierarchy() {
+        return memoryHierarchy;
+    }
+
+    /**
+     * Get the network.
+     *
+     * @return the network
+     */
     public Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> getNetwork() {
         return network;
     }
