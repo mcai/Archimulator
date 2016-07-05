@@ -2,10 +2,7 @@ package archimulator.uncore.net.noc.startup;
 
 import archimulator.uncore.net.noc.Experiment;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Common.
@@ -19,14 +16,9 @@ public class Common {
         traffics.add("transpose");
         traffics.add("hotspot");
 
-        List<Double> dataPacketInjectionRates = new ArrayList<>();
-        dataPacketInjectionRates.add(0.030);
-        dataPacketInjectionRates.add(0.045);
-        dataPacketInjectionRates.add(0.060);
-        dataPacketInjectionRates.add(0.075);
-        dataPacketInjectionRates.add(0.090);
-        dataPacketInjectionRates.add(0.105);
-        dataPacketInjectionRates.add(0.120);
+        List<Double> dataPacketInjectionRates = Arrays.asList(
+                0.030, 0.045, 0.060, 0.075, 0.090, 0.105, 0.120
+        );
 
         double antPacketInjectionRate = 0.001;
 
@@ -39,42 +31,42 @@ public class Common {
             experiments.put(traffic, new ArrayList<>());
 
             for(double dataPacketInjectionRate : dataPacketInjectionRates) {
-                experiments.get(traffic).add(new Experiment() {{
-                    getConfig().setResultDir(String.format(
-                            "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
-                            traffic, dataPacketInjectionRate, "xy", "random"
-                    ));
-                    getConfig().setTraffic(traffic);
-                    getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-                    getConfig().setRouting("xy");
-                    getConfig().setSelection("random");
-                }});
+                Experiment experimentXy = new Experiment();
+                experimentXy.getConfig().setResultDir(String.format(
+                        "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
+                        traffic, dataPacketInjectionRate, "xy", "random"
+                ));
+                experimentXy.getConfig().setTraffic(traffic);
+                experimentXy.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+                experimentXy.getConfig().setRouting("xy");
+                experimentXy.getConfig().setSelection("random");
+                experiments.get(traffic).add(experimentXy);
 
-                experiments.get(traffic).add(new Experiment(){{
-                    getConfig().setResultDir(String.format(
-                            "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
-                            traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
-                    ));
-                    getConfig().setTraffic(traffic);
-                    getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-                    getConfig().setRouting("oddEven");
-                    getConfig().setSelection("bufferLevel");
-                }});
+                Experiment experimentBufferLevel = new Experiment();
+                experimentBufferLevel.getConfig().setResultDir(String.format(
+                        "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
+                        traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
+                ));
+                experimentBufferLevel.getConfig().setTraffic(traffic);
+                experimentBufferLevel.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+                experimentBufferLevel.getConfig().setRouting("oddEven");
+                experimentBufferLevel.getConfig().setSelection("bufferLevel");
+                experiments.get(traffic).add(experimentBufferLevel);
 
-                experiments.get(traffic).add(new Experiment(){{
-                    getConfig().setResultDir(String.format(
-                            "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
-                            traffic, dataPacketInjectionRate, "oddEven", "aco",
-                            antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
-                    ));
-                    getConfig().setTraffic(traffic);
-                    getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-                    getConfig().setRouting("oddEven");
-                    getConfig().setSelection("aco");
-                    getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
-                    getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
-                    getConfig().setReinforcementFactor(reinforcementFactor);
-                }});
+                Experiment experimentAco = new Experiment();
+                experimentAco.getConfig().setResultDir(String.format(
+                        "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
+                        traffic, dataPacketInjectionRate, "oddEven", "aco",
+                        antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
+                ));
+                experimentAco.getConfig().setTraffic(traffic);
+                experimentAco.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+                experimentAco.getConfig().setRouting("oddEven");
+                experimentAco.getConfig().setSelection("aco");
+                experimentAco.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
+                experimentAco.getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
+                experimentAco.getConfig().setReinforcementFactor(reinforcementFactor);
+                experiments.get(traffic).add(experimentAco);
             }
         }
 
@@ -85,54 +77,52 @@ public class Common {
         String traffic = "transpose";
         double dataPacketInjectionRate = 0.060;
 
-        List<Double> antPacketInjectionRates = new ArrayList<>();
-        antPacketInjectionRates.add(0.0002);
-        antPacketInjectionRates.add(0.001);
-        antPacketInjectionRates.add(0.005);
-        antPacketInjectionRates.add(0.025);
+        List<Double> antPacketInjectionRates = Arrays.asList(
+                0.0002, 0.001, 0.005, 0.025
+        );
 
         double acoSelectionAlpha = 0.45;
         double reinforcementFactor = 0.001;
 
         List<Experiment> experiments = new ArrayList<>();
 
-        experiments.add(new Experiment() {{
-            getConfig().setResultDir(String.format(
-                    "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
-                    traffic, dataPacketInjectionRate, "xy", "random"
-            ));
-            getConfig().setTraffic(traffic);
-            getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-            getConfig().setRouting("xy");
-            getConfig().setSelection("random");
-        }});
+        Experiment experimentXy = new Experiment();
+        experimentXy.getConfig().setResultDir(String.format(
+                "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
+                traffic, dataPacketInjectionRate, "xy", "random"
+        ));
+        experimentXy.getConfig().setTraffic(traffic);
+        experimentXy.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+        experimentXy.getConfig().setRouting("xy");
+        experimentXy.getConfig().setSelection("random");
+        experiments.add(experimentXy);
 
-        experiments.add(new Experiment() {{
-            getConfig().setResultDir(String.format(
-                    "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
-                    traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
-            ));
-            getConfig().setTraffic(traffic);
-            getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-            getConfig().setRouting("oddEven");
-            getConfig().setSelection("bufferLevel");
-        }});
+        Experiment experimentBufferLevel = new Experiment();
+        experimentBufferLevel.getConfig().setResultDir(String.format(
+                "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
+                traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
+        ));
+        experimentBufferLevel.getConfig().setTraffic(traffic);
+        experimentBufferLevel.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+        experimentBufferLevel.getConfig().setRouting("oddEven");
+        experimentBufferLevel.getConfig().setSelection("bufferLevel");
+        experiments.add(experimentBufferLevel);
 
         for(double antPacketInjectionRate : antPacketInjectionRates) {
-            experiments.add(new Experiment() {{
-                getConfig().setResultDir(String.format(
-                        "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
-                        traffic, dataPacketInjectionRate, "oddEven", "aco",
-                        antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
-                ));
-                getConfig().setTraffic(traffic);
-                getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-                getConfig().setRouting("oddEven");
-                getConfig().setSelection("aco");
-                getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
-                getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
-                getConfig().setReinforcementFactor(reinforcementFactor);
-            }});
+            Experiment experimentAco = new Experiment();
+            experimentAco.getConfig().setResultDir(String.format(
+                    "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
+                    traffic, dataPacketInjectionRate, "oddEven", "aco",
+                    antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
+            ));
+            experimentAco.getConfig().setTraffic(traffic);
+            experimentAco.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+            experimentAco.getConfig().setRouting("oddEven");
+            experimentAco.getConfig().setSelection("aco");
+            experimentAco.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
+            experimentAco.getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
+            experimentAco.getConfig().setReinforcementFactor(reinforcementFactor);
+            experiments.add(experimentAco);
         }
 
         return experiments;
@@ -144,67 +134,54 @@ public class Common {
 
         double antPacketInjectionRate = 0.001;
 
-        List<Double> acoSelectionAlphas = new ArrayList<>();
-        acoSelectionAlphas.add(0.30);
-        acoSelectionAlphas.add(0.35);
-        acoSelectionAlphas.add(0.40);
-        acoSelectionAlphas.add(0.45);
-        acoSelectionAlphas.add(0.50);
-        acoSelectionAlphas.add(0.55);
-        acoSelectionAlphas.add(0.60);
-        acoSelectionAlphas.add(0.65);
-        acoSelectionAlphas.add(0.70);
+        List<Double> acoSelectionAlphas = Arrays.asList(
+                0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70
+        );
 
-        List<Double> reinforcementFactors = new ArrayList<>();
-        reinforcementFactors.add(0.0005);
-        reinforcementFactors.add(0.001);
-        reinforcementFactors.add(0.002);
-        reinforcementFactors.add(0.004);
-        reinforcementFactors.add(0.008);
-        reinforcementFactors.add(0.016);
-        reinforcementFactors.add(0.032);
-        reinforcementFactors.add(0.064);
+        List<Double> reinforcementFactors = Arrays.asList(
+                0.0005, 0.001, 0.002, 0.004, 0.008, 0.016, 0.032, 0.064
+        );
 
         List<Experiment> experiments = new ArrayList<>();
 
-        experiments.add(new Experiment(){{
-            getConfig().setResultDir(String.format(
-                    "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
-                    traffic, dataPacketInjectionRate, "xy", "random"
-            ));
-            getConfig().setTraffic(traffic);
-            getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-            getConfig().setRouting("xy");
-            getConfig().setSelection("random");
-        }});
+        Experiment experimentXy = new Experiment();
+        experimentXy.getConfig().setResultDir(String.format(
+                "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
+                traffic, dataPacketInjectionRate, "xy", "random"
+        ));
+        experimentXy.getConfig().setTraffic(traffic);
+        experimentXy.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+        experimentXy.getConfig().setRouting("xy");
+        experimentXy.getConfig().setSelection("random");
+        experiments.add(experimentXy);
 
-        experiments.add(new Experiment(){{
-            getConfig().setResultDir(String.format(
-                    "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
-                    traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
-            ));
-            getConfig().setTraffic(traffic);
-            getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-            getConfig().setRouting("oddEven");
-            getConfig().setSelection("bufferLevel");
-        }});
+        Experiment experimentBufferLevel = new Experiment();
+        experimentBufferLevel.getConfig().setResultDir(String.format(
+                "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
+                traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
+        ));
+        experimentBufferLevel.getConfig().setTraffic(traffic);
+        experimentBufferLevel.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+        experimentBufferLevel.getConfig().setRouting("oddEven");
+        experimentBufferLevel.getConfig().setSelection("bufferLevel");
+        experiments.add(experimentBufferLevel);
 
         for(double acoSelectionAlpha : acoSelectionAlphas) {
             for(double reinforcementFactor : reinforcementFactors) {
-                experiments.add(new Experiment(){{
-                    getConfig().setResultDir(String.format(
-                            "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
-                            traffic, dataPacketInjectionRate, "oddEven", "aco",
-                            antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
-                    ));
-                    getConfig().setTraffic(traffic);
-                    getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
-                    getConfig().setRouting("oddEven");
-                    getConfig().setSelection("aco");
-                    getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
-                    getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
-                    getConfig().setReinforcementFactor(reinforcementFactor);
-                }});
+                Experiment experimentAco = new Experiment();
+                experimentAco.getConfig().setResultDir(String.format(
+                        "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
+                        traffic, dataPacketInjectionRate, "oddEven", "aco",
+                        antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
+                ));
+                experimentAco.getConfig().setTraffic(traffic);
+                experimentAco.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
+                experimentAco.getConfig().setRouting("oddEven");
+                experimentAco.getConfig().setSelection("aco");
+                experimentAco.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
+                experimentAco.getConfig().setAcoSelectionAlpha(acoSelectionAlpha);
+                experimentAco.getConfig().setReinforcementFactor(reinforcementFactor);
+                experiments.add(experimentAco);
             }
         }
 

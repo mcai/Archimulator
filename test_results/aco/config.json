@@ -1,5 +1,4 @@
 {
-  "enableDebugging": false,
   "noDrain": true,
   "randSeed": 13,
   "resultDir": "test_results/aco/",

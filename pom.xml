@@ -4,7 +4,7 @@
     <groupId>archimulator</groupId>
     <artifactId>archimulator</artifactId>
     <packaging>jar</packaging>
-    <version>2015-SNAPSHOT</version>
+    <version>2016-SNAPSHOT</version>
     <name>archimulator</name>
     <url>http://maven.apache.org</url>
 
