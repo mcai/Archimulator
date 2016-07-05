@@ -26,12 +26,12 @@ import archimulator.uncore.dram.MemoryControllerType;
 import archimulator.util.serialization.JsonSerializationHelper;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static archimulator.util.StorageUnitHelper.displaySizeToByteCount;
 
@@ -123,27 +123,23 @@ public class SimulateCommand {
         experiment.run();
 
         if (experiment.getState() == ExperimentState.COMPLETED) {
-            File file = new File(outputDirectory, "result.json");
+            File resultDirFile = new File(config.getOutputDirectory());
 
-            if (!file.exists()) {
-                List<ExperimentStat> stats = experiment.getStats();
-
-                String json = JsonSerializationHelper.toJson(stats, true);
-
-                if (!file.getParentFile().exists()) {
-                    if (!file.getParentFile().mkdirs()) {
-                        throw new RuntimeException();
-                    }
+            if (!resultDirFile.exists()) {
+                if (!resultDirFile.mkdirs()) {
+                    throw new RuntimeException();
                 }
-
-                try {
-                    FileUtils.writeStringToFile(file, json);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                System.out.println("Experiment statistics has been written to " + file.getPath());
             }
+
+            List<ExperimentStat> stats = experiment.getStats();
+
+            Map<String, Object> stats1 = new LinkedHashMap<>();
+            for(ExperimentStat stat : stats) {
+                stats1.put(stat.getPrefix() + "." + stat.getKey(), stat.getValue());
+            }
+
+            JsonSerializationHelper.writeJsonFile(config, config.getOutputDirectory(), "config.json");
+            JsonSerializationHelper.writeJsonFile(stats1, config.getOutputDirectory(), "stats.json");
         }
     }
 }

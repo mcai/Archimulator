@@ -22,7 +22,10 @@ package archimulator.util.serialization;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -163,6 +166,18 @@ public class JsonSerializationHelper {
      */
     public static String prettyPrint(String json) {
         return gsonPrettyPrint.toJson(gsonPrettyPrint.fromJson(json, Object.class));
+    }
+
+    public static void writeJsonFile(Object obj, String resultDir, String outputJsonFileName) {
+        File file = new File(resultDir, outputJsonFileName);
+
+        String json = toJson(obj, true);
+
+        try {
+            FileUtils.writeStringToFile(file, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -171,20 +171,8 @@ public class Experiment implements NoCSettings {
             }
         }
 
-        this.writeJsonFile(config, "config.json");
-        this.writeJsonFile(stats, "stats.json");
-    }
-
-    private void writeJsonFile(Object obj, String outputJsonFileName) {
-        File file = new File(config.getResultDir(), outputJsonFileName);
-
-        String json = JsonSerializationHelper.toJson(obj, true);
-
-        try {
-            FileUtils.writeStringToFile(file, json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        JsonSerializationHelper.writeJsonFile(config, this.config.getResultDir(), "config.json");
+        JsonSerializationHelper.writeJsonFile(stats, this.config.getResultDir(), "stats.json");
     }
 
     @SuppressWarnings("unchecked")
