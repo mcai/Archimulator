@@ -1,5 +1,8 @@
 package archimulator.uncore.net.noc.util;
 
+import com.google.common.collect.Iterators;
+
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -10,28 +13,26 @@ import java.util.List;
 public abstract class RoundRobinArbiter<ResourceT, RequesterT> {
     private ResourceT resource;
     private List<RequesterT> requesters;
+    private Iterator<RequesterT> requestersIter;
 
     public RoundRobinArbiter(ResourceT resource, List<RequesterT> requesters) {
         this.resource = resource;
         this.requesters = requesters;
+        this.requestersIter = Iterators.cycle(this.requesters);
     }
 
     protected abstract boolean resourceAvailable(ResourceT resource);
 
     protected abstract boolean requesterHasRequests(RequesterT requester);
 
-    private int lastServicedRequesterIndex = -1;
-
     public RequesterT next() {
-        for (int i = lastServicedRequesterIndex + 1, count = 0;  count < requesters.size(); i++, count++) {
-            if(!this.resourceAvailable(resource)) {
-                return null;
-            }
+        if(!this.resourceAvailable(resource)) {
+            return null;
+        }
 
-            RequesterT requester = requesters.get(i % requesters.size());
-
+        for(int count = 0; count < requesters.size(); count++) {
+            RequesterT requester = this.requestersIter.next();
             if(this.requesterHasRequests(requester)) {
-                lastServicedRequesterIndex = i;
                 return requester;
             }
         }
