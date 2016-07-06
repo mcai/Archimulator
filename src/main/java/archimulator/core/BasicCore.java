@@ -62,7 +62,8 @@ public class BasicCore extends AbstractBasicCore {
                         return true;
                     }
                 },
-                Thread::registerRenameOne, getExperiment().getConfig().getDecodeWidth()
+                Thread::registerRenameOne,
+                getExperiment().getConfig().getDecodeWidth()
         );
 
         this.dispatchScheduler = new RoundRobinScheduler<>(
