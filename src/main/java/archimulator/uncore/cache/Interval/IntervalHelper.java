@@ -199,41 +199,196 @@ public class IntervalHelper implements Reportable {
         reportNode.getChildren().add(new ReportNode(reportNode, "intervalHelper") {{
             for (int i = 0; i < intervals.size(); i++) {
                 Interval interval = intervals.get(i);
-                getChildren().add(new ReportNode(this, "numMainThreadDynamicInstructionsCommitted[" + i + "]", interval.numMainThreadDynamicInstructionsCommitted + ""));
-                getChildren().add(new ReportNode(this, "numHelperThreadDynamicInstructionsCommitted[" + i + "]", interval.numHelperThreadDynamicInstructionsCommitted + ""));
 
-                getChildren().add(new ReportNode(this, "numMainThreadL2Hits[" + i + "]", interval.numMainThreadL2Hits + ""));
-                getChildren().add(new ReportNode(this, "numMainThreadL2Misses[" + i + "]", interval.numMainThreadL2Misses + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numMainThreadDynamicInstructionsCommitted/%d", i),
+                                String.format("%d", interval.numMainThreadDynamicInstructionsCommitted)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numHelperThreadL2Hits[" + i + "]", interval.numHelperThreadL2Hits + ""));
-                getChildren().add(new ReportNode(this, "numHelperThreadL2Misses[" + i + "]", interval.numHelperThreadL2Misses + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numHelperThreadDynamicInstructionsCommitted/%d", i),
+                                String.format("%d", interval.numHelperThreadDynamicInstructionsCommitted)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numRedundantHitToTransientTagHelperThreadL2Requests[" + i + "]", interval.numRedundantHitToTransientTagHelperThreadL2Requests + ""));
-                getChildren().add(new ReportNode(this, "numRedundantHitToCacheHelperThreadL2Requests[" + i + "]", interval.numRedundantHitToCacheHelperThreadL2Requests + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numMainThreadL2Hits/%d", i),
+                                String.format("%d", interval.numMainThreadL2Hits)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numTimelyHelperThreadL2Requests[" + i + "]", interval.numTimelyHelperThreadL2Requests + ""));
-                getChildren().add(new ReportNode(this, "numLateHelperThreadL2Requests[" + i + "]", interval.numLateHelperThreadL2Requests + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numMainThreadL2Misses/%d", i),
+                                String.format("%d", interval.numMainThreadL2Misses)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numBadHelperThreadL2Requests[" + i + "]", interval.numBadHelperThreadL2Requests + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numHelperThreadL2Hits/%d", i),
+                                String.format("%d", interval.numHelperThreadL2Hits)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numEarlyHelperThreadL2Requests[" + i + "]", interval.numEarlyHelperThreadL2Requests + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numHelperThreadL2Misses/%d", i),
+                                String.format("%d", interval.numHelperThreadL2Misses)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "numUglyHelperThreadL2Requests[" + i + "]", interval.numUglyHelperThreadL2Requests + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numRedundantHitToTransientTagHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numRedundantHitToTransientTagHelperThreadL2Requests)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "mainThreadIpc[" + i + "]", interval.mainThreadIpc + ""));
-                getChildren().add(new ReportNode(this, "helperThreadIpc[" + i + "]", interval.helperThreadIpc + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numRedundantHitToCacheHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numRedundantHitToCacheHelperThreadL2Requests)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "mainThreadCpi[" + i + "]", interval.mainThreadCpi + ""));
-                getChildren().add(new ReportNode(this, "helperThreadCpi[" + i + "]", interval.helperThreadCpi + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numTimelyHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numTimelyHelperThreadL2Requests)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "mainThreadMpki[" + i + "]", interval.mainThreadMpki + ""));
-                getChildren().add(new ReportNode(this, "helperThreadMpki[" + i + "]", interval.helperThreadMpki + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numLateHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numLateHelperThreadL2Requests)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "averageL2MissMlpCost[" + i + "]", (interval.numL2MissMlpSamples == 0 ? 0 : interval.l2MissMlpCosts / interval.numL2MissMlpSamples) + ""));
-                getChildren().add(new ReportNode(this, "numL2MissMlpSamples[" + i + "]", interval.numL2MissMlpSamples + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numBadHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numBadHelperThreadL2Requests)
+                        )
+                );
 
-                getChildren().add(new ReportNode(this, "averageDramBankAccessBlpCost[" + i + "]", (interval.numDramBankAccessBlpSamples == 0 ? 0 : interval.dramBankAccessBlpCosts / interval.numDramBankAccessBlpSamples) + ""));
-                getChildren().add(new ReportNode(this, "numDramBankAccessBlpSamples[" + i + "]", interval.numDramBankAccessBlpSamples + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numEarlyHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numEarlyHelperThreadL2Requests)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numUglyHelperThreadL2Requests/%d", i),
+                                String.format("%d", interval.numUglyHelperThreadL2Requests)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("mainThreadIpc/%d", i),
+                                String.format("%s", interval.mainThreadIpc)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("helperThreadIpc/%d", i),
+                                String.format("%s", interval.helperThreadIpc)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("mainThreadCpi/%d", i),
+                                String.format("%s", interval.mainThreadCpi)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("helperThreadCpi/%d", i),
+                                String.format("%s", interval.helperThreadCpi)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("mainThreadMpki/%d", i),
+                                String.format("%s", interval.mainThreadMpki)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("helperThreadMpki/%d", i),
+                                String.format("%s", interval.helperThreadMpki)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("averageL2MissMlpCost/%d", i),
+                                String.format(
+                                        "%s",
+                                        interval.numL2MissMlpSamples == 0 ? 0 : interval.l2MissMlpCosts / interval.numL2MissMlpSamples
+                                )
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numL2MissMlpSamples/%d", i),
+                                String.format("%s", interval.numL2MissMlpSamples)
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("averageDramBankAccessBlpCost/%d", i),
+                                String.format(
+                                        "%s",
+                                        interval.numDramBankAccessBlpSamples == 0 ? 0 : interval.dramBankAccessBlpCosts / interval.numDramBankAccessBlpSamples
+                                )
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("numDramBankAccessBlpSamples/%d", i),
+                                String.format("%s", interval.numDramBankAccessBlpSamples)
+                        )
+                );
             }
         }});
     }

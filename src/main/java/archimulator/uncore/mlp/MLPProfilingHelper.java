@@ -207,16 +207,44 @@ public class MLPProfilingHelper implements Reportable {
     @Override
     public void dumpStats(final ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "mlpCostQuantizer") {{
-            getChildren().add(new ReportNode(this, "maxValue", mlpCostQuantizer.getMaxValue() + ""));
-            getChildren().add(new ReportNode(this, "quantum", mlpCostQuantizer.getQuantum() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "maxValue",
+                            String.format("%d", mlpCostQuantizer.getMaxValue())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "quantum",
+                            String.format("%d", mlpCostQuantizer.getQuantum())
+                    )
+            );
         }});
 
         for (int i = 0; i < mlpCostQuantizer.getMaxValue(); i++) {
-            reportNode.getChildren().add(new ReportNode(reportNode, "numL2MissesPerMlpCostQuantum[" + i + "]", (numL2MissesPerMlpCostQuantum.containsKey(i) ? numL2MissesPerMlpCostQuantum.get(i) : 0) + ""));
+            reportNode.getChildren().add(
+                    new ReportNode(
+                            reportNode,
+                            String.format("numL2MissesPerMlpCostQuantum/%d", i),
+                            String.format(
+                                    "%d",
+                                    numL2MissesPerMlpCostQuantum.containsKey(i) ? numL2MissesPerMlpCostQuantum.get(i) : 0
+                            )
+                    )
+            );
         }
 
         for (int i : numCyclesPerMlp.keySet()) {
-            reportNode.getChildren().add(new ReportNode(reportNode, "numCyclesPerMlp[" + i + "]", numCyclesPerMlp.get(i) + ""));
+            reportNode.getChildren().add(
+                    new ReportNode(
+                            reportNode,
+                            String.format("numCyclesPerMlp/%d", i),
+                            String.format("%d", numCyclesPerMlp.get(i))
+                    )
+            );
         }
     }
 

@@ -293,7 +293,7 @@ public interface Thread extends MemoryHierarchyThread {
     Map<Mnemonic, Long> getExecutedMnemonics();
 
     /**
-     * get the executed system call names.
+     * Get the executed system call names.
      *
      * @return the executed system call names
      */
@@ -301,33 +301,177 @@ public interface Thread extends MemoryHierarchyThread {
 
     default void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
-            getChildren().add(new ReportNode(this, "numInstructions", getNumInstructions() + ""));
-            getChildren().add(new ReportNode(this, "executedMnemonics", getExecutedMnemonics() + "")); //TODO
-            getChildren().add(new ReportNode(this, "executedSystemCalls", getExecutedSystemCalls() + "")); //TODO
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numInstructions",
+                            String.format("%d", getNumInstructions())
+                    )
+            );
 
-            getChildren().add(new ReportNode(this, "branchPredictor/type", getBranchPredictor().getType() + ""));
-            getChildren().add(new ReportNode(this, "branchPredictor/hitRatio", getBranchPredictor().getHitRatio() + ""));
-            getChildren().add(new ReportNode(this, "branchPredictor/numAccesses", getBranchPredictor().getNumAccesses() + ""));
-            getChildren().add(new ReportNode(this, "branchPredictor/numHits", getBranchPredictor().getNumHits() + ""));
-            getChildren().add(new ReportNode(this, "branchPredictor/numMisses", getBranchPredictor().getNumMisses() + ""));
+            for(Mnemonic mnemonic : getExecutedMnemonics().keySet()) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("executedMnemonics/%s", mnemonic),
+                                String.format("%s", getExecutedMnemonics().get(mnemonic))
+                        )
+                );
+            }
 
-            getChildren().add(new ReportNode(this, "numDecodeBufferFullStalls", getNumDecodeBufferFullStalls() + ""));
-            getChildren().add(new ReportNode(this, "numReorderBufferFullStalls", getNumReorderBufferFullStalls() + ""));
-            getChildren().add(new ReportNode(this, "numLoadStoreQueueFullStalls", getNumLoadStoreQueueFullStalls() + ""));
+            for(String systemCall : getExecutedSystemCalls().keySet()) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("executedSystemCalls/%s", systemCall),
+                                String.format("%s", getExecutedSystemCalls().get(systemCall))
+                        )
+                );
+            }
 
-            getChildren().add(new ReportNode(this, "numIntPhysicalRegisterFileFullStalls", getNumIntPhysicalRegisterFileFullStalls() + ""));
-            getChildren().add(new ReportNode(this, "numFpPhysicalRegisterFileFullStalls", getNumFpPhysicalRegisterFileFullStalls() + ""));
-            getChildren().add(new ReportNode(this, "numMiscPhysicalRegisterFileFullStalls", getNumMiscPhysicalRegisterFileFullStalls() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "branchPredictor/type",
+                            String.format("%s", getBranchPredictor().getType())
+                    )
+            );
 
-            getChildren().add(new ReportNode(this, "numFetchStallsOnDecodeBufferIsFull", getNumFetchStallsOnDecodeBufferIsFull() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "branchPredictor/hitRatio",
+                            String.format("%s", getBranchPredictor().getHitRatio())
+                    )
+            );
 
-            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnDecodeBufferIsEmpty", getNumRegisterRenameStallsOnDecodeBufferIsEmpty() + ""));
-            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnReorderBufferIsFull", getNumRegisterRenameStallsOnReorderBufferIsFull() + ""));
-            getChildren().add(new ReportNode(this, "numRegisterRenameStallsOnLoadStoreQueueFull", getNumRegisterRenameStallsOnLoadStoreQueueFull() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "branchPredictor/numAccesses",
+                            String.format("%d", getBranchPredictor().getNumAccesses())
+                    )
+            );
 
-            getChildren().add(new ReportNode(this, "numSelectionStallsOnCanNotLoad", getNumSelectionStallsOnCanNotLoad() + ""));
-            getChildren().add(new ReportNode(this, "numSelectionStallsOnCanNotStore", getNumSelectionStallsOnCanNotStore() + ""));
-            getChildren().add(new ReportNode(this, "numSelectionStallsOnNoFreeFunctionalUnit", getNumSelectionStallsOnNoFreeFunctionalUnit() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "branchPredictor/numHits",
+                            String.format("%d", getBranchPredictor().getNumHits())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "branchPredictor/numMisses",
+                            String.format("%d", getBranchPredictor().getNumMisses())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numDecodeBufferFullStalls",
+                            String.format("%d", getNumDecodeBufferFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numReorderBufferFullStalls",
+                            String.format("%d", getNumReorderBufferFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numLoadStoreQueueFullStalls",
+                            String.format("%d", getNumLoadStoreQueueFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numIntPhysicalRegisterFileFullStalls",
+                            String.format("%d", getNumIntPhysicalRegisterFileFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numFpPhysicalRegisterFileFullStalls",
+                            String.format("%d", getNumFpPhysicalRegisterFileFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numMiscPhysicalRegisterFileFullStalls",
+                            String.format("%d", getNumMiscPhysicalRegisterFileFullStalls())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numFetchStallsOnDecodeBufferIsFull",
+                            String.format("%d", getNumFetchStallsOnDecodeBufferIsFull())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numRegisterRenameStallsOnDecodeBufferIsEmpty",
+                            String.format("%d", getNumRegisterRenameStallsOnDecodeBufferIsEmpty())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numRegisterRenameStallsOnReorderBufferIsFull",
+                            String.format("%d", getNumRegisterRenameStallsOnReorderBufferIsFull())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numRegisterRenameStallsOnLoadStoreQueueFull",
+                            String.format("%d", getNumRegisterRenameStallsOnLoadStoreQueueFull())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numSelectionStallsOnCanNotLoad",
+                            String.format("%d", getNumSelectionStallsOnCanNotLoad())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numSelectionStallsOnCanNotStore",
+                            String.format("%d", getNumSelectionStallsOnCanNotStore())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "numSelectionStallsOnNoFreeFunctionalUnit",
+                            String.format("%d", getNumSelectionStallsOnNoFreeFunctionalUnit())
+                    )
+            );
         }});
     }
 }

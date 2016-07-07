@@ -44,6 +44,7 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
      *
      * @param simulation the simulation
      */
+    @SuppressWarnings("unchecked")
     public DelinquentLoadIdentificationHelper(Simulation simulation) {
         this.delinquentLoadIdentificationTables = new HashMap<>();
 
@@ -87,11 +88,31 @@ public class DelinquentLoadIdentificationHelper implements Reportable {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "delinquentLoadIdentificationHelper") {{
-            getChildren().add(new ReportNode(this, "identifiedDelinquentLoads.size", identifiedDelinquentLoads.size() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "identifiedDelinquentLoads.size",
+                            String.format("%d", identifiedDelinquentLoads.size())
+                    )
+            );
 
             for (int i = 0; i < identifiedDelinquentLoads.size(); i++) {
                 Pair<Integer, Integer> delinquentLoad = identifiedDelinquentLoads.get(i);
-                getChildren().add(new ReportNode(this, "identifiedDelinquentLoad_" + i, String.format("threadId: %d, pc: 0x%08x", delinquentLoad.getFirst(), delinquentLoad.getSecond())));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("identifiedDelinquentLoad/%d/threadId", i),
+                                String.format("%d", delinquentLoad.getFirst())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("identifiedDelinquentLoad/%d/pc", i),
+                                String.format("0x%08x", delinquentLoad.getSecond())
+                        )
+                );
             }
         }});
     }

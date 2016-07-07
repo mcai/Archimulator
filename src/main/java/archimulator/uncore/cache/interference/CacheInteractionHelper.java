@@ -131,8 +131,8 @@ public class CacheInteractionHelper implements Reportable {
                     getChildren().add(
                             new ReportNode(
                                     this,
-                                    "numL2InterThreadConstructiveInteractions[" + threadFrom + "," + threadTo + "]",
-                                    constructiveInteractionsPerThread.get(threadTo) + ""
+                                    String.format("numL2InterThreadConstructiveInteractions/%d/%d", threadFrom, threadTo),
+                                    String.format("%d", constructiveInteractionsPerThread.get(threadTo))
                             )
                     );
                 }
@@ -144,8 +144,8 @@ public class CacheInteractionHelper implements Reportable {
                     getChildren().add(
                             new ReportNode(
                                     this,
-                                    "numL2InterThreadEvictions[" + threadFrom + "," + threadTo + "]",
-                                    evictionsPerThread.get(threadTo) + ""
+                                    String.format("numL2InterThreadEvictions/%d/%d", threadFrom, threadTo),
+                                    String.format("%d", evictionsPerThread.get(threadTo))
                             )
                     );
                 }

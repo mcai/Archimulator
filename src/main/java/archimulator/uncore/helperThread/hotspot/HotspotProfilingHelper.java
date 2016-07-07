@@ -194,13 +194,127 @@ public class HotspotProfilingHelper implements Reportable {
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, "hotspot") {{
-            getChildren().add(new ReportNode(this, "numCallsPerFunctions", getNumCallsPerFunctions() + "")); //TODO
-            getChildren().add(new ReportNode(this, "loadsInHotspotFunction", getLoadsInHotspotFunction() + "")); //TODO
+            for(String function : getNumCallsPerFunctions().keySet()) {
+                Map<String, Long> calls = getNumCallsPerFunctions().get(function);
 
-            getChildren().add(new ReportNode(this, "statL2HitStackDistances", getStatL2HitStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2MissStackDistances", getStatL2MissStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2HitHotspotInterThreadStackDistances", getStatL2HitHotspotInterThreadStackDistances() + "")); //TODO
-            getChildren().add(new ReportNode(this, "statL2MissHotspotStackDistances", getStatL2MissStackDistances() + "")); //TODO
+                for(String callee : calls.keySet()) {
+                    getChildren().add(
+                            new ReportNode(
+                                    this,
+                                    String.format("numCallsPerFunctions/%s/%s", function, callee),
+                                    String.format("%s", calls.get(callee))
+                            )
+                    );
+                }
+            }
+
+            for(int pc : getLoadsInHotspotFunction().keySet()) {
+                LoadInstructionEntry loadInstructionEntry = getLoadsInHotspotFunction().get(pc);
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/instruction", pc),
+                                String.format("%s", loadInstructionEntry.getInstruction())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l1DAccesses", pc),
+                                String.format("%s", loadInstructionEntry.getL1DAccesses())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l1DHitRatio", pc),
+                                String.format("%s", loadInstructionEntry.getL1DHitRatio())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l1DHits", pc),
+                                String.format("%s", loadInstructionEntry.getL1DHits())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l1DMisses", pc),
+                                String.format("%s", loadInstructionEntry.getL1DMisses())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l2Accesses", pc),
+                                String.format("%s", loadInstructionEntry.getL2Accesses())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l2HitRatio", pc),
+                                String.format("%s", loadInstructionEntry.getL2HitRatio())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l2Hits", pc),
+                                String.format("%s", loadInstructionEntry.getL2Hits())
+                        )
+                );
+
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("loadsInHotspotFunction/0x%08x/l2Misses", pc),
+                                String.format("%s", loadInstructionEntry.getL2Misses())
+                        )
+                );
+            }
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "statL2HitStackDistances",
+                            String.format("%s", getStatL2HitStackDistances())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "statL2MissStackDistances",
+                            String.format("%s", getStatL2MissStackDistances())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "statL2HitHotspotInterThreadStackDistances",
+                            String.format("%s", getStatL2HitHotspotInterThreadStackDistances())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "statL2MissHotspotStackDistances",
+                            String.format("%s", getStatL2MissStackDistances())
+                    )
+            );
         }});
     }
 

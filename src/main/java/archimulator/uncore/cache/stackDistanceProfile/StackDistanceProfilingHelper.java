@@ -98,13 +98,35 @@ public class StackDistanceProfilingHelper implements Reportable {
 
     @Override
     public void dumpStats(ReportNode reportNode) {
-        reportNode.getChildren().add(new ReportNode(reportNode, "stackDistanceProfilingHelper") {
-            {
-                getChildren().add(new ReportNode(this, "l2StackDistanceProfile/hitCounters", getL2StackDistanceProfile().getHitCounters() + ""));
-                getChildren().add(new ReportNode(this, "l2StackDistanceProfile/missCounter", getL2StackDistanceProfile().getMissCounter() + ""));
-                getChildren().add(new ReportNode(this, "assumedNumMissesDistribution", getAssumedNumMissesDistribution() + ""));
+        reportNode.getChildren().add(new ReportNode(reportNode, "stackDistanceProfilingHelper") {{
+            for (int i = 0; i < getL2StackDistanceProfile().getHitCounters().size(); i++) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("l2StackDistanceProfile/hitCounters/%d", i),
+                                String.format("%s", getL2StackDistanceProfile().getHitCounters().get(i))
+                        )
+                );
             }
-        });
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "l2StackDistanceProfile/missCounter",
+                            String.format("%d", getL2StackDistanceProfile().getMissCounter())
+                    )
+            );
+
+            for (int i : getAssumedNumMissesDistribution().keySet()) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("assumedNumMissesDistribution/%d", i),
+                                String.format("%s", getAssumedNumMissesDistribution().get(i))
+                        )
+                );
+            }
+        }});
     }
 
     /**

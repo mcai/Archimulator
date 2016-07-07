@@ -22,7 +22,9 @@ package archimulator.core;
 
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
+import archimulator.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.core.functionalUnit.FunctionalUnitPool;
+import archimulator.core.functionalUnit.FunctionalUnitType;
 import archimulator.util.action.Action;
 
 import java.util.List;
@@ -187,8 +189,39 @@ public interface Core extends MemoryHierarchyCore, Reportable {
 
     default void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
-            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnNoFreeFunctionalUnit() + ""));
-            getChildren().add(new ReportNode(this, "functionalUnitPool/numStallsOnAcquireFailedOnNoFreeFunctionalUnit", getFunctionalUnitPool().getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit() + ""));
+            for(FunctionalUnitType functionalUnitType :
+                    getFunctionalUnitPool().getNumStallsOnNoFreeFunctionalUnit().keySet()) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format(
+                                        "functionalUnitPool/numStallsOnNoFreeFunctionalUnit/%s",
+                                        functionalUnitType
+                                ),
+                                String.format(
+                                        "%s",
+                                        getFunctionalUnitPool().getNumStallsOnNoFreeFunctionalUnit().get(functionalUnitType)
+                                )
+                        )
+                );
+            }
+
+            for(FunctionalUnitOperationType functionalUnitOperationType :
+                    getFunctionalUnitPool().getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit().keySet()) {
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format(
+                                        "functionalUnitPool/numStallsOnAcquireFailedOnNoFreeFunctionalUnit/%s",
+                                        functionalUnitOperationType
+                                ),
+                                String.format(
+                                        "%s",
+                                        getFunctionalUnitPool().getNumStallsOnAcquireFailedOnNoFreeFunctionalUnit().get(functionalUnitOperationType)
+                                )
+                        )
+                );
+            }
         }});
     }
 }

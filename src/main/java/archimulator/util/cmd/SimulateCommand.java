@@ -135,7 +135,7 @@ public class SimulateCommand {
 
             Map<String, Object> stats1 = new LinkedHashMap<>();
             for(ExperimentStat stat : stats) {
-                stats1.put(stat.getPrefix() + "." + stat.getKey(), stat.getValue());
+                stats1.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
             }
 
             JsonSerializationHelper.writeJsonFile(config, config.getOutputDirectory(), "config.json");
