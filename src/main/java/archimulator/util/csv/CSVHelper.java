@@ -16,7 +16,7 @@ import java.util.List;
  * @author Min Cai
  */
 public class CSVHelper {
-    public static <ExperimentT> void toCsv(String outputCSVFileName, List<ExperimentT> results, List<CSVField<ExperimentT>> fields) {
+    public static <ResultT> void toCsv(String outputCSVFileName, List<ResultT> results, List<CSVField<ResultT>> fields) {
         File resultDirFile = new File(outputCSVFileName).getParentFile();
 
         if (!resultDirFile.exists()) {
@@ -32,14 +32,14 @@ public class CSVHelper {
             CSVPrinter printer = new CSVPrinter(writer, format);
             printer.printRecord(fields);
 
-            for (ExperimentT experiment : results) {
-                List<String> experimentData = new ArrayList<>();
+            for (ResultT result : results) {
+                List<String> record = new ArrayList<>();
 
-                for (CSVField<ExperimentT> field : fields) {
-                    experimentData.add(field.getFunc().apply(experiment));
+                for (CSVField<ResultT> field : fields) {
+                    record.add(field.getFunc().apply(result));
                 }
 
-                printer.printRecord(experimentData);
+                printer.printRecord(record);
             }
 
             printer.close();
