@@ -2,18 +2,11 @@ package archimulator.uncore.net;
 
 import archimulator.common.BasicSimulationObject;
 import archimulator.common.SimulationObject;
-import archimulator.common.SimulationType;
-import archimulator.uncore.net.noc.Config;
-import archimulator.uncore.net.noc.DataPacket;
-import archimulator.uncore.net.noc.Network;
-import archimulator.uncore.net.noc.NoCSettings;
-import archimulator.uncore.net.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
-import archimulator.uncore.net.noc.selection.aco.ACONode;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
-import archimulator.uncore.net.noc.selection.aco.ForwardAntPacket;
-import archimulator.uncore.net.noc.traffics.TransposeTrafficGenerator;
+import archimulator.uncore.net.noc.*;
+import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.util.action.Action;
 
 import java.util.HashMap;
@@ -25,7 +18,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
 
     private Map<SimulationObject, Integer> devicesToNodeIds;
 
-    private Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network;
+    private Network<? extends Node, ? extends RoutingAlgorithm> network;
 
     private Config config;
 
@@ -70,25 +63,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
 
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
 
-        this.network = new Network<ACONode, OddEvenTurnBasedRoutingAlgorithm>(
-                this,
-                this.memoryHierarchy.getCycleAccurateEventQueue(),
-                this.config.getNumNodes(),
-                ACONode::new,
-                OddEvenTurnBasedRoutingAlgorithm::new) {
-            @Override
-            public boolean simulateAtCurrentCycle() {
-                return memoryHierarchy.getSimulation().getType() != SimulationType.FAST_FORWARD;
-            }
-        };
-
-        new TransposeTrafficGenerator<>(
-                this.network,
-                this.config.getAntPacketInjectionRate(),
-                (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
-                this.config.getAntPacketSize(),
-                -1
-        );
+        this.network = NetworkFactory.setupNetwork(this, this.memoryHierarchy.getCycleAccurateEventQueue());
     }
 
     @Override
@@ -98,9 +73,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
 
         DataPacket packet = new DataPacket(this.network, src, dest, size, onCompletedCallback);
 
-        this.network.getCycleAccurateEventQueue().schedule(this, () -> {
-            this.network.receive(packet);
-        }, 1);
+        this.network.getCycleAccurateEventQueue().schedule(this, () -> this.network.receive(packet), 1);
     }
 
     @Override
@@ -122,7 +95,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
      *
      * @return the network
      */
-    public Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> getNetwork() {
+    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
         return network;
     }
 

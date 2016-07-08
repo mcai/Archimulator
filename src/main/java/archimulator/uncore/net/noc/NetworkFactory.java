@@ -19,7 +19,7 @@ import archimulator.util.event.CycleAccurateEventQueue;
  * @author Min Cai
  */
 public class NetworkFactory {
-    public static Network<? extends Node, ? extends RoutingAlgorithm> aco(
+    private static Network<? extends Node, ? extends RoutingAlgorithm> aco(
             NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     ) {
@@ -69,7 +69,7 @@ public class NetworkFactory {
         return network;
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> random(
+    private static Network<? extends Node, ? extends RoutingAlgorithm> random(
             NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
@@ -86,7 +86,7 @@ public class NetworkFactory {
                 OddEvenTurnBasedRoutingAlgorithm::new);
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(
+    private static Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(
             NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
@@ -103,7 +103,7 @@ public class NetworkFactory {
                 OddEvenTurnBasedRoutingAlgorithm::new);
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(
+    private static Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(
             NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     ) {
@@ -120,7 +120,7 @@ public class NetworkFactory {
                 OddEvenTurnBasedRoutingAlgorithm::new);
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> xy(
+    private static Network<? extends Node, ? extends RoutingAlgorithm> xy(
             NoCSettings settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
@@ -135,5 +135,66 @@ public class NetworkFactory {
                     }
                 },
                 XYRoutingAlgorithm::new);
+    }
+
+    public static Network<? extends Node, ? extends RoutingAlgorithm> setupNetwork(NoCSettings settings, CycleAccurateEventQueue cycleAccurateEventQueue) {
+        Network<? extends Node, ? extends RoutingAlgorithm> network;
+
+        switch (settings.getConfig().getRouting()) {
+            case "xy":
+                network = xy(settings, cycleAccurateEventQueue);
+                break;
+            case "oddEven":
+                switch (settings.getConfig().getSelection()) {
+                    case "random":
+                        network = random(settings, cycleAccurateEventQueue);
+                        break;
+                    case "bufferLevel":
+                        network = bufferLevel(settings, cycleAccurateEventQueue);
+                        break;
+                    case "neighborOnPath":
+                        network = neighborOnPath(settings, cycleAccurateEventQueue);
+                        break;
+                    case "aco":
+                        network = aco(settings, cycleAccurateEventQueue);
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                }
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        switch (settings.getConfig().getTraffic()) {
+            case "uniform":
+                new UniformTrafficGenerator<>(
+                        network,
+                        settings.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        settings.getConfig().getDataPacketSize(),
+                        settings.getConfig().getMaxPackets()
+                );
+                break;
+            case "transpose":
+                new TransposeTrafficGenerator<>(
+                        network,
+                        settings.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        settings.getConfig().getDataPacketSize(),
+                        settings.getConfig().getMaxPackets()
+                );
+                break;
+            case "hotspot":
+                new HotspotTrafficGenerator<>(
+                        network,
+                        settings.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        settings.getConfig().getDataPacketSize(),
+                        settings.getConfig().getMaxPackets()
+                );
+                break;
+        }
+        return network;
     }
 }

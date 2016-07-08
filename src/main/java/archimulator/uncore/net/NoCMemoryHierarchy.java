@@ -28,9 +28,9 @@ import archimulator.common.report.Reportable;
 import archimulator.uncore.AbstractMemoryHierarchy;
 import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.net.noc.Network;
+import archimulator.uncore.net.noc.Node;
 import archimulator.uncore.net.noc.routers.FlitState;
-import archimulator.uncore.net.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
-import archimulator.uncore.net.noc.selection.aco.ACONode;
+import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -64,7 +64,7 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Repor
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
-            Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network = net.getNetwork();
+            Network<? extends Node, ? extends RoutingAlgorithm> network = net.getNetwork();
 
             getChildren().add(
                     new ReportNode(

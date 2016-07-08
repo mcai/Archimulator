@@ -52,7 +52,7 @@ public class Config {
         this.numNodes = 8 * 8;
         this.maxCycles = 20000;
         this.maxPackets = -1;
-        this.routing = "odd_even";
+        this.routing = "oddEven";
         this.selection = "aco";
         this.traffic = "uniform";
 

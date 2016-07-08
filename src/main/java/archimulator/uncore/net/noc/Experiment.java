@@ -2,9 +2,6 @@ package archimulator.uncore.net.noc;
 
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
-import archimulator.uncore.net.noc.traffics.HotspotTrafficGenerator;
-import archimulator.uncore.net.noc.traffics.TransposeTrafficGenerator;
-import archimulator.uncore.net.noc.traffics.UniformTrafficGenerator;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.serialization.JsonSerializationHelper;
@@ -42,63 +39,7 @@ public class Experiment implements NoCSettings {
     public void run() {
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        Network<? extends Node, ? extends RoutingAlgorithm> network;
-
-        switch (this.config.getRouting()) {
-            case "xy":
-                network = NetworkFactory.xy(this, cycleAccurateEventQueue);
-                break;
-            case "oddEven":
-                switch (this.config.getSelection()) {
-                    case "random":
-                        network = NetworkFactory.random(this, cycleAccurateEventQueue);
-                        break;
-                    case "bufferLevel":
-                        network = NetworkFactory.bufferLevel(this, cycleAccurateEventQueue);
-                        break;
-                    case "neighborOnPath":
-                        network = NetworkFactory.neighborOnPath(this, cycleAccurateEventQueue);
-                        break;
-                    case "aco":
-                        network = NetworkFactory.aco(this, cycleAccurateEventQueue);
-                        break;
-                    default:
-                        throw new IllegalArgumentException();
-                }
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        switch (this.config.getTraffic()) {
-            case "uniform":
-                new UniformTrafficGenerator<>(
-                        network,
-                        this.config.getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
-                        this.config.getDataPacketSize(),
-                        this.config.getMaxPackets()
-                );
-                break;
-            case "transpose":
-                new TransposeTrafficGenerator<>(
-                        network,
-                        this.config.getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
-                        this.config.getDataPacketSize(),
-                        this.config.getMaxPackets()
-                );
-                break;
-            case "hotspot":
-                new HotspotTrafficGenerator<>(
-                        network,
-                        this.config.getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
-                        this.config.getDataPacketSize(),
-                        this.config.getMaxPackets()
-                );
-                break;
-        }
+        Network<? extends Node, ? extends RoutingAlgorithm> network = NetworkFactory.setupNetwork(this, cycleAccurateEventQueue);
 
         long beginTime = DateHelper.toTick(new Date());
 
