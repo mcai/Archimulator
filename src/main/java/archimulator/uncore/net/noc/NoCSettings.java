@@ -8,7 +8,7 @@ import java.util.Random;
  * @author Min Cai
  */
 public interface NoCSettings {
-    Config getConfig();
+    NoCConfig getConfig();
 
     Random getRandom();
 }

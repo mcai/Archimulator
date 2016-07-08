@@ -1,7 +1,8 @@
 package archimulator.uncore.net.noc.startup;
 
-import archimulator.uncore.net.noc.Experiment;
+import archimulator.uncore.net.noc.NoCExperiment;
 import archimulator.uncore.net.noc.routers.FlitState;
+import archimulator.util.plots.PlotHelper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.QuoteMode;
@@ -18,36 +19,36 @@ import java.util.List;
  * @author Min Cai
  */
 public class Analyze {
-    private static List<CSVField> fields = new ArrayList<>();
+    private static List<CSVField> csvFields = new ArrayList<>();
 
     static {
-        fields.add(new CSVField("Traffic", CSVFields::getTraffic));
-        fields.add(new CSVField("Data_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getDataPacketInjectionRate));
-        fields.add(new CSVField("Routing_Algorithm", CSVFields::getRouting));
-        fields.add(new CSVField("Selection_Policy", CSVFields::getSelection));
-        fields.add(new CSVField("Routing+Selection", CSVFields::getRoutingAndSelection));
-        fields.add(new CSVField("Ant_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getAntPacketInjectionRate));
-        fields.add(new CSVField("Alpha", CSVFields::getAcoSelectionAlpha));
-        fields.add(new CSVField("Reinforcement_Factor", CSVFields::getReinforcementFactor));
-        fields.add(new CSVField("Routing+Selection/Alpha/Reinforcement_Factor",
+        csvFields.add(new CSVField("Traffic", CSVFields::getTraffic));
+        csvFields.add(new CSVField("Data_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getDataPacketInjectionRate));
+        csvFields.add(new CSVField("Routing_Algorithm", CSVFields::getRouting));
+        csvFields.add(new CSVField("Selection_Policy", CSVFields::getSelection));
+        csvFields.add(new CSVField("Routing+Selection", CSVFields::getRoutingAndSelection));
+        csvFields.add(new CSVField("Ant_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getAntPacketInjectionRate));
+        csvFields.add(new CSVField("Alpha", CSVFields::getAcoSelectionAlpha));
+        csvFields.add(new CSVField("Reinforcement_Factor", CSVFields::getReinforcementFactor));
+        csvFields.add(new CSVField("Routing+Selection/Alpha/Reinforcement_Factor",
                 CSVFields::getRoutingAndSelectionAndAcoSelectionAlphaAndReinforcementFactor));
-        fields.add(new CSVField("Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
+        csvFields.add(new CSVField("Routing+Selection/Ant_Packet_Injection_Rate/Alpha/Reinforcement_Factor",
                 CSVFields::getRoutingAndSelectionAndAntPacketInjectionRateAndAcoSelectionAlphaAndReinforcementFactor));
-        fields.add(new CSVField("Simulation_Time", CSVFields::getSimulationTime));
-        fields.add(new CSVField("Total_Cycles", CSVFields::getTotalCycles));
-        fields.add(new CSVField("Packets_Transmitted", CSVFields::getNumPacketsTransmitted));
-        fields.add(new CSVField("Throughput_(packets/cycle/node)", CSVFields::getThroughput));
-        fields.add(new CSVField("Average_Packet_Delay_(cycles)", CSVFields::getAveragePacketDelay));
-        fields.add(new CSVField("Average_Packet_Hops", CSVFields::getAveragePacketHops));
-        fields.add(new CSVField("Payload_Packets_Transmitted", CSVFields::getNumPayloadPacketsTransmitted));
-        fields.add(new CSVField("Payload_Throughput_(packets/cycle/node)", CSVFields::getPayloadThroughput));
-        fields.add(new CSVField("Average_Payload_Packet_Delay_(cycles)", CSVFields::getAveragePayloadPacketDelay));
-        fields.add(new CSVField("Average_Payload_Packet_Hops", CSVFields::getAveragePayloadPacketHops));
+        csvFields.add(new CSVField("Simulation_Time", CSVFields::getSimulationTime));
+        csvFields.add(new CSVField("Total_Cycles", CSVFields::getTotalCycles));
+        csvFields.add(new CSVField("Packets_Transmitted", CSVFields::getNumPacketsTransmitted));
+        csvFields.add(new CSVField("Throughput_(packets/cycle/node)", CSVFields::getThroughput));
+        csvFields.add(new CSVField("Average_Packet_Delay_(cycles)", CSVFields::getAveragePacketDelay));
+        csvFields.add(new CSVField("Average_Packet_Hops", CSVFields::getAveragePacketHops));
+        csvFields.add(new CSVField("Payload_Packets_Transmitted", CSVFields::getNumPayloadPacketsTransmitted));
+        csvFields.add(new CSVField("Payload_Throughput_(packets/cycle/node)", CSVFields::getPayloadThroughput));
+        csvFields.add(new CSVField("Average_Payload_Packet_Delay_(cycles)", CSVFields::getAveragePayloadPacketDelay));
+        csvFields.add(new CSVField("Average_Payload_Packet_Hops", CSVFields::getAveragePayloadPacketHops));
 
         for (FlitState state : FlitState.values()) {
-            fields.add(new CSVField(String.format("Average_Flit_per_State_Delay::%s", state),
+            csvFields.add(new CSVField(String.format("Average_Flit_per_State_Delay::%s", state),
                     e -> CSVFields.getAverageFlitPerStateDelay(e, state)));
-            fields.add(new CSVField(String.format("Max_Flit_per_State_Delay::%s", state),
+            csvFields.add(new CSVField(String.format("Max_Flit_per_State_Delay::%s", state),
                     e -> CSVFields.getMaxFlitPerStateDelay(e, state)));
         }
     }
@@ -61,12 +62,15 @@ public class Analyze {
     }
 
     public static void analyzeTrafficsAndDataPacketInjectionRates() {
-        for (String traffic : Experiments.trafficsAndDataPacketInjectionRates.keySet()) {
-            Experiments.trafficsAndDataPacketInjectionRates.get(traffic).forEach(Experiment::loadStats);
-            toCsv(String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
-                    Experiments.trafficsAndDataPacketInjectionRates.get(traffic), fields);
+        for (String traffic : NoCExperiments.trafficsAndDataPacketInjectionRates.keySet()) {
+            NoCExperiments.trafficsAndDataPacketInjectionRates.get(traffic).forEach(NoCExperiment::loadStats);
+            toCsv(
+                    String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
+                    NoCExperiments.trafficsAndDataPacketInjectionRates.get(traffic),
+                    csvFields
+            );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_throughput.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -74,7 +78,7 @@ public class Analyze {
                     "Throughput_(packets/cycle/node)"
             );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_packet_delay.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -82,7 +86,7 @@ public class Analyze {
                     "Average_Packet_Delay_(cycles)"
             );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_packet_hops.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -90,7 +94,7 @@ public class Analyze {
                     "Average_Packet_Hops"
             );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_payload_throughput.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -98,7 +102,7 @@ public class Analyze {
                     "Payload_Throughput_(packets/cycle/node)"
             );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_payload_packet_delay.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -106,7 +110,7 @@ public class Analyze {
                     "Average_Payload_Packet_Delay_(cycles)"
             );
 
-            generatePlot(
+            PlotHelper.generatePlot(
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s.csv", traffic),
                     String.format("results/trafficsAndDataPacketInjectionRates/t_%s_average_payload_packet_hops.pdf", traffic),
                     "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -117,11 +121,14 @@ public class Analyze {
     }
 
     public static void analyzeAntPacketInjectionRates() {
-        Experiments.antPacketInjectionRates.forEach(Experiment::loadStats);
-        toCsv("results/antPacketInjectionRates/t_transpose.csv",
-                Experiments.antPacketInjectionRates, fields);
+        NoCExperiments.antPacketInjectionRates.forEach(NoCExperiment::loadStats);
+        toCsv(
+                "results/antPacketInjectionRates/t_transpose.csv",
+                NoCExperiments.antPacketInjectionRates,
+                csvFields
+        );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_throughput.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -129,7 +136,7 @@ public class Analyze {
                 "Throughput_(packets/cycle/node)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_average_packet_delay.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -137,7 +144,7 @@ public class Analyze {
                 "Average_Packet_Delay_(cycles)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_average_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -145,7 +152,7 @@ public class Analyze {
                 "Average_Packet_Hops"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_payload_throughput.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -153,7 +160,7 @@ public class Analyze {
                 "Payload_Throughput_(packets/cycle/node)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_average_payload_packet_delay.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -161,7 +168,7 @@ public class Analyze {
                 "Average_Payload_Packet_Delay_(cycles)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/antPacketInjectionRates/t_transpose.csv",
                 "results/antPacketInjectionRates/t_transpose_average_payload_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -171,11 +178,14 @@ public class Analyze {
     }
 
     public static void analyzeAcoSelectionAlphasAndReinforcementFactors() {
-        Experiments.acoSelectionAlphasAndReinforcementFactors.forEach(Experiment::loadStats);
-        toCsv("results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
-                Experiments.acoSelectionAlphasAndReinforcementFactors, fields);
+        NoCExperiments.acoSelectionAlphasAndReinforcementFactors.forEach(NoCExperiment::loadStats);
+        toCsv(
+                "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
+                NoCExperiments.acoSelectionAlphasAndReinforcementFactors,
+                csvFields
+        );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_throughput.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -183,7 +193,7 @@ public class Analyze {
                 "Throughput_(packets/cycle/node)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_packet_delay.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -191,7 +201,7 @@ public class Analyze {
                 "Average_Packet_Delay_(cycles)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -199,7 +209,7 @@ public class Analyze {
                 "Average_Packet_Hops"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_payload_throughput.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -207,7 +217,7 @@ public class Analyze {
                 "Payload_Throughput_(packets/cycle/node)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_payload_packet_delay.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -215,7 +225,7 @@ public class Analyze {
                 "Average_Payload_Packet_Delay_(cycles)"
         );
 
-        generatePlot(
+        PlotHelper.generatePlot(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose.csv",
                 "results/acoSelectionAlphasAndReinforcementFactors/t_transpose_average_payload_packet_hops.pdf",
                 "Data_Packet_Injection_Rate_(packets/cycle/node)",
@@ -224,7 +234,8 @@ public class Analyze {
         );
     }
 
-    public static void toCsv(String outputCSVFileName, List<Experiment> results, List<CSVField> fields) {
+    // TODO: generalize it!!!
+    public static void toCsv(String outputCSVFileName, List<NoCExperiment> results, List<CSVField> fields) {
         File resultDirFile = new File(outputCSVFileName).getParentFile();
 
         if (!resultDirFile.exists()) {
@@ -240,7 +251,7 @@ public class Analyze {
             CSVPrinter printer = new CSVPrinter(writer, format);
             printer.printRecord(fields);
 
-            for (Experiment experiment : results) {
+            for (NoCExperiment experiment : results) {
                 List<String> experimentData = new ArrayList<>();
 
                 for (CSVField field : fields) {
@@ -252,23 +263,6 @@ public class Analyze {
 
             printer.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void generatePlot(String csvFileName, String plotFileName, String x, String hue, String y) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "tools/plots/plots.sh",
-                    "--csv_file_name", csvFileName,
-                    "--plot_file_name", plotFileName,
-                    "--x", x,
-                    "--hue", hue,
-                    "--y", y
-            ).inheritIO();
-
-            pb.start().waitFor();
-        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

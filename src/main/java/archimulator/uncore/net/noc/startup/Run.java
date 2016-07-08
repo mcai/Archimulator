@@ -1,6 +1,6 @@
 package archimulator.uncore.net.noc.startup;
 
-import archimulator.uncore.net.noc.Experiment;
+import archimulator.uncore.net.noc.NoCExperiment;
 
 /**
  * Run.
@@ -9,12 +9,12 @@ import archimulator.uncore.net.noc.Experiment;
  */
 public class Run {
     public static void main(String[] args) {
-        for(String traffic : Experiments.trafficsAndDataPacketInjectionRates.keySet()) {
-            Experiment.runExperiments(Experiments.trafficsAndDataPacketInjectionRates.get(traffic), true);
+        for(String traffic : NoCExperiments.trafficsAndDataPacketInjectionRates.keySet()) {
+            NoCExperiment.runExperiments(NoCExperiments.trafficsAndDataPacketInjectionRates.get(traffic), true);
         }
 
-        Experiment.runExperiments(Experiments.antPacketInjectionRates, true);
+        NoCExperiment.runExperiments(NoCExperiments.antPacketInjectionRates, true);
 
-        Experiment.runExperiments(Experiments.acoSelectionAlphasAndReinforcementFactors, true);
+        NoCExperiment.runExperiments(NoCExperiments.acoSelectionAlphasAndReinforcementFactors, true);
     }
 }

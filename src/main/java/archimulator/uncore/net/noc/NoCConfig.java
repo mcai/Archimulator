@@ -5,7 +5,7 @@ package archimulator.uncore.net.noc;
  *
  * @author Min Cai
  */
-public class Config {
+public class NoCConfig {
     private boolean noDrain;
 
     private int randSeed;
@@ -42,7 +42,7 @@ public class Config {
     private double acoSelectionAlpha;
     private double reinforcementFactor;
 
-    public Config() {
+    public NoCConfig() {
         this.noDrain = true;
 
         this.randSeed = 13;

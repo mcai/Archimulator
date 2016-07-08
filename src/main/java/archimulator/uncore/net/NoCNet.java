@@ -20,7 +20,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
 
     private Network<? extends Node, ? extends RoutingAlgorithm> network;
 
-    private Config config;
+    private NoCConfig config;
 
     private Random random;
 
@@ -57,7 +57,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
             numNodes = (width + 1) * (width + 1);
         }
 
-        this.config = new Config();
+        this.config = new NoCConfig();
         this.config.setNumNodes(numNodes);
         this.config.setMaxInputBufferSize(this.memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
 
@@ -100,7 +100,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
     }
 
     @Override
-    public Config getConfig() {
+    public NoCConfig getConfig() {
         return config;
     }
 

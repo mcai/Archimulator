@@ -1,6 +1,6 @@
 package archimulator.uncore.net.noc.startup;
 
-import archimulator.uncore.net.noc.Experiment;
+import archimulator.uncore.net.noc.NoCExperiment;
 import archimulator.uncore.net.noc.util.Function;
 
 /**
@@ -11,9 +11,9 @@ import archimulator.uncore.net.noc.util.Function;
 public class CSVField {
     private String name;
 
-    private Function<String, Experiment> func;
+    private Function<String, NoCExperiment> func;
 
-    public CSVField(String name, Function<String, Experiment> func) {
+    public CSVField(String name, Function<String, NoCExperiment> func) {
         this.name = name;
         this.func = func;
     }
@@ -27,7 +27,7 @@ public class CSVField {
         return name;
     }
 
-    public Function<String, Experiment> getFunc() {
+    public Function<String, NoCExperiment> getFunc() {
         return func;
     }
 }

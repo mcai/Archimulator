@@ -1,16 +1,16 @@
 package archimulator.uncore.net.noc.startup;
 
-import archimulator.uncore.net.noc.Experiment;
+import archimulator.uncore.net.noc.NoCExperiment;
 
 import java.util.*;
 
 /**
- * Experiments.
+ * NoC Experiments.
  *
  * @author Min Cai
  */
-public class Experiments {
-    private static Map<String, List<Experiment>> testTrafficsAndDataPacketInjectionRates() {
+public class NoCExperiments {
+    private static Map<String, List<NoCExperiment>> testTrafficsAndDataPacketInjectionRates() {
         List<String> traffics = new ArrayList<>();
         traffics.add("uniform");
         traffics.add("transpose");
@@ -25,13 +25,13 @@ public class Experiments {
         double acoSelectionAlpha = 0.45;
         double reinforcementFactor = 0.001;
 
-        Map<String, List<Experiment>> experiments = new HashMap<>();
+        Map<String, List<NoCExperiment>> experiments = new HashMap<>();
 
         for(String traffic : traffics) {
             experiments.put(traffic, new ArrayList<>());
 
             for(double dataPacketInjectionRate : dataPacketInjectionRates) {
-                Experiment experimentXy = new Experiment();
+                NoCExperiment experimentXy = new NoCExperiment();
                 experimentXy.getConfig().setResultDir(String.format(
                         "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
                         traffic, dataPacketInjectionRate, "xy", "random"
@@ -42,7 +42,7 @@ public class Experiments {
                 experimentXy.getConfig().setSelection("random");
                 experiments.get(traffic).add(experimentXy);
 
-                Experiment experimentBufferLevel = new Experiment();
+                NoCExperiment experimentBufferLevel = new NoCExperiment();
                 experimentBufferLevel.getConfig().setResultDir(String.format(
                         "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
                         traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
@@ -53,7 +53,7 @@ public class Experiments {
                 experimentBufferLevel.getConfig().setSelection("bufferLevel");
                 experiments.get(traffic).add(experimentBufferLevel);
 
-                Experiment experimentAco = new Experiment();
+                NoCExperiment experimentAco = new NoCExperiment();
                 experimentAco.getConfig().setResultDir(String.format(
                         "results/trafficsAndDataPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
                         traffic, dataPacketInjectionRate, "oddEven", "aco",
@@ -73,7 +73,7 @@ public class Experiments {
         return experiments;
     }
 
-    private static List<Experiment> testAntPacketInjectionRates() {
+    private static List<NoCExperiment> testAntPacketInjectionRates() {
         String traffic = "transpose";
         double dataPacketInjectionRate = 0.060;
 
@@ -84,9 +84,9 @@ public class Experiments {
         double acoSelectionAlpha = 0.45;
         double reinforcementFactor = 0.001;
 
-        List<Experiment> experiments = new ArrayList<>();
+        List<NoCExperiment> experiments = new ArrayList<>();
 
-        Experiment experimentXy = new Experiment();
+        NoCExperiment experimentXy = new NoCExperiment();
         experimentXy.getConfig().setResultDir(String.format(
                 "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
                 traffic, dataPacketInjectionRate, "xy", "random"
@@ -97,7 +97,7 @@ public class Experiments {
         experimentXy.getConfig().setSelection("random");
         experiments.add(experimentXy);
 
-        Experiment experimentBufferLevel = new Experiment();
+        NoCExperiment experimentBufferLevel = new NoCExperiment();
         experimentBufferLevel.getConfig().setResultDir(String.format(
                 "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/",
                 traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
@@ -109,7 +109,7 @@ public class Experiments {
         experiments.add(experimentBufferLevel);
 
         for(double antPacketInjectionRate : antPacketInjectionRates) {
-            Experiment experimentAco = new Experiment();
+            NoCExperiment experimentAco = new NoCExperiment();
             experimentAco.getConfig().setResultDir(String.format(
                     "results/antPacketInjectionRates/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
                     traffic, dataPacketInjectionRate, "oddEven", "aco",
@@ -128,7 +128,7 @@ public class Experiments {
         return experiments;
     }
 
-    private static List<Experiment> testAcoSelectionAlphasAndReinforcementFactors() {
+    private static List<NoCExperiment> testAcoSelectionAlphasAndReinforcementFactors() {
         String traffic = "transpose";
         double dataPacketInjectionRate  = 0.060;
 
@@ -142,9 +142,9 @@ public class Experiments {
                 0.0005, 0.001, 0.002, 0.004, 0.008, 0.016, 0.032, 0.064
         );
 
-        List<Experiment> experiments = new ArrayList<>();
+        List<NoCExperiment> experiments = new ArrayList<>();
 
-        Experiment experimentXy = new Experiment();
+        NoCExperiment experimentXy = new NoCExperiment();
         experimentXy.getConfig().setResultDir(String.format(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
                 traffic, dataPacketInjectionRate, "xy", "random"
@@ -155,7 +155,7 @@ public class Experiments {
         experimentXy.getConfig().setSelection("random");
         experiments.add(experimentXy);
 
-        Experiment experimentBufferLevel = new Experiment();
+        NoCExperiment experimentBufferLevel = new NoCExperiment();
         experimentBufferLevel.getConfig().setResultDir(String.format(
                 "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/",
                 traffic, dataPacketInjectionRate, "oddEven", "bufferLevel"
@@ -168,7 +168,7 @@ public class Experiments {
 
         for(double acoSelectionAlpha : acoSelectionAlphas) {
             for(double reinforcementFactor : reinforcementFactors) {
-                Experiment experimentAco = new Experiment();
+                NoCExperiment experimentAco = new NoCExperiment();
                 experimentAco.getConfig().setResultDir(String.format(
                         "results/acoSelectionAlphasAndReinforcementFactors/t_%s/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
                         traffic, dataPacketInjectionRate, "oddEven", "aco",
@@ -188,7 +188,7 @@ public class Experiments {
         return experiments;
     }
 
-    public static Map<String, List<Experiment>> trafficsAndDataPacketInjectionRates = testTrafficsAndDataPacketInjectionRates();
-    public static List<Experiment> antPacketInjectionRates = testAntPacketInjectionRates();
-    public static List<Experiment> acoSelectionAlphasAndReinforcementFactors = testAcoSelectionAlphasAndReinforcementFactors();
+    public static Map<String, List<NoCExperiment>> trafficsAndDataPacketInjectionRates = testTrafficsAndDataPacketInjectionRates();
+    public static List<NoCExperiment> antPacketInjectionRates = testAntPacketInjectionRates();
+    public static List<NoCExperiment> acoSelectionAlphasAndReinforcementFactors = testAcoSelectionAlphasAndReinforcementFactors();
 }

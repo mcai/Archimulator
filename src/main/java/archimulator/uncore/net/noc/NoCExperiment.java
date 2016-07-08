@@ -17,22 +17,22 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class Experiment implements NoCSettings {
-    private Config config;
+public class NoCExperiment implements NoCSettings {
+    private NoCConfig config;
     private Map<String, Object> stats;
     private Random random;
 
-    public Experiment() {
-        this.config = new Config();
+    public NoCExperiment() {
+        this.config = new NoCConfig();
         this.stats = new LinkedHashMap<>();
         this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
     }
 
-    public static void runExperiments(List<Experiment> experiments, boolean parallel) {
+    public static void runExperiments(List<NoCExperiment> experiments, boolean parallel) {
         if(parallel) {
-            experiments.parallelStream().forEach(Experiment::run);
+            experiments.parallelStream().forEach(NoCExperiment::run);
         } else {
-            experiments.forEach(Experiment::run);
+            experiments.forEach(NoCExperiment::run);
         }
     }
 
@@ -130,7 +130,7 @@ public class Experiment implements NoCSettings {
     }
 
     @Override
-    public Config getConfig() {
+    public NoCConfig getConfig() {
         return config;
     }
 

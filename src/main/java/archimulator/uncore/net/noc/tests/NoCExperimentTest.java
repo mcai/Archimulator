@@ -1,6 +1,6 @@
 package archimulator.uncore.net.noc.tests;
 
-import archimulator.uncore.net.noc.Experiment;
+import archimulator.uncore.net.noc.NoCExperiment;
 import org.junit.Test;
 
 /**
@@ -8,7 +8,7 @@ import org.junit.Test;
  *
  * @author Min Cai
  */
-public class ExperimentTest {
+public class NoCExperimentTest {
     private double dataPacketInjectionRate = 0.060;
 
     private double antPacketInjectionRate = 0.001;
@@ -17,7 +17,7 @@ public class ExperimentTest {
 
     @Test
     public void testBufferLevel() {
-        Experiment experiment = new Experiment();
+        NoCExperiment experiment = new NoCExperiment();
         experiment.getConfig().setResultDir("test_results/buffer_level/");
         experiment.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experiment.getConfig().setTraffic(traffic);
@@ -28,7 +28,7 @@ public class ExperimentTest {
 
     @Test
     public void testAco() {
-        Experiment experiment = new Experiment();
+        NoCExperiment experiment = new NoCExperiment();
         experiment.getConfig().setResultDir("test_results/aco/");
         experiment.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experiment.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
