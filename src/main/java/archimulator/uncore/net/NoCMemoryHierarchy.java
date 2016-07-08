@@ -66,30 +66,136 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Repor
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
             Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network = net.getNetwork();
 
-            getChildren().add(new ReportNode(this, "numPacketsReceived", network.getNumPacketsReceived() + ""));
-            getChildren().add(new ReportNode(this, "numPacketsTransmitted", network.getNumPacketsTransmitted() + ""));
-            getChildren().add(new ReportNode(this, "throughput", network.throughput() + ""));
-            getChildren().add(new ReportNode(this, "averagePacketDelay", network.averagePacketDelay() + ""));
-            getChildren().add(new ReportNode(this, "averagePacketHops", network.averagePacketHops() + ""));
-            getChildren().add(new ReportNode(this, "maxPacketDelay", network.getMaxPacketDelay() + ""));
-            getChildren().add(new ReportNode(this, "maxPacketHops", network.getMaxPacketHops() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/numPacketsReceived",
+                            String.format("%d", network.getNumPacketsReceived())
+                    )
+            );
 
-            getChildren().add(new ReportNode(this, "numPayloadPacketsReceived", network.getNumPayloadPacketsReceived() + ""));
-            getChildren().add(new ReportNode(this, "numPayloadPacketsTransmitted", network.getNumPayloadPacketsTransmitted() + ""));
-            getChildren().add(new ReportNode(this, "payloadThroughput", network.payloadThroughput() + ""));
-            getChildren().add(new ReportNode(this, "averagePayloadPacketDelay", network.averagePayloadPacketDelay() + ""));
-            getChildren().add(new ReportNode(this, "averagePayloadPacketHops", network.averagePayloadPacketHops() + ""));
-            getChildren().add(new ReportNode(this, "maxPayloadPacketDelay", network.getMaxPayloadPacketDelay() + ""));
-            getChildren().add(new ReportNode(this, "maxPayloadPacketHops", network.getMaxPayloadPacketHops() + ""));
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/numPacketsTransmitted",
+                            String.format("%d", network.getNumPacketsTransmitted())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/throughput",
+                            String.format("%s", network.throughput())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/averagePacketDelay",
+                            String.format("%s", network.averagePacketDelay())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/averagePacketHops",
+                            String.format("%s", network.averagePacketHops())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/maxPacketDelay",
+                            String.format("%d", network.getMaxPacketDelay())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/maxPacketHops",
+                            String.format("%d", network.getMaxPacketHops())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/numPayloadPacketsReceived",
+                            String.format("%d", network.getNumPayloadPacketsReceived())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/numPayloadPacketsTransmitted",
+                            String.format("%d", network.getNumPayloadPacketsTransmitted())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/payloadThroughput",
+                            String.format("%s", network.payloadThroughput())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/averagePayloadPacketDelay",
+                            String.format("%s", network.averagePayloadPacketDelay())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/averagePayloadPacketHops",
+                            String.format("%s", network.averagePayloadPacketHops())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/maxPayloadPacketDelay",
+                            String.format("%d", network.getMaxPayloadPacketDelay())
+                    )
+            );
+
+            getChildren().add(
+                    new ReportNode(
+                            this,
+                            "noc/maxPayloadPacketHops",
+                            String.format("%d", network.getMaxPayloadPacketHops())
+                    )
+            );
 
             for(FlitState state : FlitState.values()) {
-                getChildren().add(new ReportNode(this, String.format("averageFlitPerStateDelay::%s", state),
-                        network.averageFlitPerStateDelay(state) + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("noc/averageFlitPerStateDelay::%s", state),
+                                String.format("%s", network.averageFlitPerStateDelay(state))
+                        )
+                );
             }
 
             for(FlitState state : FlitState.values()) {
-                getChildren().add(new ReportNode(this, String.format("maxFlitPerStateDelay::%s", state),
-                        network.getMaxFlitPerStateDelay().containsKey(state) ? network.getMaxFlitPerStateDelay().get(state) + "" : 0.0 + ""));
+                getChildren().add(
+                        new ReportNode(
+                                this,
+                                String.format("noc/maxFlitPerStateDelay::%s", state),
+                                network.getMaxFlitPerStateDelay().containsKey(state) ? String.format("%d", network.getMaxFlitPerStateDelay().get(state)) : String.format("%s", 0.0)
+                        )
+                );
             }
         }});
     }
