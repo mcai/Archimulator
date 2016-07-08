@@ -17,7 +17,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class NoCExperiment implements NoCSettings {
+public class NoCExperiment implements NoCSettings, NoCStats {
     private NoCConfig config;
     private Map<String, Object> stats;
     private Random random;
@@ -134,6 +134,7 @@ public class NoCExperiment implements NoCSettings {
         return config;
     }
 
+    @Override
     public Map<String, Object> getStats() {
         return stats;
     }
