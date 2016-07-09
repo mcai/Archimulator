@@ -111,7 +111,7 @@ public class ReportNode implements Serializable {
      * @return the path of the node
      */
     public String getPath() {
-        return (getParent() != null && !getParent().getKey().isEmpty() ? getParent().getPath() + "/" : "") + getKey();
+        return String.format("%s%s", getParent() != null && !getParent().getKey().isEmpty() ? getParent().getPath() + "/" : "", getKey());
     }
 
     /**
