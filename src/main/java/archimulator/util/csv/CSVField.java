@@ -1,6 +1,6 @@
 package archimulator.util.csv;
 
-import archimulator.uncore.net.noc.util.Function;
+import java.util.function.Function;
 
 /**
  * CSV field.
@@ -10,9 +10,9 @@ import archimulator.uncore.net.noc.util.Function;
 public class CSVField<ExperimentT> {
     private String name;
 
-    private Function<String, ExperimentT> func;
+    private Function<ExperimentT, String> func;
 
-    public CSVField(String name, Function<String, ExperimentT> func) {
+    public CSVField(String name, Function<ExperimentT, String> func) {
         this.name = name;
         this.func = func;
     }
@@ -26,7 +26,7 @@ public class CSVField<ExperimentT> {
         return name;
     }
 
-    public Function<String, ExperimentT> getFunc() {
+    public Function<ExperimentT, String> getFunc() {
         return func;
     }
 }
