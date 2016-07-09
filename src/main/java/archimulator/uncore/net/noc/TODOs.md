@@ -4,4 +4,4 @@
 
 * Helper thread programs, N-body problem code integration.
 
-stride prefetch vs. speculative precomputation @ n-body problem.
+* Stride prefetch vs. speculative precomputation @ n-body problem.
