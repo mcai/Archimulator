@@ -23,7 +23,6 @@ package archimulator.uncore;
 import archimulator.common.BasicSimulationObject;
 import archimulator.common.SimulationObject;
 import archimulator.uncore.cache.MemoryDeviceType;
-import archimulator.util.action.Action;
 
 import java.io.Serializable;
 
@@ -59,7 +58,7 @@ public abstract class MemoryDevice extends BasicSimulationObject implements Simu
      * @param size   the size of the message to be transferred
      * @param action the callback action performed when the message arrives at the destination
      */
-    public void transfer(MemoryDevice to, int size, Action action) {
+    public void transfer(MemoryDevice to, int size, Runnable action) {
         this.getMemoryHierarchy().getNet(this, to).transfer(this, to, size, action);
     }
 

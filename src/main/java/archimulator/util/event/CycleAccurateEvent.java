@@ -20,8 +20,6 @@
  */
 package archimulator.util.event;
 
-import archimulator.util.action.Action;
-
 /**
  * Cycle accurate event.
  *
@@ -29,7 +27,7 @@ import archimulator.util.action.Action;
  */
 public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
     private Object sender;
-    private Action action;
+    private Runnable action;
     private long scheduledTime;
     private long when;
     private long id;
@@ -42,7 +40,7 @@ public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
      * @param action the action that is to be performed when the event takes place
      * @param when   the cycle at which the event takes place
      */
-    public CycleAccurateEvent(CycleAccurateEventQueue parent, Object sender, Action action, long when) {
+    public CycleAccurateEvent(CycleAccurateEventQueue parent, Object sender, Runnable action, long when) {
         this.id = parent.currentId++;
         this.sender = sender;
         this.action = action;
@@ -99,7 +97,7 @@ public class CycleAccurateEvent implements Comparable<CycleAccurateEvent> {
      *
      * @return the action that is to be performed when the event takes place
      */
-    public Action getAction() {
+    public Runnable getAction() {
         return action;
     }
 

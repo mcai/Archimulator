@@ -22,7 +22,6 @@ package archimulator.uncore.coherence.msi.flow;
 
 import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.coherence.msi.controller.CacheController;
-import archimulator.util.action.Action;
 
 /**
  * Store flow.
@@ -30,7 +29,7 @@ import archimulator.util.action.Action;
  * @author Min Cai
  */
 public class StoreFlow extends CacheCoherenceFlow {
-    private Action onCompletedCallback;
+    private Runnable onCompletedCallback;
 
     /**
      * Create a store flow.
@@ -40,11 +39,11 @@ public class StoreFlow extends CacheCoherenceFlow {
      * @param onCompletedCallback the callback action performed when the store flow is completed
      * @param access              the memory hierarchy access
      */
-    public StoreFlow(final CacheController generator, int tag, final Action onCompletedCallback, MemoryHierarchyAccess access) {
+    public StoreFlow(final CacheController generator, int tag, final Runnable onCompletedCallback, MemoryHierarchyAccess access) {
         super(generator, null, access, tag);
 
         this.onCompletedCallback = () -> {
-            onCompletedCallback.apply();
+            onCompletedCallback.run();
             onCompleted();
         };
     }
@@ -54,7 +53,7 @@ public class StoreFlow extends CacheCoherenceFlow {
      *
      * @return the callback action performed when the store flow is completed
      */
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 

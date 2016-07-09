@@ -23,7 +23,6 @@ package archimulator.core.functionalUnit;
 import archimulator.common.Named;
 import archimulator.core.AbstractBasicCore;
 import archimulator.core.ReorderBufferEntry;
-import archimulator.util.action.Action;
 
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -107,7 +106,7 @@ public class FunctionalUnitPool implements Named {
      * @param onCompletedCallback the callback action performed when the operation is completed
      * @return a value indicating whether the acquiring succeeds or not
      */
-    public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Action onCompletedCallback) {
+    public boolean acquire(final ReorderBufferEntry reorderBufferEntry, final Runnable onCompletedCallback) {
         FunctionalUnitOperationType functionalUnitOperationType = reorderBufferEntry.getDynamicInstruction().getStaticInstruction().getMnemonic().getFunctionalUnitOperationType();
         FunctionalUnitType functionalUnitType = this.functionalUnitOperationToFunctionalUnitMap.get(functionalUnitOperationType);
         FunctionalUnitOperation functionalUnitOperation = this.descriptors.get(functionalUnitType).getOperations().get(functionalUnitOperationType);
@@ -127,7 +126,7 @@ public class FunctionalUnitPool implements Named {
                 .schedule(this, () -> functionalUnitDescriptor.setNumFree(functionalUnitDescriptor.getNumFree() + 1), functionalUnitOperation.getIssueLatency())
                 .schedule(this, () -> {
                     if (!reorderBufferEntry.isSquashed()) {
-                        onCompletedCallback.apply();
+                        onCompletedCallback.run();
                     }
                 }, functionalUnitOperation.getOperationLatency());
 

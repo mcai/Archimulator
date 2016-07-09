@@ -24,7 +24,6 @@ import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.coherence.msi.controller.L1DController;
 import archimulator.uncore.coherence.msi.controller.L1IController;
-import archimulator.util.action.Action;
 
 /**
  * Memory hierarchy core.
@@ -67,7 +66,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the instruction fetch is completed
      */
-    void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a load at the specified address.
@@ -77,7 +76,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the load is completed
      */
-    void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a store at the specified address.
@@ -87,7 +86,7 @@ public interface MemoryHierarchyCore extends SimulationObject, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the store is completed
      */
-    void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Do measurement for one cycle.

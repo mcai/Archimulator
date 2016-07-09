@@ -24,7 +24,6 @@ import archimulator.core.functionalUnit.FunctionalUnitPool;
 import archimulator.uncore.MemoryAccessInitiatedEvent;
 import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.MemoryHierarchyAccessType;
-import archimulator.util.action.Action;
 import archimulator.util.math.Counter;
 
 import java.util.ArrayList;
@@ -188,7 +187,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
     }
 
     @Override
-    public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+    public void ifetch(Thread thread, int virtualAddress, int virtualPc, final Runnable onCompletedCallback) {
         final int physicalAddress = thread.getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.getL1IController().getCache().getTag(physicalAddress);
 
@@ -201,7 +200,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
             counterPending.decrement();
 
             if (counterPending.getValue() == 0) {
-                onCompletedCallback.apply();
+                onCompletedCallback.run();
             }
         });
 
@@ -212,7 +211,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
                 counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
+                    onCompletedCallback.run();
                 }
             });
 
@@ -223,7 +222,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
     }
 
     @Override
-    public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+    public void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Runnable onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.getL1DController().getCache().getTag(physicalAddress);
 
@@ -232,13 +231,11 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
         counterPending.increment();
 
         MemoryHierarchyAccess alias = this.getL1DController().findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, new Action() {
-            public void apply() {
-                counterPending.decrement();
+        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.LOAD, virtualPc, physicalAddress, physicalTag, () -> {
+            counterPending.decrement();
 
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
+            if (counterPending.getValue() == 0) {
+                onCompletedCallback.run();
             }
         });
 
@@ -249,7 +246,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
                 counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
+                    onCompletedCallback.run();
                 }
             });
 
@@ -260,7 +257,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
     }
 
     @Override
-    public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Action onCompletedCallback) {
+    public void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, final Runnable onCompletedCallback) {
         final int physicalAddress = dynamicInstruction.getThread().getContext().getProcess().getMemory().getPhysicalAddress(virtualAddress);
         final int physicalTag = this.getL1DController().getCache().getTag(physicalAddress);
 
@@ -269,13 +266,11 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
         counterPending.increment();
 
         MemoryHierarchyAccess alias = this.getL1DController().findAccess(physicalTag);
-        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, new Action() {
-            public void apply() {
-                counterPending.decrement();
+        MemoryHierarchyAccess access = this.getL1DController().beginAccess(dynamicInstruction, dynamicInstruction.getThread(), MemoryHierarchyAccessType.STORE, virtualPc, physicalAddress, physicalTag, () -> {
+            counterPending.decrement();
 
-                if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
-                }
+            if (counterPending.getValue() == 0) {
+                onCompletedCallback.run();
             }
         });
 
@@ -286,7 +281,7 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
                 counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
+                    onCompletedCallback.run();
                 }
             });
 
@@ -312,17 +307,17 @@ public abstract class AbstractBasicCore extends AbstractMemoryHierarchyCore impl
     }
 
     @Override
-    public void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         ifetch((Thread)thread, virtualAddress, virtualPc, onCompletedCallback);
     }
 
     @Override
-    public void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         load((DynamicInstruction)dynamicInstruction, virtualAddress, virtualPc, onCompletedCallback);
     }
 
     @Override
-    public void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         store((DynamicInstruction)dynamicInstruction, virtualAddress, virtualPc, onCompletedCallback);
     }
 

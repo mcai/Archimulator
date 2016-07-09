@@ -22,7 +22,6 @@ package archimulator.uncore;
 
 import archimulator.core.DynamicInstruction;
 import archimulator.core.Thread;
-import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class MemoryHierarchyAccess {
     private int physicalAddress;
     private int physicalTag;
 
-    private Action onCompletedCallback;
+    private Runnable onCompletedCallback;
     private List<MemoryHierarchyAccess> aliases;
 
     private long beginCycle;
@@ -59,7 +58,7 @@ public class MemoryHierarchyAccess {
      * @param physicalTag         the physical tag of the data under access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
+    public MemoryHierarchyAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Runnable onCompletedCallback) {
         this.id = thread.getSimulation().currentMemoryHierarchyAccessId++;
 
         this.dynamicInstruction = dynamicInstruction;
@@ -82,7 +81,7 @@ public class MemoryHierarchyAccess {
      */
     public void complete() {
         this.endCycle = this.thread.getCycleAccurateEventQueue().getCurrentCycle();
-        this.onCompletedCallback.apply();
+        this.onCompletedCallback.run();
         this.onCompletedCallback = null;
     }
 

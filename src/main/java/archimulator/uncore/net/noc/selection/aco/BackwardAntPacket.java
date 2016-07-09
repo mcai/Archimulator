@@ -1,10 +1,9 @@
 package archimulator.uncore.net.noc.selection.aco;
 
 import archimulator.uncore.net.noc.Network;
-import archimulator.util.action.Action;
 
 public class BackwardAntPacket extends AntPacket {
-    public BackwardAntPacket(Network network, int src, int dest, int size, Action onCompletedCallback) {
+    public BackwardAntPacket(Network network, int src, int dest, int size, Runnable onCompletedCallback) {
         super(network, src, dest, size, false, onCompletedCallback);
     }
 

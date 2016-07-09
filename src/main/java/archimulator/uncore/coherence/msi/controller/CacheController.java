@@ -37,7 +37,6 @@ import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachine;
 import archimulator.uncore.coherence.msi.fsm.CacheControllerFiniteStateMachineFactory;
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
-import archimulator.util.action.Action;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -120,7 +119,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onCompletedCallback the callback action performed when the memory hierarchy access is completed
      * @return the newly created memory hierarchy access
      */
-    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Action onCompletedCallback) {
+    public MemoryHierarchyAccess beginAccess(DynamicInstruction dynamicInstruction, Thread thread, MemoryHierarchyAccessType type, int virtualPc, int physicalAddress, int physicalTag, Runnable onCompletedCallback) {
         MemoryHierarchyAccess newAccess = new MemoryHierarchyAccess(dynamicInstruction, thread, type, virtualPc, physicalAddress, physicalTag, onCompletedCallback);
 
         MemoryHierarchyAccess access = this.findAccess(physicalTag);
@@ -159,7 +158,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param access              the memory hierarchy access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void receiveIfetch(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
+    public void receiveIfetch(final MemoryHierarchyAccess access, final Runnable onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(
                 this,
                 () -> onLoad(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
@@ -172,7 +171,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param access              the memory hierarchy access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void receiveLoad(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
+    public void receiveLoad(final MemoryHierarchyAccess access, final Runnable onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(
                 this,
                 () -> onLoad(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
@@ -185,7 +184,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param access              the memory hierarchy access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void receiveStore(final MemoryHierarchyAccess access, final Action onCompletedCallback) {
+    public void receiveStore(final MemoryHierarchyAccess access, final Runnable onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(
                 this,
                 () -> onStore(access, access.getPhysicalTag(), onCompletedCallback), this.getHitLatency()
@@ -251,7 +250,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void onLoad(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
+    public void onLoad(MemoryHierarchyAccess access, int tag, Runnable onCompletedCallback) {
         onLoad(access, tag, new LoadFlow(this, tag, onCompletedCallback, access));
     }
 
@@ -263,7 +262,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param loadFlow the load flow
      */
     private void onLoad(final MemoryHierarchyAccess access, final int tag, final LoadFlow loadFlow) {
-        final Action onStalledCallback = () -> onLoad(access, tag, loadFlow);
+        final Runnable onStalledCallback = () -> onLoad(access, tag, loadFlow);
 
         this.access(loadFlow, access, tag, (set, way) -> {
             CacheLine<CacheControllerState> line = getCache().getLine(set, way);
@@ -279,7 +278,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void onStore(MemoryHierarchyAccess access, int tag, Action onCompletedCallback) {
+    public void onStore(MemoryHierarchyAccess access, int tag, Runnable onCompletedCallback) {
         onStore(access, tag, new StoreFlow(this, tag, onCompletedCallback, access));
     }
 
@@ -291,7 +290,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param storeFlow the associated store flow
      */
     private void onStore(final MemoryHierarchyAccess access, final int tag, final StoreFlow storeFlow) {
-        final Action onStalledCallback = () -> onStore(access, tag, storeFlow);
+        final Runnable onStalledCallback = () -> onStore(access, tag, storeFlow);
 
         this.access(storeFlow, access, tag, (set, way) -> {
             CacheLine<CacheControllerState> line = getCache().getLine(set, way);
@@ -393,7 +392,7 @@ public abstract class CacheController extends GeneralCacheController<CacheContro
      * @param onReplacementCompletedCallback the callback action performed when the line replacement is completed
      * @param onReplacementStalledCallback   the callback action performed when the line replacement is stalled
      */
-    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Runnable onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
         final CacheAccess<CacheControllerState> cacheAccess = this.getCache().newAccess(access, tag);

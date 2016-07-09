@@ -25,7 +25,6 @@ import archimulator.uncore.cache.CacheAccess;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
-import archimulator.util.action.Action;
 
 /**
  * The event fired when the directory controller performs a line replacement.
@@ -36,8 +35,8 @@ public class ReplacementEvent extends DirectoryControllerEvent {
     private CacheAccess<DirectoryControllerState> cacheAccess;
     private int set;
     private int way;
-    private Action onCompletedCallback;
-    private Action onStalledCallback;
+    private Runnable onCompletedCallback;
+    private Runnable onStalledCallback;
 
     /**
      * Create an event when the directory controller performs a line replacement.
@@ -52,7 +51,7 @@ public class ReplacementEvent extends DirectoryControllerEvent {
      * @param onStalledCallback   the callback action performed when the line replacement is stalled
      * @param access              the memory hierarchy access
      */
-    public ReplacementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<DirectoryControllerState> cacheAccess, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
+    public ReplacementEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, int tag, CacheAccess<DirectoryControllerState> cacheAccess, int set, int way, Runnable onCompletedCallback, Runnable onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.REPLACEMENT, access, tag);
         this.cacheAccess = cacheAccess;
         this.set = set;
@@ -93,7 +92,7 @@ public class ReplacementEvent extends DirectoryControllerEvent {
      *
      * @return the callback action performed when the line replacement is completed
      */
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
@@ -102,7 +101,7 @@ public class ReplacementEvent extends DirectoryControllerEvent {
      *
      * @return the callback action performed when the line replacement is stalled
      */
-    public Action getOnStalledCallback() {
+    public Runnable getOnStalledCallback() {
         return onStalledCallback;
     }
 

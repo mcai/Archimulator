@@ -2,7 +2,6 @@ package archimulator.uncore.net.noc;
 
 import archimulator.uncore.net.noc.routers.Flit;
 import archimulator.util.Pair;
-import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +24,13 @@ public abstract class Packet {
 
     private int size;
 
-    private Action onCompletedCallback;
+    private Runnable onCompletedCallback;
 
     private List<Pair<Integer, Long>> memory;
 
     private List<Flit> flits;
 
-    public Packet(Network network, int src, int dest, int size, Action onCompletedCallback) {
+    public Packet(Network network, int src, int dest, int size, Runnable onCompletedCallback) {
         this.network = network;
 
         this.id = this.network.currentPacketId++;
@@ -118,7 +117,7 @@ public abstract class Packet {
         return size;
     }
 
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 

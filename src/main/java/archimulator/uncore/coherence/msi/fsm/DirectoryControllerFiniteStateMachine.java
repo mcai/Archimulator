@@ -32,7 +32,6 @@ import archimulator.uncore.coherence.msi.flow.CacheCoherenceFlow;
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.util.ValueProvider;
-import archimulator.util.action.Action;
 import archimulator.util.fsm.BasicFiniteStateMachine;
 import archimulator.util.fsm.event.ExitStateEvent;
 
@@ -53,9 +52,9 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
 
     private int numRecallAcks;
 
-    private List<Action> stalledEvents;
+    private List<Runnable> stalledEvents;
 
-    private Action onCompletedCallback;
+    private Runnable onCompletedCallback;
 
     private int evicterTag;
 
@@ -90,7 +89,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag               the tag
      * @param onStalledCallback the callback action performed when the event is stalled
      */
-    public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Action onStalledCallback) {
+    public void onEventGetS(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Runnable onStalledCallback) {
         GetSEvent getSEvent = new GetSEvent(this.directoryController, producerFlow, requester, tag, set, way, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(requester + "." + String.format("0x%08x", tag), getSEvent);
     }
@@ -103,7 +102,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param tag               the tag
      * @param onStalledCallback the callback action performed when the event is stalled
      */
-    public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Action onStalledCallback) {
+    public void onEventGetM(CacheCoherenceFlow producerFlow, CacheController requester, int tag, Runnable onStalledCallback) {
         GetMEvent getMEvent = new GetMEvent(this.directoryController, producerFlow, requester, tag, set, way, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(requester + "." + String.format("0x%08x", tag), getMEvent);
     }
@@ -118,7 +117,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      * @param onCompletedCallback the callback action performed when the replacement is completed
      * @param onStalledCallback   the callback action performed when the replacement is stalled
      */
-    public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController requester, int tag, CacheAccess<DirectoryControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventReplacement(CacheCoherenceFlow producerFlow, CacheController requester, int tag, CacheAccess<DirectoryControllerState> cacheAccess, Runnable onCompletedCallback, Runnable onStalledCallback) {
         ReplacementEvent replacementEvent = new ReplacementEvent(this.directoryController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(requester + "." + String.format("0x%08x", tag), replacementEvent);
     }
@@ -226,7 +225,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      *
      * @param action the callback action performed when the stall is awaken
      */
-    public void stall(Action action) {
+    public void stall(Runnable action) {
         stalledEvents.add(action);
     }
 
@@ -587,7 +586,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      *
      * @return the list of stalled events
      */
-    public List<Action> getStalledEvents() {
+    public List<Runnable> getStalledEvents() {
         return stalledEvents;
     }
 
@@ -596,7 +595,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      *
      * @return the callback action performed when the pending event is completed
      */
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
@@ -605,7 +604,7 @@ public class DirectoryControllerFiniteStateMachine extends BasicFiniteStateMachi
      *
      * @param onCompletedCallback the callback action performed when the pending event is completed
      */
-    public void setOnCompletedCallback(Action onCompletedCallback) {
+    public void setOnCompletedCallback(Runnable onCompletedCallback) {
         if (this.onCompletedCallback != null && onCompletedCallback != null) {
             throw new IllegalArgumentException();
         }

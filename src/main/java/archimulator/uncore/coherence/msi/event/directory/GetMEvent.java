@@ -24,7 +24,6 @@ import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.coherence.msi.controller.CacheController;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
 import archimulator.uncore.coherence.msi.flow.CacheCoherenceFlow;
-import archimulator.util.action.Action;
 
 /**
  * The event fired when the directory controller receives a "GetM" message.
@@ -35,7 +34,7 @@ public class GetMEvent extends DirectoryControllerEvent {
     private CacheController requester;
     private int set;
     private int way;
-    private Action onStalledCallback;
+    private Runnable onStalledCallback;
 
     /**
      * Create an event when the directory controller receives a "GetM" message.
@@ -49,7 +48,7 @@ public class GetMEvent extends DirectoryControllerEvent {
      * @param onStalledCallback the callback action performed when the access is stalled
      * @param access            the memory hierarchy access
      */
-    public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, int set, int way, Action onStalledCallback, MemoryHierarchyAccess access) {
+    public GetMEvent(DirectoryController generator, CacheCoherenceFlow producerFlow, CacheController requester, int tag, int set, int way, Runnable onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, DirectoryControllerEventType.GETM, access, tag);
         this.requester = requester;
         this.set = set;
@@ -89,7 +88,7 @@ public class GetMEvent extends DirectoryControllerEvent {
      *
      * @return the callback action performed when the access is stalled
      */
-    public Action getOnStalledCallback() {
+    public Runnable getOnStalledCallback() {
         return onStalledCallback;
     }
 

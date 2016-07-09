@@ -22,7 +22,6 @@ package archimulator.uncore.dram;
 
 import archimulator.common.SimulationEvent;
 import archimulator.uncore.MemoryHierarchy;
-import archimulator.util.action.Action;
 import archimulator.util.math.Counter;
 
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class BasicMemoryController extends MemoryController {
         private class PendingAccess {
             private int row;
             private boolean contiguous;
-            private Action onCompletedCallback;
+            private Runnable onCompletedCallback;
 
             /**
              * Create a pending access on the specified row of the bank.
@@ -68,7 +67,7 @@ public class BasicMemoryController extends MemoryController {
              * @param contiguous          a value indicating whether access is contiguous or not
              * @param onCompletedCallback the callback action performed when the access is completed
              */
-            private PendingAccess(int row, boolean contiguous, Action onCompletedCallback) {
+            private PendingAccess(int row, boolean contiguous, Runnable onCompletedCallback) {
                 this.row = row;
                 this.contiguous = contiguous;
                 this.onCompletedCallback = onCompletedCallback;
@@ -78,7 +77,7 @@ public class BasicMemoryController extends MemoryController {
              * Complete the pending access.
              */
             private void complete() {
-                this.onCompletedCallback.apply();
+                this.onCompletedCallback.run();
             }
         }
 
@@ -100,10 +99,10 @@ public class BasicMemoryController extends MemoryController {
          *
          * @param onCompletedCallback the callback action performed when the precharge is completed
          */
-        private void precharge(final Action onCompletedCallback) {
+        private void precharge(final Runnable onCompletedCallback) {
             getCycleAccurateEventQueue().schedule(this, () -> {
                 status = BankStatus.PRECHARGED;
-                onCompletedCallback.apply();
+                onCompletedCallback.run();
             }, getClosedLatency());
         }
 
@@ -130,7 +129,7 @@ public class BasicMemoryController extends MemoryController {
          * @param contiguous          a value indicating whether the access is contiguous or not
          * @param onCompletedCallback the callback action performed when the access is completed
          */
-        private void beginAccess(int row, boolean contiguous, Action onCompletedCallback) {
+        private void beginAccess(int row, boolean contiguous, Runnable onCompletedCallback) {
             final PendingAccess pendingAccess = new PendingAccess(row, contiguous, onCompletedCallback);
             this.pendingAccesses.add(pendingAccess);
 
@@ -146,7 +145,7 @@ public class BasicMemoryController extends MemoryController {
          * @param contiguous          a value indicating whether the access is contiguous or not
          * @param onCompletedCallback the callback action performed when the access is completed
          */
-        private void access(final int row, final boolean contiguous, final Action onCompletedCallback) {
+        private void access(final int row, final boolean contiguous, final Runnable onCompletedCallback) {
             if (this.status == BankStatus.CLOSED) {
                 this.precharge(() -> access(row, contiguous, onCompletedCallback));
             } else {
@@ -279,7 +278,7 @@ public class BasicMemoryController extends MemoryController {
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
-    protected void access(int address, final Action onCompletedCallback) {
+    protected void access(int address, final Runnable onCompletedCallback) {
         final Counter counterPending = new Counter(0);
 
         int offset = 0;
@@ -294,7 +293,7 @@ public class BasicMemoryController extends MemoryController {
                 counterPending.decrement();
 
                 if (counterPending.getValue() == 0) {
-                    onCompletedCallback.apply();
+                    onCompletedCallback.run();
                 }
             }), this.getToDramLatency());
 
@@ -310,7 +309,7 @@ public class BasicMemoryController extends MemoryController {
      * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    private void accessDram(final int address, final Action onCompletedCallback) {
+    private void accessDram(final int address, final Runnable onCompletedCallback) {
         final int targetRow = (address >> this.rowBits) / this.getNumBanks();
         final int targetBank = (address >> this.rowBits) % this.getNumBanks();
 

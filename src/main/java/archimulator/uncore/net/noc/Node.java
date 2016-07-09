@@ -76,7 +76,7 @@ public abstract class Node {
         this.network.logPacketTransmitted(packet);
 
         if(packet.getOnCompletedCallback() != null) {
-            packet.getOnCompletedCallback().apply();
+            packet.getOnCompletedCallback().run();
         }
     }
 

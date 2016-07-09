@@ -7,7 +7,6 @@ import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.net.noc.*;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
-import archimulator.util.action.Action;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +66,7 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
     }
 
     @Override
-    public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Action onCompletedCallback) {
+    public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Runnable onCompletedCallback) {
         int src = this.devicesToNodeIds.get(deviceFrom);
         int dest = this.devicesToNodeIds.get(deviceTo);
 

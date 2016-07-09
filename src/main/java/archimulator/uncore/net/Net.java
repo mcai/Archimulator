@@ -22,7 +22,6 @@ package archimulator.uncore.net;
 
 import archimulator.common.SimulationObject;
 import archimulator.uncore.MemoryDevice;
-import archimulator.util.action.Action;
 
 /**
  * Net.
@@ -38,5 +37,5 @@ public interface Net extends SimulationObject {
      * @param size                the size
      * @param onCompletedCallback the callback action performed when the transfer is completed
      */
-    void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Action onCompletedCallback);
+    void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Runnable onCompletedCallback);
 }

@@ -1,7 +1,6 @@
 package archimulator.core;
 
 import archimulator.common.report.ReportNode;
-import archimulator.util.action.Action;
 
 /**
  * Basic memory hierarchy core.
@@ -38,19 +37,19 @@ public class BasicMemoryHierarchyCore extends AbstractMemoryHierarchyCore {
     }
 
     @Override
-    public void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void ifetch(MemoryHierarchyThread thread, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         //TODO
 
     }
 
     @Override
-    public void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void load(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         //TODO
 
     }
 
     @Override
-    public void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback) {
+    public void store(MemoryHierarchyDynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback) {
         //TODO
 
     }

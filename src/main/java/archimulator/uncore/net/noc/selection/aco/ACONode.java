@@ -52,7 +52,7 @@ public class ACONode extends Node {
             this.getNetwork().logPacketTransmitted(packet);
 
             if (packet.getOnCompletedCallback() != null) {
-                packet.getOnCompletedCallback().apply();
+                packet.getOnCompletedCallback().run();
             }
         } else {
             super.handleDestArrived(packet, inputVirtualChannel);

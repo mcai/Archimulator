@@ -23,7 +23,6 @@ package archimulator.uncore.coherence.msi.event.cache;
 import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.coherence.msi.controller.CacheController;
 import archimulator.uncore.coherence.msi.flow.CacheCoherenceFlow;
-import archimulator.util.action.Action;
 
 /**
  * The event fired when an L1 cache controller receives a "store" memory hierarchy access.
@@ -33,8 +32,8 @@ import archimulator.util.action.Action;
 public class StoreEvent extends CacheControllerEvent {
     private int set;
     private int way;
-    private Action onCompletedCallback;
-    private Action onStalledCallback;
+    private Runnable onCompletedCallback;
+    private Runnable onStalledCallback;
 
     /**
      * Create an event when an L1 cache controller receives a "store" memory hierarchy access.
@@ -48,7 +47,7 @@ public class StoreEvent extends CacheControllerEvent {
      * @param onStalledCallback   the callback action performed when the access is stalled
      * @param access              the memory hierarchy access
      */
-    public StoreEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Action onCompletedCallback, Action onStalledCallback, MemoryHierarchyAccess access) {
+    public StoreEvent(CacheController generator, CacheCoherenceFlow producerFlow, int tag, int set, int way, Runnable onCompletedCallback, Runnable onStalledCallback, MemoryHierarchyAccess access) {
         super(generator, producerFlow, CacheControllerEventType.STORE, access, tag);
 
         this.set = set;
@@ -80,7 +79,7 @@ public class StoreEvent extends CacheControllerEvent {
      *
      * @return the callback action performed when the access is completed
      */
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
@@ -89,7 +88,7 @@ public class StoreEvent extends CacheControllerEvent {
      *
      * @return the callback action performed when the access is stalled
      */
-    public Action getOnStalledCallback() {
+    public Runnable getOnStalledCallback() {
         return onStalledCallback;
     }
 

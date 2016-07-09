@@ -36,7 +36,6 @@ import archimulator.uncore.coherence.msi.flow.StoreFlow;
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.CacheControllerState;
 import archimulator.util.ValueProvider;
-import archimulator.util.action.Action;
 import archimulator.util.fsm.BasicFiniteStateMachine;
 import archimulator.util.fsm.event.ExitStateEvent;
 
@@ -56,9 +55,9 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
 
     private int numInvAcks;
 
-    private List<Action> stalledEvents = new ArrayList<>();
+    private List<Runnable> stalledEvents = new ArrayList<>();
 
-    private Action onCompletedCallback;
+    private Runnable onCompletedCallback;
 
     /**
      * Create an L1 cache controller finite state machine.
@@ -85,7 +84,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param onCompletedCallback the callback action performed when the event is completed
      * @param onStalledCallback   the callback action performed when the event is stalled
      */
-    public void onEventLoad(LoadFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventLoad(LoadFlow producerFlow, int tag, Runnable onCompletedCallback, Runnable onStalledCallback) {
         LoadEvent loadEvent = new LoadEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), loadEvent);
     }
@@ -98,7 +97,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param onCompletedCallback the callback action performed when the event is completed
      * @param onStalledCallback   the callback action performed when the event is stalled
      */
-    public void onEventStore(StoreFlow producerFlow, int tag, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventStore(StoreFlow producerFlow, int tag, Runnable onCompletedCallback, Runnable onStalledCallback) {
         StoreEvent storeEvent = new StoreEvent(cacheController, producerFlow, tag, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), storeEvent);
     }
@@ -112,7 +111,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      * @param onCompletedCallback the callback action performed when the replacement is completed
      * @param onStalledCallback   the callback action performed when the replacement is stalled
      */
-    public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, Action onCompletedCallback, Action onStalledCallback) {
+    public void onEventReplacement(CacheCoherenceFlow producerFlow, int tag, CacheAccess<CacheControllerState> cacheAccess, Runnable onCompletedCallback, Runnable onStalledCallback) {
         ReplacementEvent replacementEvent = new ReplacementEvent(cacheController, producerFlow, tag, cacheAccess, set, way, onCompletedCallback, onStalledCallback, producerFlow.getAccess());
         this.fireTransition(producerFlow.getAccess().getThread().getName() + "." + String.format("0x%08x", tag), replacementEvent);
     }
@@ -366,7 +365,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      *
      * @param action the callback action performed when the stall is awaken
      */
-    public void stall(Action action) {
+    public void stall(Runnable action) {
         stalledEvents.add(action);
     }
 
@@ -463,7 +462,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      *
      * @return the list of stalled events
      */
-    public List<Action> getStalledEvents() {
+    public List<Runnable> getStalledEvents() {
         return stalledEvents;
     }
 
@@ -481,7 +480,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      *
      * @return the callback action performed when the pending event is completed
      */
-    public Action getOnCompletedCallback() {
+    public Runnable getOnCompletedCallback() {
         return onCompletedCallback;
     }
 
@@ -490,7 +489,7 @@ public class CacheControllerFiniteStateMachine extends BasicFiniteStateMachine<C
      *
      * @param onCompletedCallback the callback action performed when the pending event is completed
      */
-    public void setOnCompletedCallback(Action onCompletedCallback) {
+    public void setOnCompletedCallback(Runnable onCompletedCallback) {
         if (this.onCompletedCallback != null && onCompletedCallback != null) {
             throw new IllegalArgumentException();
         }

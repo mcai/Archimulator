@@ -24,7 +24,6 @@ import archimulator.uncore.cache.CacheLine;
 import archimulator.uncore.coherence.msi.controller.CacheController;
 import archimulator.uncore.coherence.msi.event.directory.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
-import archimulator.util.action.Action;
 import archimulator.util.fsm.FiniteStateMachineFactory;
 
 import java.util.List;
@@ -46,19 +45,19 @@ public class DirectoryControllerFiniteStateMachineFactory extends FiniteStateMac
     private DirectoryControllerFiniteStateMachineFactory() {
         Consumer<DirectoryControllerFiniteStateMachine> actionWhenStateChanged = fsm -> {
             if (fsm.getPreviousState() != fsm.getState() && fsm.getState().isStable()) {
-                Action onCompletedCallback = fsm.getOnCompletedCallback();
+                Runnable onCompletedCallback = fsm.getOnCompletedCallback();
                 if (onCompletedCallback != null) {
                     fsm.setOnCompletedCallback(null);
-                    onCompletedCallback.apply();
+                    onCompletedCallback.run();
                 }
             }
 
             if (fsm.getPreviousState() != fsm.getState()) {
-                List<Action> stalledEventsToProcess = fsm.getStalledEvents().stream().collect(Collectors.toList());
+                List<Runnable> stalledEventsToProcess = fsm.getStalledEvents().stream().collect(Collectors.toList());
 
                 fsm.getStalledEvents().clear();
 
-                stalledEventsToProcess.forEach(Action::apply);
+                stalledEventsToProcess.forEach(Runnable::run);
             }
         };
 

@@ -28,7 +28,6 @@ import archimulator.uncore.MemoryHierarchyAccess;
 import archimulator.uncore.cache.*;
 import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.util.ValueProvider;
-import archimulator.util.action.Action;
 
 /**
  * Translation lookaside buffer (TLB).
@@ -73,7 +72,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
      * @param access              the memory hierarchy access
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    public void access(MemoryHierarchyAccess access, Action onCompletedCallback) {
+    public void access(MemoryHierarchyAccess access, Runnable onCompletedCallback) {
         int set = this.cache.getSet(access.getPhysicalAddress());
         CacheAccess<Boolean> cacheAccess = this.cache.newAccess(access, access.getPhysicalAddress());
 

@@ -32,7 +32,6 @@ import archimulator.uncore.coherence.msi.fsm.DirectoryControllerFiniteStateMachi
 import archimulator.uncore.coherence.msi.message.*;
 import archimulator.uncore.coherence.msi.state.DirectoryControllerState;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.util.action.Action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +127,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetS" message
      */
     private void onGetS(final GetSMessage message) {
-        final Action onStalledCallback = () -> onGetS(message);
+        final Runnable onStalledCallback = () -> onGetS(message);
 
         this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
             CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -143,7 +142,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param message the "GetM" message
      */
     private void onGetM(final GetMMessage message) {
-        final Action onStalledCallback = () -> onGetM(message);
+        final Runnable onStalledCallback = () -> onGetM(message);
 
         this.access(message, message.getAccess(), message.getRequester(), message.getTag(), (set, way) -> {
             CacheLine<DirectoryControllerState> line = getCache().getLine(set, way);
@@ -232,7 +231,7 @@ public class DirectoryController extends GeneralCacheController<DirectoryControl
      * @param onReplacementCompletedCallback the callback action performed when the replacement is completed
      * @param onReplacementStalledCallback   the callback action performed when the replacement is stalled
      */
-    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Action onReplacementStalledCallback) {
+    private void access(CacheCoherenceFlow producerFlow, MemoryHierarchyAccess access, CacheController req, final int tag, final BiConsumer<Integer, Integer> onReplacementCompletedCallback, final Runnable onReplacementStalledCallback) {
         final int set = this.cache.getSet(tag);
 
         for (CacheLine<DirectoryControllerState> line : this.cache.getLines(set)) {

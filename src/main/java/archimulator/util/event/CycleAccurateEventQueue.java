@@ -20,8 +20,6 @@
  */
 package archimulator.util.event;
 
-import archimulator.util.action.Action;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -34,7 +32,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class CycleAccurateEventQueue {
     private long currentCycle;
     private PriorityBlockingQueue<CycleAccurateEvent> events;
-    private List<Action> perCycleEvents;
+    private List<Runnable> perCycleEvents;
 
     /**
      * Create a cycle accurate event queue.
@@ -55,11 +53,11 @@ public class CycleAccurateEventQueue {
                 break;
             }
 
-            event.getAction().apply();
+            event.getAction().run();
             this.events.remove(event);
         }
 
-        this.perCycleEvents.forEach(Action::apply);
+        this.perCycleEvents.forEach(Runnable::run);
 
         this.currentCycle++;
     }
@@ -72,7 +70,7 @@ public class CycleAccurateEventQueue {
      * @param delay  the delay in cycles after which the the specified event takes place
      * @return the newly created cycle accurate event
      */
-    public CycleAccurateEventQueue schedule(Object sender, Action action, int delay) {
+    public CycleAccurateEventQueue schedule(Object sender, Runnable action, int delay) {
         this.schedule(new CycleAccurateEvent(this, sender, action, this.currentCycle + delay));
         return this;
     }
@@ -112,7 +110,7 @@ public class CycleAccurateEventQueue {
      *
      * @return the list of actions that is to be performed at each cycle
      */
-    public List<Action> getPerCycleEvents() {
+    public List<Runnable> getPerCycleEvents() {
         return perCycleEvents;
     }
 

@@ -21,7 +21,6 @@
 package archimulator.uncore.dram;
 
 import archimulator.uncore.MemoryHierarchy;
-import archimulator.util.action.Action;
 
 /**
  * Fixed latency memory controller.
@@ -45,7 +44,7 @@ public class FixedLatencyMemoryController extends MemoryController {
      * @param onCompletedCallback the callback action performed when the access is completed
      */
     @Override
-    protected void access(int address, Action onCompletedCallback) {
+    protected void access(int address, Runnable onCompletedCallback) {
         this.getCycleAccurateEventQueue().schedule(this, onCompletedCallback, this.getLatency());
     }
 

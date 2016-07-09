@@ -1,14 +1,12 @@
 package archimulator.uncore.net.noc;
 
-import archimulator.util.action.Action;
-
 /**
  * Data packet.
  *
  * @author Min Cai
  */
 public class DataPacket extends Packet {
-    public DataPacket(Network network, int src, int dest, int size, Action onCompletedCallback) {
+    public DataPacket(Network network, int src, int dest, int size, Runnable onCompletedCallback) {
         super(network, src, dest, size, onCompletedCallback);
     }
 

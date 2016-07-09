@@ -25,7 +25,6 @@ import archimulator.common.report.Reportable;
 import archimulator.core.functionalUnit.FunctionalUnitOperationType;
 import archimulator.core.functionalUnit.FunctionalUnitPool;
 import archimulator.core.functionalUnit.FunctionalUnitType;
-import archimulator.util.action.Action;
 
 import java.util.List;
 
@@ -70,7 +69,7 @@ public interface Core extends MemoryHierarchyCore, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the instruction fetch is completed
      */
-    void ifetch(Thread thread, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void ifetch(Thread thread, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a load at the specified address.
@@ -80,7 +79,7 @@ public interface Core extends MemoryHierarchyCore, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the load is completed
      */
-    void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void load(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Act on when the specified thread perform a store at the specified address.
@@ -90,7 +89,7 @@ public interface Core extends MemoryHierarchyCore, Reportable {
      * @param virtualPc           the virtual address of the program counter (PC)
      * @param onCompletedCallback the callback action performed when the store is completed
      */
-    void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Action onCompletedCallback);
+    void store(DynamicInstruction dynamicInstruction, int virtualAddress, int virtualPc, Runnable onCompletedCallback);
 
     /**
      * Remove the entry from the queues.

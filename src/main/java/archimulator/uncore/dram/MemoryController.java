@@ -26,7 +26,6 @@ import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.MemoryHierarchy;
 import archimulator.uncore.cache.MemoryDeviceType;
 import archimulator.uncore.coherence.msi.controller.DirectoryController;
-import archimulator.util.action.Action;
 
 /**
  * Memory controller.
@@ -53,7 +52,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
      * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the request is completed
      */
-    public void memReadRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
+    public void memReadRequestReceive(final MemoryDevice source, int tag, final Runnable onCompletedCallback) {
         this.numReads++;
 
         this.access(tag, () -> transfer(source, ((DirectoryController) source).getCache().getLineSize() + 8, onCompletedCallback));
@@ -66,7 +65,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
      * @param tag                 the tag
      * @param onCompletedCallback the callback action performed when the request is completed
      */
-    public void memWriteRequestReceive(final MemoryDevice source, int tag, final Action onCompletedCallback) {
+    public void memWriteRequestReceive(final MemoryDevice source, int tag, final Runnable onCompletedCallback) {
         this.numWrites++;
 
         this.access(tag, () -> transfer(source, 8, onCompletedCallback));
@@ -78,7 +77,7 @@ public abstract class MemoryController extends MemoryDevice implements Reportabl
      * @param address             the address
      * @param onCompletedCallback the callback action performed when the access is completed
      */
-    protected abstract void access(int address, Action onCompletedCallback);
+    protected abstract void access(int address, Runnable onCompletedCallback);
 
     @Override
     public void dumpStats(ReportNode reportNode) {
