@@ -16,6 +16,14 @@ import java.util.List;
  * @author Min Cai
  */
 public class CSVHelper {
+    /**
+     * To CSV.
+     *
+     * @param outputCSVFileName the output CSV file name
+     * @param results the list of results
+     * @param fields the list of fields
+     * @param <ResultT> the result type
+     */
     public static <ResultT> void toCsv(String outputCSVFileName, List<ResultT> results, List<CSVField<ResultT>> fields) {
         File resultDirFile = new File(outputCSVFileName).getParentFile();
 

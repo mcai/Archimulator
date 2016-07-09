@@ -12,6 +12,12 @@ public class CSVField<ExperimentT> {
 
     private Function<ExperimentT, String> func;
 
+    /**
+     * Create a CSV field.
+     *
+     * @param name the name
+     * @param func the function
+     */
     public CSVField(String name, Function<ExperimentT, String> func) {
         this.name = name;
         this.func = func;
@@ -22,10 +28,20 @@ public class CSVField<ExperimentT> {
         return name;
     }
 
+    /**
+     * Get the name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the function.
+     *
+     * @return the function
+     */
     public Function<ExperimentT, String> getFunc() {
         return func;
     }
