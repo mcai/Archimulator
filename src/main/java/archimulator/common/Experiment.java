@@ -26,9 +26,11 @@ import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.serialization.JsonSerializationHelper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -46,6 +48,8 @@ public class Experiment {
     private String failedReason;
 
     private List<ExperimentStat> stats;
+
+    private Map<String, Object> statsMap;
 
     /**
      * Current (max) memory page ID.
@@ -191,13 +195,17 @@ public class Experiment {
     }
 
     public Map<String, Object> getStatsMap() {
-        Map<String, Object> statsMap = new LinkedHashMap<>();
+        if (statsMap != null) {
+            return statsMap;
+        } else {
+            Map<String, Object> result = new LinkedHashMap<>();
 
-        for(ExperimentStat stat : stats) {
-            statsMap.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
+            for(ExperimentStat stat : stats) {
+                result.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
+            }
+
+            return result;
         }
-
-        return statsMap;
     }
 
     /**
@@ -218,8 +226,17 @@ public class Experiment {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
     }
 
+    @SuppressWarnings("unchecked")
     public void loadStats() {
-        // TODO
+        File file = new File(config.getOutputDirectory(), "stats.json");
+
+        try {
+            String json = FileUtils.readFileToString(file);
+
+            statsMap = JsonSerializationHelper.fromJson(Map.class, json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void runExperiments(List<Experiment> experiments, boolean parallel) {
