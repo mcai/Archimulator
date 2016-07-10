@@ -106,10 +106,10 @@ public interface Core extends MemoryHierarchyCore, Reportable {
     }
 
     /**
-     * Do cache warmup for one cycle.
+     * Do warmup for one cycle.
      */
-    default void doCacheWarmupOneCycle() {
-        this.getThreads().forEach(Thread::warmupCacheOneCycle);
+    default void doWarmupOneCycle() {
+        this.getThreads().forEach(Thread::warmupOneCycle);
     }
 
     /**

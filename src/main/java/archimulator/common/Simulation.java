@@ -205,8 +205,8 @@ public abstract class Simulation implements SimulationObject, Reportable {
         try {
             if (this.getType() == SimulationType.FAST_FORWARD) {
                 this.doFastForward();
-            } else if (this.getType() == SimulationType.CACHE_WARMUP) {
-                this.doCacheWarmup();
+            } else if (this.getType() == SimulationType.WARMUP) {
+                this.doWarmup();
             } else if (this.getType() == SimulationType.MEASUREMENT) {
                 this.doMeasurement();
             }
@@ -280,7 +280,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
         rootReportNode.traverse(node -> stats.add(new ExperimentStat(getPrefix(), node.getPath(), node.getValue())));
 
-        if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.CACHE_WARMUP) {
+        if (this.getType() == SimulationType.MEASUREMENT || this.getType() == SimulationType.WARMUP) {
             getProcessor().getMemoryHierarchy().dumpCacheControllerFsmStats(stats);
         }
 
@@ -295,11 +295,11 @@ public abstract class Simulation implements SimulationObject, Reportable {
     protected abstract boolean canDoFastForwardOneCycle();
 
     /**
-     * Get a value indicating whether it can do cache warmup one cycle or not.
+     * Get a value indicating whether it can do warmup one cycle or not.
      *
-     * @return a value indicating whether it can do cache warmup one cycle or not
+     * @return a value indicating whether it can do warmup one cycle or not
      */
-    protected abstract boolean canDoCacheWarmupOneCycle();
+    protected abstract boolean canDoWarmupOneCycle();
 
     /**
      * Get a value indicating whether it can do measurement one cycle or not.
@@ -333,11 +333,11 @@ public abstract class Simulation implements SimulationObject, Reportable {
     /**
      * Do cache warmup.
      */
-    public void doCacheWarmup() {
-        Logger.info(Logger.SIMULATION, "Switched to cache warmup mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
+    public void doWarmup() {
+        Logger.info(Logger.SIMULATION, "Switched to warmup mode.", this.getCycleAccurateEventQueue().getCurrentCycle());
 
-        while (!this.getProcessor().getKernel().getContexts().isEmpty() && this.canDoCacheWarmupOneCycle()) {
-            this.getProcessor().getCores().forEach(Core::doCacheWarmupOneCycle);
+        while (!this.getProcessor().getKernel().getContexts().isEmpty() && this.canDoWarmupOneCycle()) {
+            this.getProcessor().getCores().forEach(Core::doWarmupOneCycle);
             this.advanceOneCycle();
         }
     }

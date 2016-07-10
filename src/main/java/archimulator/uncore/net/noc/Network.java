@@ -13,7 +13,7 @@ import java.util.*;
  *
  * @author  Min Cai
  */
-public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
+public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
     long currentPacketId;
 
     private NoCNet settings;
@@ -135,8 +135,6 @@ public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends Rout
         this.totalFlitPerStateDelays = new HashMap<>();
         this.maxFlitPerStateDelay = new HashMap<>();
     }
-
-    public abstract boolean simulateAtCurrentCycle();
 
     public void logPacketReceived(Packet packet) {
         this.numPacketsReceived++;

@@ -53,9 +53,9 @@ public class BasicThread extends AbstractBasicThread {
     private boolean lastDecodedDynamicInstructionCommitted;
 
     private long lastCommitCycle;
-    private int noInstructionCommittedCounterThreshold;
+    private int noDynamicInstructionCommittedCounterThreshold;
 
-    private DynamicInstruction nextInstructionInCacheWarmupPhase;
+    private DynamicInstruction nextDynamicInstructionInWarmupPhase;
 
     /**
      * Create a basic thread.
@@ -87,13 +87,13 @@ public class BasicThread extends AbstractBasicThread {
     }
 
     @Override
-    public void warmupCacheOneCycle() {
+    public void warmupOneCycle() {
         if (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled) {
-            if (this.nextInstructionInCacheWarmupPhase == null) {
+            if (this.nextDynamicInstructionInWarmupPhase == null) {
                 StaticInstruction staticInstruction;
                 do {
                     staticInstruction = this.context.decodeNextInstruction();
-                    this.nextInstructionInCacheWarmupPhase = new DynamicInstruction(this, this.context.getRegisterFile().getPc(), staticInstruction);
+                    this.nextDynamicInstructionInWarmupPhase = new DynamicInstruction(this, this.context.getRegisterFile().getPc(), staticInstruction);
                     StaticInstruction.execute(staticInstruction, this.context);
 
                     if (!this.context.isPseudoCallEncounteredInLastInstructionExecution() && staticInstruction.getMnemonic().getType() != StaticInstructionType.NOP) {
@@ -103,7 +103,7 @@ public class BasicThread extends AbstractBasicThread {
                 while (this.context != null && this.context.getState() == ContextState.RUNNING && !this.fetchStalled && (this.context.isPseudoCallEncounteredInLastInstructionExecution() || staticInstruction.getMnemonic().getType() == StaticInstructionType.NOP));
             }
 
-            int pc = this.nextInstructionInCacheWarmupPhase.getPc();
+            int pc = this.nextDynamicInstructionInWarmupPhase.getPc();
 
             int cacheLineToFetch = aligned(pc, this.lineSizeOfICache);
             if (cacheLineToFetch != this.lastFetchedCacheLine) {
@@ -117,24 +117,24 @@ public class BasicThread extends AbstractBasicThread {
                 }
             }
 
-            int effectiveAddress = this.nextInstructionInCacheWarmupPhase.getEffectiveAddress();
+            int effectiveAddress = this.nextDynamicInstructionInWarmupPhase.getEffectiveAddress();
 
-            if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
+            if (this.nextDynamicInstructionInWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.LOAD) {
                 if (this.core.canLoad(this, effectiveAddress)) {
-                    this.core.load(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {
+                    this.core.load(this.nextDynamicInstructionInWarmupPhase, effectiveAddress, pc, () -> {
                     });
 
-                    this.nextInstructionInCacheWarmupPhase = null;
+                    this.nextDynamicInstructionInWarmupPhase = null;
                 }
-            } else if (this.nextInstructionInCacheWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
+            } else if (this.nextDynamicInstructionInWarmupPhase.getStaticInstruction().getMnemonic().getType() == StaticInstructionType.STORE) {
                 if (this.core.canStore(this, effectiveAddress)) {
-                    this.core.store(this.nextInstructionInCacheWarmupPhase, effectiveAddress, pc, () -> {
+                    this.core.store(this.nextDynamicInstructionInWarmupPhase, effectiveAddress, pc, () -> {
                     });
 
-                    this.nextInstructionInCacheWarmupPhase = null;
+                    this.nextDynamicInstructionInWarmupPhase = null;
                 }
             } else {
-                this.nextInstructionInCacheWarmupPhase = null;
+                this.nextDynamicInstructionInWarmupPhase = null;
             }
         }
     }
@@ -393,13 +393,13 @@ public class BasicThread extends AbstractBasicThread {
         int COMMIT_TIMEOUT = 1000000;
 
         if (this.getCycleAccurateEventQueue().getCurrentCycle() - this.lastCommitCycle > COMMIT_TIMEOUT) {
-            if (noInstructionCommittedCounterThreshold > 5) {
+            if (noDynamicInstructionCommittedCounterThreshold > 5) {
                 getSimulation().dumpPendingFlowTree();
 
 //                Logger.fatalf(Logger.THREAD, "%s: No instruction committed for %d cycles, %d committed.", this.getCycleAccurateEventQueue().getCurrentCycle(), this.getName(), COMMIT_TIMEOUT, this.numInstructions);
             } else {
                 this.lastCommitCycle = this.getCycleAccurateEventQueue().getCurrentCycle();
-                this.noInstructionCommittedCounterThreshold++;
+                this.noDynamicInstructionCommittedCounterThreshold++;
             }
         }
 

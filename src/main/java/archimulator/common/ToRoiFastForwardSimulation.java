@@ -57,12 +57,12 @@ public class ToRoiFastForwardSimulation extends Simulation {
     }
 
     /**
-     * Get a value indicating whether it can do cache warmup for one cycle or not.
+     * Get a value indicating whether it can do warmup for one cycle or not.
      *
-     * @return a value indicating whether it can do cache warmup for one cycle or not
+     * @return a value indicating whether it can do warmup for one cycle or not
      */
     @Override
-    public boolean canDoCacheWarmupOneCycle() {
+    public boolean canDoWarmupOneCycle() {
         throw new IllegalArgumentException();
     }
 

@@ -47,9 +47,9 @@ public interface Thread extends MemoryHierarchyThread {
     void fastForwardOneCycle();
 
     /**
-     * Warmup cache for one cycle.
+     * Warmup for one cycle.
      */
-    void warmupCacheOneCycle();
+    void warmupOneCycle();
 
     /**
      * Update the fetch NPC and the fetch NNPC from the architectural register file.

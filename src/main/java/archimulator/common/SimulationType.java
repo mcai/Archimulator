@@ -32,9 +32,9 @@ public enum SimulationType {
     FAST_FORWARD,
 
     /**
-     * Cache warmup.
+     * Warmup.
      */
-    CACHE_WARMUP,
+    WARMUP,
 
     /**
      * Measurement.

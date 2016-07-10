@@ -1,5 +1,6 @@
 package archimulator.uncore.net.noc.routers;
 
+import archimulator.common.SimulationType;
 import archimulator.uncore.net.noc.Direction;
 import archimulator.uncore.net.noc.Node;
 import archimulator.uncore.net.noc.Packet;
@@ -55,7 +56,8 @@ public class Router {
     }
 
     private void advanceOneCycle() {
-        if(this.node.getNetwork().simulateAtCurrentCycle()) {
+        if (this.getNode().getNetwork().getSettings().getSimulation().getType() == SimulationType.MEASUREMENT
+                || this.getNode().getNetwork().getSettings().getSimulation().getType() == SimulationType.WARMUP) {
             this.stageLinkTraversal();
 
             this.crossbarSwitch.stageSwitchTraversal();

@@ -20,7 +20,7 @@ public class NetworkFactory {
             NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     ) {
-        return new StandaloneNetwork<>(
+        return new Network<>(
                 settings,
                 cycleAccurateEventQueue,
                 settings.getExperiment().getConfig().getNumNodes(),
@@ -37,7 +37,7 @@ public class NetworkFactory {
             NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
-        return new StandaloneNetwork<>(
+        return new Network<>(
                 settings,
                 cycleAccurateEventQueue,
                 settings.getExperiment().getConfig().getNumNodes(),
@@ -54,7 +54,7 @@ public class NetworkFactory {
             NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
-        return new StandaloneNetwork<>(
+        return new Network<>(
                 settings,
                 cycleAccurateEventQueue,
                 settings.getExperiment().getConfig().getNumNodes(),
@@ -71,7 +71,7 @@ public class NetworkFactory {
             NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     ) {
-        return new StandaloneNetwork<>(
+        return new Network<>(
                 settings,
                 cycleAccurateEventQueue,
                 settings.getExperiment().getConfig().getNumNodes(),
@@ -88,7 +88,7 @@ public class NetworkFactory {
             NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue
     )  {
-        return new StandaloneNetwork<>(
+        return new Network<>(
                 settings,
                 cycleAccurateEventQueue,
                 settings.getExperiment().getConfig().getNumNodes(),
