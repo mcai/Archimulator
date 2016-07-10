@@ -37,12 +37,15 @@ public class Startup {
         ExperimentConfig config = new ExperimentConfig();
 
         config.setType(ExperimentType.DETAILED);
-        config.setOutputDirectory("results/mst_ht_100");
+        config.setOutputDirectory("results/mst_ht_100x4");
 
         config.setNumCores(16);
         config.setNumThreadsPerCore(1);
 
         config.getContextMappings().add(new ContextMapping(0, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
+        config.getContextMappings().add(new ContextMapping(4, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
+        config.getContextMappings().add(new ContextMapping(8, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
+        config.getContextMappings().add(new ContextMapping(12, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
 
         ExperimentFactory.run(config);
     }
