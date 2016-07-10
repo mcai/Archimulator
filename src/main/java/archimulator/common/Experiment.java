@@ -25,11 +25,11 @@ import archimulator.util.Reference;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
+import archimulator.util.serialization.JsonSerializationHelper;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 
 /**
  * Experiment.
@@ -61,11 +61,9 @@ public class Experiment {
 
     /**
      * Create an experiment.
-     *
-     * @param config the experiment config
      */
-    public Experiment(ExperimentConfig config) {
-        this.config = config;
+    public Experiment() {
+        this.config = new ExperimentConfig();
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
         this.contextMappings = new ArrayList<>(config.getContextMappings());
@@ -107,6 +105,19 @@ public class Experiment {
             this.setState(ExperimentState.ABORTED);
             this.setFailedReason(ExceptionUtils.getStackTrace(e));
             e.printStackTrace();
+        }
+
+        if (this.getState() == ExperimentState.COMPLETED) {
+            File resultDirFile = new File(this.getConfig().getOutputDirectory());
+
+            if (!resultDirFile.exists()) {
+                if (!resultDirFile.mkdirs()) {
+                    throw new RuntimeException();
+                }
+            }
+
+            JsonSerializationHelper.writeJsonFile(this.getConfig(), this.getConfig().getOutputDirectory(), "config.json");
+            JsonSerializationHelper.writeJsonFile(this.getStatsMap(), this.getConfig().getOutputDirectory(), "stats.json");
         }
     }
 
@@ -191,6 +202,16 @@ public class Experiment {
         return stats;
     }
 
+    public Map<String, Object> getStatsMap() {
+        Map<String, Object> statsMap = new LinkedHashMap<>();
+
+        for(ExperimentStat stat : stats) {
+            statsMap.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
+        }
+
+        return statsMap;
+    }
+
     /**
      * Set the in-memory list of statistics.
      *
@@ -207,5 +228,17 @@ public class Experiment {
      */
     public boolean isStopped() {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
+    }
+
+    public void loadStats() {
+        // TODO
+    }
+
+    public static void runExperiments(List<Experiment> experiments, boolean parallel) {
+        if(parallel) {
+            experiments.parallelStream().forEach(Experiment::run);
+        } else {
+            experiments.forEach(Experiment::run);
+        }
     }
 }

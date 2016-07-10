@@ -211,7 +211,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>archimulator.util.cmd.Startup</mainClass>
+                            <mainClass>archimulator.startup.Run</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
