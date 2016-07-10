@@ -56,8 +56,8 @@ public class Router {
     }
 
     private void advanceOneCycle() {
-        if (this.getNode().getNetwork().getSettings().getSimulation().getType() == SimulationType.MEASUREMENT
-                || this.getNode().getNetwork().getSettings().getSimulation().getType() == SimulationType.WARMUP) {
+        if (this.getNode().getNetwork().getMemoryHierarchy().getSimulation().getType() == SimulationType.MEASUREMENT
+                || this.getNode().getNetwork().getMemoryHierarchy().getSimulation().getType() == SimulationType.WARMUP) {
             this.stageLinkTraversal();
 
             this.crossbarSwitch.stageSwitchTraversal();
@@ -88,7 +88,7 @@ public class Router {
 
                             this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> {
                                 nextHopArrived(flit, nextHop, ip, ivc);
-                            }, this.node.getNetwork().getSettings().getExperiment().getConfig().getLinkDelay());
+                            }, this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getLinkDelay());
                         }
 
                         inputVirtualChannel.getInputBuffer().pop();
@@ -117,7 +117,7 @@ public class Router {
         InputBuffer inputBuffer =
                 this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).getVirtualChannels().get(ivc).getInputBuffer();
 
-        if(inputBuffer.size() + 1 <= this.node.getNetwork().getSettings().getExperiment().getConfig().getMaxInputBufferSize()) {
+        if(inputBuffer.size() + 1 <= this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()) {
             flit.setState(FlitState.INPUT_BUFFER);
             this.node.getNetwork().getNodes().get(nextHop).getRouter().insertFlit(flit, ip, ivc);
         } else {
@@ -129,18 +129,18 @@ public class Router {
         while (true) {
             boolean requestInserted = false;
 
-            for(int ivc = 0; ivc < this.node.getNetwork().getSettings().getExperiment().getConfig().getNumVirtualChannels(); ivc++) {
+            for(int ivc = 0; ivc < this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getNumVirtualChannels(); ivc++) {
                 if(this.injectionBuffer.isEmpty()) {
                     continue;
                 }
 
                 Packet packet = this.injectionBuffer.get(0);
 
-                int numFlits = (int) Math.ceil((double)(packet.getSize()) / this.node.getNetwork().getSettings().getExperiment().getConfig().getLinkWidth());
+                int numFlits = (int) Math.ceil((double)(packet.getSize()) / this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getLinkWidth());
 
                 InputBuffer inputBuffer = this.inputPorts.get(Direction.LOCAL).getVirtualChannels().get(ivc).getInputBuffer();
 
-                if(inputBuffer.size() + numFlits <= this.node.getNetwork().getSettings().getExperiment().getConfig().getMaxInputBufferSize()) {
+                if(inputBuffer.size() + numFlits <= this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()) {
                     for(int i = 0; i < numFlits; i++) {
                         Flit flit = new Flit(packet, i, i == 0, i == numFlits - 1);
                         this.insertFlit(flit, Direction.LOCAL, ivc);
@@ -159,7 +159,7 @@ public class Router {
     }
 
     public boolean injectPacket(Packet packet) {
-        if(this.injectionBuffer.size() < this.node.getNetwork().getSettings().getExperiment().getConfig().getMaxInjectionBufferSize()) {
+        if(this.injectionBuffer.size() < this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInjectionBufferSize()) {
             this.injectionBuffer.add(packet);
             return true;
         }
@@ -174,7 +174,7 @@ public class Router {
     }
 
     public int freeSlots(Direction ip, int ivc) {
-        return this.node.getNetwork().getSettings().getExperiment().getConfig().getMaxInputBufferSize()
+        return this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()
                 - this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().size();
     }
 

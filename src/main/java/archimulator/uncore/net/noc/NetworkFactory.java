@@ -1,6 +1,6 @@
 package archimulator.uncore.net.noc;
 
-import archimulator.uncore.net.NoCNet;
+import archimulator.uncore.net.NoCMemoryHierarchy;
 import archimulator.uncore.net.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.XYRoutingAlgorithm;
@@ -17,13 +17,14 @@ import archimulator.util.event.CycleAccurateEventQueue;
  */
 public class NetworkFactory {
     private static Network<? extends Node, ? extends RoutingAlgorithm> aco(
-            NoCNet settings,
-            CycleAccurateEventQueue cycleAccurateEventQueue
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
     ) {
         return new Network<>(
-                settings,
+                memoryHierarchy,
                 cycleAccurateEventQueue,
-                settings.getExperiment().getConfig().getNumNodes(),
+                numNodes,
                 new NodeFactory<ACONode>() {
                     @Override
                     public ACONode createNode(Network<ACONode, ?> network1, int i) {
@@ -34,13 +35,14 @@ public class NetworkFactory {
     }
 
     private static Network<? extends Node, ? extends RoutingAlgorithm> random(
-            NoCNet settings,
-            CycleAccurateEventQueue cycleAccurateEventQueue
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
     )  {
         return new Network<>(
-                settings,
+                memoryHierarchy,
                 cycleAccurateEventQueue,
-                settings.getExperiment().getConfig().getNumNodes(),
+                numNodes,
                 new NodeFactory<RandomSelectionBasedNode>() {
                     @Override
                     public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network, int i) {
@@ -51,13 +53,14 @@ public class NetworkFactory {
     }
 
     private static Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(
-            NoCNet settings,
-            CycleAccurateEventQueue cycleAccurateEventQueue
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
     )  {
         return new Network<>(
-                settings,
+                memoryHierarchy,
                 cycleAccurateEventQueue,
-                settings.getExperiment().getConfig().getNumNodes(),
+                numNodes,
                 new NodeFactory<BufferLevelSelectionBasedNode>() {
                     @Override
                     public BufferLevelSelectionBasedNode createNode(Network<BufferLevelSelectionBasedNode, ?> network, int i) {
@@ -68,13 +71,14 @@ public class NetworkFactory {
     }
 
     private static Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(
-            NoCNet settings,
-            CycleAccurateEventQueue cycleAccurateEventQueue
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
     ) {
         return new Network<>(
-                settings,
+                memoryHierarchy,
                 cycleAccurateEventQueue,
-                settings.getExperiment().getConfig().getNumNodes(),
+                numNodes,
                 new NodeFactory<NeighborOnPathSelectionBasedNode>() {
                     @Override
                     public NeighborOnPathSelectionBasedNode createNode(Network<NeighborOnPathSelectionBasedNode, ?> network, int i) {
@@ -85,13 +89,14 @@ public class NetworkFactory {
     }
 
     private static Network<? extends Node, ? extends RoutingAlgorithm> xy(
-            NoCNet settings,
-            CycleAccurateEventQueue cycleAccurateEventQueue
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
     )  {
         return new Network<>(
-                settings,
+                memoryHierarchy,
                 cycleAccurateEventQueue,
-                settings.getExperiment().getConfig().getNumNodes(),
+                numNodes,
                 new NodeFactory<RandomSelectionBasedNode>() {
                     @Override
                     public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network, int i) {
@@ -101,26 +106,30 @@ public class NetworkFactory {
                 XYRoutingAlgorithm::new);
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> setupNetwork(NoCNet settings, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public static Network<? extends Node, ? extends RoutingAlgorithm> setupNetwork(
+            NoCMemoryHierarchy memoryHierarchy,
+            CycleAccurateEventQueue cycleAccurateEventQueue,
+            int numNodes
+    ) {
         Network<? extends Node, ? extends RoutingAlgorithm> network;
 
-        switch (settings.getExperiment().getConfig().getRouting()) {
+        switch (memoryHierarchy.getExperiment().getConfig().getRouting()) {
             case "xy":
-                network = xy(settings, cycleAccurateEventQueue);
+                network = xy(memoryHierarchy, cycleAccurateEventQueue, numNodes);
                 break;
             case "oddEven":
-                switch (settings.getExperiment().getConfig().getSelection()) {
+                switch (memoryHierarchy.getExperiment().getConfig().getSelection()) {
                     case "random":
-                        network = random(settings, cycleAccurateEventQueue);
+                        network = random(memoryHierarchy, cycleAccurateEventQueue, numNodes);
                         break;
                     case "bufferLevel":
-                        network = bufferLevel(settings, cycleAccurateEventQueue);
+                        network = bufferLevel(memoryHierarchy, cycleAccurateEventQueue, numNodes);
                         break;
                     case "neighborOnPath":
-                        network = neighborOnPath(settings, cycleAccurateEventQueue);
+                        network = neighborOnPath(memoryHierarchy, cycleAccurateEventQueue, numNodes);
                         break;
                     case "aco":
-                        network = aco(settings, cycleAccurateEventQueue);
+                        network = aco(memoryHierarchy, cycleAccurateEventQueue, numNodes);
                         break;
                     default:
                         throw new IllegalArgumentException();

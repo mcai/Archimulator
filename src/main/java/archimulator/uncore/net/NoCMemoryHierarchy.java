@@ -23,24 +23,36 @@ package archimulator.uncore.net;
 import archimulator.common.Experiment;
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
+import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.AbstractMemoryHierarchy;
 import archimulator.uncore.MemoryDevice;
+import archimulator.uncore.coherence.msi.controller.L1IController;
+import archimulator.uncore.net.noc.DataPacket;
 import archimulator.uncore.net.noc.Network;
+import archimulator.uncore.net.noc.NetworkFactory;
 import archimulator.uncore.net.noc.Node;
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
 /**
  * NoC memory hierarchy.
  *
  * @author Min Cai
  */
-public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Reportable {
-    private NoCNet net;
+public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, Reportable {
+    private Network<? extends Node, ? extends RoutingAlgorithm> network;
+
+    private Map<SimulationObject, Integer> devicesToNodeIds;
+
+    private Random random;
 
     /**
      * Create a basic memory hierarchy.
@@ -53,19 +65,68 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Repor
     public NoCMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
-        this.net = new NoCNet(this);
+        this.devicesToNodeIds = new HashMap<>();
+
+        int i = 0;
+
+        for (L1IController l1IController : this.getL1IControllers()) {
+            this.devicesToNodeIds.put(l1IController, i);
+            this.devicesToNodeIds.put(
+                    this.getL1DControllers().get(
+                            this.getL1IControllers().indexOf(l1IController)
+                    ),
+                    i);
+
+            i++;
+        }
+
+        this.devicesToNodeIds.put(this.getL2Controller(), i);
+
+        i++;
+
+        this.devicesToNodeIds.put(this.getMemoryController(), i);
+
+        i++;
+
+        int width = (int) Math.sqrt(i);
+        if (width * width != i) {
+            i = (width + 1) * (width + 1);
+        }
+
+        this.network = NetworkFactory.setupNetwork(this, this.getCycleAccurateEventQueue(), i);
+
+        this.getExperiment().getConfig().setMaxInputBufferSize(this.getL2Controller().getCache().getLineSize() + 8);
+
+        this.random = this.getExperiment().getConfig().getRandSeed() != -1 ? new Random(this.getExperiment().getConfig().getRandSeed()) : new Random();
     }
 
     @Override
     public Net getNet(MemoryDevice from, MemoryDevice to) {
-        return net;
+        return this;
+    }
+
+    @Override
+    public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Runnable onCompletedCallback) {
+        int src = this.devicesToNodeIds.get(deviceFrom);
+        int dest = this.devicesToNodeIds.get(deviceTo);
+
+        DataPacket packet = new DataPacket(this.network, src, dest, size, onCompletedCallback);
+
+        this.getCycleAccurateEventQueue().schedule(this, () -> this.network.receive(packet), 1);
+    }
+
+    @Override
+    public String getName() {
+        return "net";
+    }
+
+    public Random getRandom() {
+        return random;
     }
 
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
-            Network<? extends Node, ? extends RoutingAlgorithm> network = net.getNetwork();
-
             getChildren().add(
                     new ReportNode(
                             this,

@@ -1,12 +1,15 @@
 package archimulator.uncore.net.noc;
 
-import archimulator.uncore.net.NoCNet;
+import archimulator.uncore.net.NoCMemoryHierarchy;
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Network.
@@ -16,7 +19,7 @@ import java.util.*;
 public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
     long currentPacketId;
 
-    private NoCNet settings;
+    private NoCMemoryHierarchy memoryHierarchy;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
@@ -68,15 +71,15 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private Map<FlitState, Long> maxFlitPerStateDelay;
 
     public Network(
-            NoCNet settings,
+            NoCMemoryHierarchy memoryHierarchy,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
             NodeFactory<NodeT> nodeFactory,
             RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
     ) {
-        this.currentPacketId = 0;
+        this.memoryHierarchy = memoryHierarchy;
 
-        this.settings = settings;
+        this.currentPacketId = 0;
 
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
 
@@ -247,7 +250,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     public int randDest(int src) {
         while (true) {
-            int i = this.settings.getRandom().nextInt(this.numNodes);
+            int i = this.memoryHierarchy.getRandom().nextInt(this.numNodes);
             if(i != src) {
                 return i;
             }
@@ -325,10 +328,6 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         }
 
         return 0.0;
-    }
-
-    public NoCNet getSettings() {
-        return settings;
     }
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
@@ -421,5 +420,9 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     public Map<FlitState, Long> getMaxFlitPerStateDelay() {
         return maxFlitPerStateDelay;
+    }
+
+    public NoCMemoryHierarchy getMemoryHierarchy() {
+        return memoryHierarchy;
     }
 }

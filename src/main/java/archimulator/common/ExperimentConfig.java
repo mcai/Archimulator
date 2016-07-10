@@ -161,8 +161,6 @@ public class ExperimentConfig {
 
     private int randSeed;
 
-    private int numNodes;
-
     private String routing;
 
     private String selection;
@@ -279,7 +277,6 @@ public class ExperimentConfig {
         this.basicMemoryControllerRowSize = 2048;
 
         this.randSeed = 13;
-        this.numNodes = -1;
         this.routing = "oddEven";
         this.selection = "aco";
         this.maxInjectionBufferSize = 32;
@@ -893,14 +890,6 @@ public class ExperimentConfig {
 
     public void setRandSeed(int randSeed) {
         this.randSeed = randSeed;
-    }
-
-    public int getNumNodes() {
-        return numNodes;
-    }
-
-    public void setNumNodes(int numNodes) {
-        this.numNodes = numNodes;
     }
 
     public String getRouting() {

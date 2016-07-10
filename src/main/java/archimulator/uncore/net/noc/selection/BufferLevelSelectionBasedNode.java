@@ -39,7 +39,7 @@ public class BufferLevelSelectionBasedNode extends Node {
         }
 
         if(!bestDirections.isEmpty()) {
-            return bestDirections.get(this.getNetwork().getSettings().getRandom().nextInt(bestDirections.size()));
+            return bestDirections.get(this.getNetwork().getMemoryHierarchy().getRandom().nextInt(bestDirections.size()));
         }
 
         return super.select(src, dest, ivc, directions);
