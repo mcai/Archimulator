@@ -20,8 +20,10 @@
  */
 package archimulator.util.cmd;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
+import archimulator.common.ContextMapping;
+import archimulator.common.Experiment;
+import archimulator.common.ExperimentConfig;
+import archimulator.common.ExperimentType;
 
 /**
  * Startup.
@@ -35,28 +37,16 @@ public class Startup {
      * @param args arguments
      */
     public static void main(String[] args) {
-        SimulateCommand simulateCommand = new SimulateCommand();
+        ExperimentConfig config = new ExperimentConfig();
 
-        JCommander commander = new JCommander();
-        commander.addCommand(simulateCommand);
+        config.setType(ExperimentType.DETAILED);
+        config.setOutputDirectory("results/mst_ht_100");
 
-        try {
-            commander.parse(args);
+        config.setNumCores(16);
+        config.setNumThreadsPerCore(1);
 
-            if (commander.getParsedCommand() == null) {
-                commander.usage();
-            } else {
-                switch (commander.getParsedCommand()) {
-                    case "simulate":
-                        simulateCommand.run();
-                        break;
-                    default:
-                        commander.usage();
-                        break;
-                }
-            }
-        } catch (ParameterException e) {
-            commander.usage();
-        }
+        config.getContextMappings().add(new ContextMapping(0, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
+
+        Experiment.run(config);
     }
 }

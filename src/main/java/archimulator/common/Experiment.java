@@ -25,11 +25,11 @@ import archimulator.util.Reference;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
+import archimulator.util.serialization.JsonSerializationHelper;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.File;
+import java.util.*;
 
 /**
  * Experiment.
@@ -37,6 +37,37 @@ import java.util.List;
  * @author Min Cai
  */
 public class Experiment {
+    /**
+     * Run an experiment using the specified experiment config.
+     *
+     * @param config the experiment config
+     */
+    public static void run(ExperimentConfig config) {
+        Experiment experiment = new Experiment(config);
+
+        experiment.run();
+
+        if (experiment.getState() == ExperimentState.COMPLETED) {
+            File resultDirFile = new File(config.getOutputDirectory());
+
+            if (!resultDirFile.exists()) {
+                if (!resultDirFile.mkdirs()) {
+                    throw new RuntimeException();
+                }
+            }
+
+            List<ExperimentStat> stats = experiment.getStats();
+
+            Map<String, Object> statsMap = new LinkedHashMap<>();
+            for(ExperimentStat stat : stats) {
+                statsMap.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
+            }
+
+            JsonSerializationHelper.writeJsonFile(config, config.getOutputDirectory(), "config.json");
+            JsonSerializationHelper.writeJsonFile(statsMap, config.getOutputDirectory(), "stats.json");
+        }
+    }
+
     private long createTime;
 
     private ExperimentConfig config;
@@ -62,13 +93,12 @@ public class Experiment {
     /**
      * Create an experiment.
      * @param config the experiment config
-     * @param contextMappings    the context mappings
      */
-    public Experiment(ExperimentConfig config, List<ContextMapping> contextMappings) {
+    public Experiment(ExperimentConfig config) {
         this.config = config;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
-        this.contextMappings = new ArrayList<>(contextMappings);
+        this.contextMappings = new ArrayList<>(config.getContextMappings());
 
         this.createTime = DateHelper.toTick(new Date());
         this.stats = new ArrayList<>();

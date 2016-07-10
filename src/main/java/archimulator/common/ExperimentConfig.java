@@ -5,6 +5,9 @@ import archimulator.uncore.cache.replacement.CacheReplacementPolicyType;
 import archimulator.uncore.dram.MemoryControllerType;
 import archimulator.util.StorageUnitHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Experiment config.
  *
@@ -14,6 +17,8 @@ public class ExperimentConfig {
     private ExperimentType type;
 
     private String outputDirectory;
+
+    private List<ContextMapping> contextMappings;
 
     private long numMaxInstructions;
 
@@ -185,7 +190,11 @@ public class ExperimentConfig {
 
     public ExperimentConfig() {
         this.type = ExperimentType.DETAILED;
+
         this.outputDirectory = "";
+
+        this.contextMappings = new ArrayList<>();
+
         this.numMaxInstructions = -1;
 
         this.helperThreadPthreadSpawnIndex = 3720;
@@ -306,6 +315,10 @@ public class ExperimentConfig {
 
     public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    public List<ContextMapping> getContextMappings() {
+        return contextMappings;
     }
 
     public long getNumMaxInstructions() {
