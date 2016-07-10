@@ -45,8 +45,6 @@ public class Experiment {
 
     private String failedReason;
 
-    private List<ContextMapping> contextMappings;
-
     private List<ExperimentStat> stats;
 
     /**
@@ -66,7 +64,6 @@ public class Experiment {
         this.config = new ExperimentConfig();
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
-        this.contextMappings = new ArrayList<>(config.getContextMappings());
 
         this.createTime = DateHelper.toTick(new Date());
         this.stats = new ArrayList<>();
@@ -182,15 +179,6 @@ public class Experiment {
      */
     public void setFailedReason(String failedReason) {
         this.failedReason = failedReason;
-    }
-
-    /**
-     * Get the context mappings.
-     *
-     * @return the context mappings
-     */
-    public List<ContextMapping> getContextMappings() {
-        return contextMappings;
     }
 
     /**

@@ -378,7 +378,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
     public Kernel prepareKernel() {
         Kernel kernel = new Kernel(this);
 
-        for (final ContextMapping contextMapping : this.getExperiment().getContextMappings()) {
+        for (final ContextMapping contextMapping : this.getExperiment().getConfig().getContextMappings()) {
             final Context context = Context.load(kernel, contextMapping);
 
             if (!kernel.map(context, candidateThreadId -> candidateThreadId == contextMapping.getThreadId())) {
