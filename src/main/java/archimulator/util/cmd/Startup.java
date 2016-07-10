@@ -36,11 +36,9 @@ public class Startup {
      */
     public static void main(String[] args) {
         SimulateCommand simulateCommand = new SimulateCommand();
-        NoCSimulateCommand noCSimulateCommand = new NoCSimulateCommand();
 
         JCommander commander = new JCommander();
         commander.addCommand(simulateCommand);
-        commander.addCommand(noCSimulateCommand);
 
         try {
             commander.parse(args);
@@ -51,9 +49,6 @@ public class Startup {
                 switch (commander.getParsedCommand()) {
                     case "simulate":
                         simulateCommand.run();
-                        break;
-                    case "noc_simulate":
-                        noCSimulateCommand.run();
                         break;
                     default:
                         commander.usage();

@@ -1,5 +1,6 @@
 package archimulator.uncore.net.noc;
 
+import archimulator.uncore.net.NoCNet;
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithmFactory;
@@ -15,7 +16,7 @@ import java.util.*;
 public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
     long currentPacketId;
 
-    private NoCSettings settings;
+    private NoCNet settings;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
@@ -67,7 +68,7 @@ public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends Rout
     private Map<FlitState, Long> maxFlitPerStateDelay;
 
     public Network(
-            NoCSettings settings,
+            NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
             NodeFactory<NodeT> nodeFactory,
@@ -328,7 +329,7 @@ public abstract class Network<NodeT extends Node, RoutingAlgorithmT extends Rout
         return 0.0;
     }
 
-    public NoCSettings getSettings() {
+    public NoCNet getSettings() {
         return settings;
     }
 

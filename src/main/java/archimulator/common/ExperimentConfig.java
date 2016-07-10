@@ -159,6 +159,32 @@ public class ExperimentConfig {
 
     private int basicMemoryControllerRowSize;
 
+    private int randSeed;
+
+    private int numNodes;
+
+    private String routing;
+
+    private String selection;
+
+    private int maxInjectionBufferSize;
+
+    private int maxInputBufferSize;
+
+    private int numVirtualChannels;
+
+    private int linkWidth;
+    private int linkDelay;
+
+    private int dataPacketSize;
+    private double dataPacketInjectionRate;
+
+    private int antPacketSize;
+    private double antPacketInjectionRate;
+
+    private double acoSelectionAlpha;
+    private double reinforcementFactor;
+
     public ExperimentConfig() {
         this.type = ExperimentType.DETAILED;
         this.outputDirectory = "";
@@ -251,6 +277,22 @@ public class ExperimentConfig {
         this.basicMemoryControllerBusWidth = 4;
         this.basicMemoryControllerNumBanks = 8;
         this.basicMemoryControllerRowSize = 2048;
+
+        this.randSeed = 13;
+        this.numNodes = -1;
+        this.routing = "oddEven";
+        this.selection = "aco";
+        this.maxInjectionBufferSize = 32;
+        this.maxInputBufferSize = 4;
+        this.numVirtualChannels = 4;
+        this.linkWidth = 4;
+        this.linkDelay = 1;
+        this.dataPacketSize = 16;
+        this.dataPacketInjectionRate = 0.01;
+        this.antPacketSize = 4;
+        this.antPacketInjectionRate = 0.01;
+        this.acoSelectionAlpha = 0.5;
+        this.reinforcementFactor = 0.05;
     }
 
     public ExperimentType getType() {
@@ -843,5 +885,125 @@ public class ExperimentConfig {
 
     public void setBasicMemoryControllerRowSize(int basicMemoryControllerRowSize) {
         this.basicMemoryControllerRowSize = basicMemoryControllerRowSize;
+    }
+
+    public int getRandSeed() {
+        return randSeed;
+    }
+
+    public void setRandSeed(int randSeed) {
+        this.randSeed = randSeed;
+    }
+
+    public int getNumNodes() {
+        return numNodes;
+    }
+
+    public void setNumNodes(int numNodes) {
+        this.numNodes = numNodes;
+    }
+
+    public String getRouting() {
+        return routing;
+    }
+
+    public void setRouting(String routing) {
+        this.routing = routing;
+    }
+
+    public String getSelection() {
+        return selection;
+    }
+
+    public void setSelection(String selection) {
+        this.selection = selection;
+    }
+
+    public int getMaxInjectionBufferSize() {
+        return maxInjectionBufferSize;
+    }
+
+    public void setMaxInjectionBufferSize(int maxInjectionBufferSize) {
+        this.maxInjectionBufferSize = maxInjectionBufferSize;
+    }
+
+    public int getMaxInputBufferSize() {
+        return maxInputBufferSize;
+    }
+
+    public void setMaxInputBufferSize(int maxInputBufferSize) {
+        this.maxInputBufferSize = maxInputBufferSize;
+    }
+
+    public int getNumVirtualChannels() {
+        return numVirtualChannels;
+    }
+
+    public void setNumVirtualChannels(int numVirtualChannels) {
+        this.numVirtualChannels = numVirtualChannels;
+    }
+
+    public int getLinkWidth() {
+        return linkWidth;
+    }
+
+    public void setLinkWidth(int linkWidth) {
+        this.linkWidth = linkWidth;
+    }
+
+    public int getLinkDelay() {
+        return linkDelay;
+    }
+
+    public void setLinkDelay(int linkDelay) {
+        this.linkDelay = linkDelay;
+    }
+
+    public int getDataPacketSize() {
+        return dataPacketSize;
+    }
+
+    public void setDataPacketSize(int dataPacketSize) {
+        this.dataPacketSize = dataPacketSize;
+    }
+
+    public double getDataPacketInjectionRate() {
+        return dataPacketInjectionRate;
+    }
+
+    public void setDataPacketInjectionRate(double dataPacketInjectionRate) {
+        this.dataPacketInjectionRate = dataPacketInjectionRate;
+    }
+
+    public int getAntPacketSize() {
+        return antPacketSize;
+    }
+
+    public void setAntPacketSize(int antPacketSize) {
+        this.antPacketSize = antPacketSize;
+    }
+
+    public double getAntPacketInjectionRate() {
+        return antPacketInjectionRate;
+    }
+
+    public void setAntPacketInjectionRate(double antPacketInjectionRate) {
+        this.antPacketInjectionRate = antPacketInjectionRate;
+    }
+
+    public double getAcoSelectionAlpha() {
+        return acoSelectionAlpha;
+    }
+
+    public void setAcoSelectionAlpha(double acoSelectionAlpha) {
+        this.acoSelectionAlpha = acoSelectionAlpha;
+    }
+
+    public double getReinforcementFactor() {
+        return reinforcementFactor;
+    }
+
+    public void setReinforcementFactor(double reinforcementFactor) {
+        this.reinforcementFactor = reinforcementFactor;
     }
 }

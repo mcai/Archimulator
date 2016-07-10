@@ -12,14 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
+public class NoCNet extends BasicSimulationObject implements Net {
     private MemoryHierarchy memoryHierarchy;
 
     private Map<SimulationObject, Integer> devicesToNodeIds;
 
     private Network<? extends Node, ? extends RoutingAlgorithm> network;
-
-    private NoCConfig config;
 
     private Random random;
 
@@ -56,11 +54,10 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
             numNodes = (width + 1) * (width + 1);
         }
 
-        this.config = new NoCConfig();
-        this.config.setNumNodes(numNodes);
-        this.config.setMaxInputBufferSize(this.memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
+        this.getExperiment().getConfig().setNumNodes(numNodes);
+        this.getExperiment().getConfig().setMaxInputBufferSize(this.memoryHierarchy.getL2Controller().getCache().getLineSize() + 8);
 
-        this.random = this.config.getRandSeed() != -1 ? new Random(this.config.getRandSeed()) : new Random();
+        this.random = this.getExperiment().getConfig().getRandSeed() != -1 ? new Random(this.getExperiment().getConfig().getRandSeed()) : new Random();
 
         this.network = NetworkFactory.setupNetwork(this, this.memoryHierarchy.getCycleAccurateEventQueue());
     }
@@ -98,12 +95,6 @@ public class NoCNet extends BasicSimulationObject implements Net, NoCSettings {
         return network;
     }
 
-    @Override
-    public NoCConfig getConfig() {
-        return config;
-    }
-
-    @Override
     public Random getRandom() {
         return random;
     }

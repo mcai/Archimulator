@@ -1,5 +1,6 @@
 package archimulator.uncore.net.noc;
 
+import archimulator.uncore.net.NoCNet;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -14,7 +15,7 @@ import archimulator.util.event.CycleAccurateEventQueue;
 public class StandaloneNetwork<NodeT extends Node,  RoutingAlgorithmT extends RoutingAlgorithm>
         extends Network<NodeT, RoutingAlgorithmT> {
     StandaloneNetwork(
-            NoCSettings settings,
+            NoCNet settings,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
             NodeFactory<NodeT> nodeFactory,

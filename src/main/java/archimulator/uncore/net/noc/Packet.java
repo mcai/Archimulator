@@ -43,11 +43,11 @@ public abstract class Packet {
 
         this.size = size;
 
-        int numFlits = (int) Math.ceil((double)(this.size) / this.network.getSettings().getConfig().getLinkWidth());
-        if(numFlits > this.network.getSettings().getConfig().getMaxInputBufferSize()) {
+        int numFlits = (int) Math.ceil((double)(this.size) / this.network.getSettings().getExperiment().getConfig().getLinkWidth());
+        if(numFlits > this.network.getSettings().getExperiment().getConfig().getMaxInputBufferSize()) {
             throw new IllegalArgumentException(
                     String.format("Number of flits (%d) in a packet cannot be greater than max input buffer size (%d)",
-                            numFlits, this.network.getSettings().getConfig().getMaxInputBufferSize()
+                            numFlits, this.network.getSettings().getExperiment().getConfig().getMaxInputBufferSize()
                     )
             );
         }

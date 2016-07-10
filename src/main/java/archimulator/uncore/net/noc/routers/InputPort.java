@@ -24,7 +24,7 @@ public class InputPort {
 
         this.virtualChannels = new ArrayList<>();
 
-        for (int i = 0; i < this.router.getNode().getNetwork().getSettings().getConfig().getNumVirtualChannels(); i++) {
+        for (int i = 0; i < this.router.getNode().getNetwork().getSettings().getExperiment().getConfig().getNumVirtualChannels(); i++) {
             this.virtualChannels.add(new InputVirtualChannel(this, i));
         }
     }
