@@ -91,19 +91,6 @@ public class NoCExperiment implements NoCSettings, NoCStats {
     }
 
     private void dumpConfigAndStats() {
-        System.out.println();
-
-        System.out.println("Config: ");
-        this.config.dump();
-
-        System.out.println();
-
-        System.out.println("Stats: ");
-        for(String key : this.stats.keySet()) {
-            Object value = this.stats.get(key);
-            System.out.println(String.format("  %s: %s", key, value));
-        }
-
         File resultDirFile = new File(config.getResultDir());
 
         if (!resultDirFile.exists()) {
