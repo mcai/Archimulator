@@ -15,6 +15,8 @@ public class ExperimentConfig {
 
     private String outputDirectory;
 
+    private long numMaxInstructions;
+
     private int helperThreadPthreadSpawnIndex;
 
     private boolean dynamicSpeculativePrecomputationEnabled;
@@ -157,8 +159,6 @@ public class ExperimentConfig {
 
     private int basicMemoryControllerRowSize;
 
-    private long numMaxInstructions;
-
     public ExperimentConfig() {
         this.type = ExperimentType.DETAILED;
         this.outputDirectory = "";
@@ -267,6 +267,14 @@ public class ExperimentConfig {
 
     public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    public long getNumMaxInstructions() {
+        return numMaxInstructions;
+    }
+
+    public void setNumMaxInstructions(long numMaxInstructions) {
+        this.numMaxInstructions = numMaxInstructions;
     }
 
     public int getHelperThreadPthreadSpawnIndex() {
@@ -835,13 +843,5 @@ public class ExperimentConfig {
 
     public void setBasicMemoryControllerRowSize(int basicMemoryControllerRowSize) {
         this.basicMemoryControllerRowSize = basicMemoryControllerRowSize;
-    }
-
-    public long getNumMaxInstructions() {
-        return numMaxInstructions;
-    }
-
-    public void setNumMaxInstructions(long numMaxInstructions) {
-        this.numMaxInstructions = numMaxInstructions;
     }
 }
