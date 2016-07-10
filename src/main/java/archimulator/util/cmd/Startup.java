@@ -20,10 +20,7 @@
  */
 package archimulator.util.cmd;
 
-import archimulator.common.ContextMapping;
-import archimulator.common.Experiment;
-import archimulator.common.ExperimentConfig;
-import archimulator.common.ExperimentType;
+import archimulator.common.*;
 
 /**
  * Startup.
@@ -47,6 +44,6 @@ public class Startup {
 
         config.getContextMappings().add(new ContextMapping(0, "benchmarks/Olden_Custom1/mst/ht/mst.mips", "100"));
 
-        Experiment.run(config);
+        ExperimentFactory.run(config);
     }
 }
