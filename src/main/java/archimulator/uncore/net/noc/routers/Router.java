@@ -24,10 +24,6 @@ public class Router {
 
     private Map<Direction, OutputPort> outputPorts;
 
-    private RouteComputation routeComputation;
-
-    private CrossbarSwitch crossbarSwitch;
-
     public Router(Node node) {
         this.node = node;
 
@@ -43,9 +39,6 @@ public class Router {
             this.outputPorts.put(direction, new OutputPort(this, direction));
         }
 
-        this.routeComputation = new RouteComputation(this);
-        this.crossbarSwitch = new CrossbarSwitch(this);
-
         this.node.getNetwork().getCycleAccurateEventQueue().getPerCycleEvents().add(this::advanceOneCycle);
     }
 
@@ -54,13 +47,13 @@ public class Router {
                 || this.getNode().getNetwork().getMemoryHierarchy().getSimulation().getType() == SimulationType.WARMUP) {
             this.stageLinkTraversal();
 
-            this.crossbarSwitch.stageSwitchTraversal();
+            this.stageSwitchTraversal();
 
             this.stageSwitchAllocation();
 
             this.stageVirtualChannelAllocation();
 
-            this.routeComputation.stageRouteComputation();
+            this.stageRouteComputation();
 
             this.localPacketInjection();
         }
@@ -119,6 +112,38 @@ public class Router {
         }
     }
 
+    private void stageSwitchTraversal() {
+        for (OutputPort outputPort: this.outputPorts.values()) {
+            for (InputPort inputPort : this.inputPorts.values()) {
+                if (outputPort.getDirection() == inputPort.getDirection()) {
+                    continue;
+                }
+
+                for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
+                    if(inputVirtualChannel.getOutputVirtualChannel() != null
+                            && inputVirtualChannel.getOutputVirtualChannel().getOutputPort() == outputPort) {
+                        Flit flit = inputVirtualChannel.getInputBuffer().peek();
+                        if(flit != null && flit.getState() == FlitState.SWITCH_ALLOCATION) {
+                            flit.setState(FlitState.SWITCH_TRAVERSAL);
+
+                            if(inputPort.getDirection() != Direction.LOCAL) {
+                                Node parent = this.node.getNetwork().getNodes().get(
+                                        this.node.getNeighbors().get(inputPort.getDirection())
+                                );
+
+                                OutputVirtualChannel outputVirtualChannelAtParent =
+                                        parent.getRouter().getOutputPorts().get(inputPort.getDirection().getReflexDirection())
+                                                .getVirtualChannels().get(inputVirtualChannel.getId());
+
+                                outputVirtualChannelAtParent.setCredits(outputVirtualChannelAtParent.getCredits() + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void stageSwitchAllocation() {
         for(OutputPort outputPort : this.outputPorts.values()) {
             InputVirtualChannel winnerInputVirtualChannel = outputPort.getArbiter().next();
@@ -143,6 +168,28 @@ public class Router {
                         winnerInputVirtualChannel.setOutputVirtualChannel(outputVirtualChannel);
                         outputVirtualChannel.setInputVirtualChannel(winnerInputVirtualChannel);
                     }
+                }
+            }
+        }
+    }
+
+    private void stageRouteComputation() {
+        for(InputPort inputPort : this.inputPorts.values()) {
+            for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
+                Flit flit = inputVirtualChannel.getInputBuffer().peek();
+
+                if(flit != null && flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER) {
+                    if(flit.getPacket().getDest() == this.node.getId()) {
+                        inputVirtualChannel.setRoute(Direction.LOCAL);
+                    } else {
+                        inputVirtualChannel.setRoute(
+                                this.node.doRouteCalculation(
+                                        flit.getPacket(), inputVirtualChannel
+                                )
+                        );
+                    }
+
+                    flit.setState(FlitState.ROUTE_CALCULATION);
                 }
             }
         }
@@ -220,13 +267,5 @@ public class Router {
 
     public Map<Direction, OutputPort> getOutputPorts() {
         return outputPorts;
-    }
-
-    public RouteComputation getRouteComputation() {
-        return routeComputation;
-    }
-
-    public CrossbarSwitch getCrossbarSwitch() {
-        return crossbarSwitch;
     }
 }
