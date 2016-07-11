@@ -57,11 +57,11 @@ if __name__ == '__main__':
     print(sys.argv)
 
     arg_parser = ArgumentParser()
-    arg_parser.add_argument('--csv_file_name', type=str)
-    arg_parser.add_argument('--plot_file_name', type=str)
-    arg_parser.add_argument('--x', type=str)
-    arg_parser.add_argument('--hue', type=str)
-    arg_parser.add_argument('--y', type=str)
+    arg_parser.add_argument('--csv_file_name', type=str, default=None)
+    arg_parser.add_argument('--plot_file_name', type=str, default=None)
+    arg_parser.add_argument('--x', type=str, default=None)
+    arg_parser.add_argument('--hue', type=str, default=None)
+    arg_parser.add_argument('--y', type=str, default=None)
 
     args = arg_parser.parse_args()
 

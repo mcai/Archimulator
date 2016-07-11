@@ -179,9 +179,6 @@ public class ExperimentConfig {
     private int linkWidth;
     private int linkDelay;
 
-    private int dataPacketSize;
-    private double dataPacketInjectionRate;
-
     private int antPacketSize;
     private double antPacketInjectionRate;
 
@@ -293,8 +290,6 @@ public class ExperimentConfig {
         this.numVirtualChannels = 4;
         this.linkWidth = 4;
         this.linkDelay = 1;
-        this.dataPacketSize = 16;
-        this.dataPacketInjectionRate = 0.01;
         this.antPacketSize = 4;
         this.antPacketInjectionRate = 0.01;
         this.acoSelectionAlpha = 0.5;
@@ -959,22 +954,6 @@ public class ExperimentConfig {
 
     public void setLinkDelay(int linkDelay) {
         this.linkDelay = linkDelay;
-    }
-
-    public int getDataPacketSize() {
-        return dataPacketSize;
-    }
-
-    public void setDataPacketSize(int dataPacketSize) {
-        this.dataPacketSize = dataPacketSize;
-    }
-
-    public double getDataPacketInjectionRate() {
-        return dataPacketInjectionRate;
-    }
-
-    public void setDataPacketInjectionRate(double dataPacketInjectionRate) {
-        this.dataPacketInjectionRate = dataPacketInjectionRate;
     }
 
     public int getAntPacketSize() {

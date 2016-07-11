@@ -17,14 +17,27 @@ public class PlotHelper {
      */
     public static void generatePlot(String csvFileName, String plotFileName, String x, String hue, String y) {
         try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "tools/plots/plots.sh",
-                    "--csv_file_name", csvFileName,
-                    "--plot_file_name", plotFileName,
-                    "--x", x,
-                    "--hue", hue,
-                    "--y", y
-            ).inheritIO();
+            ProcessBuilder pb;
+
+            if(hue != null) {
+                pb = new ProcessBuilder(
+                        "tools/plots/plots.sh",
+                        "--csv_file_name", csvFileName,
+                        "--plot_file_name", plotFileName,
+                        "--x", x,
+                        "--hue", hue,
+                        "--y", y
+                ).inheritIO();
+            }
+            else {
+                pb = new ProcessBuilder(
+                        "tools/plots/plots.sh",
+                        "--csv_file_name", csvFileName,
+                        "--plot_file_name", plotFileName,
+                        "--x", x,
+                        "--y", y
+                ).inheritIO();
+            }
 
             pb.start().waitFor();
         } catch (IOException | InterruptedException e) {

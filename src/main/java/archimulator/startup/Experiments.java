@@ -30,8 +30,6 @@ public class Experiments {
     }
 
     private static List<Experiment> testAntPacketInjectionRates() {
-        double dataPacketInjectionRate = 0.060;
-
         List<Double> antPacketInjectionRates = Arrays.asList(
                 0.0002, 0.001, 0.005, 0.025
         );
@@ -44,10 +42,9 @@ public class Experiments {
         Experiment experimentXy = new Experiment();
         setupCommonConfig(experimentXy);
         experimentXy.getConfig().setOutputDirectory(String.format(
-                "results/antPacketInjectionRates/j_%s/r_%s/s_%s/",
-                dataPacketInjectionRate, "xy", "random"
+                "results/antPacketInjectionRates/r_%s/s_%s/",
+                "xy", "random"
         ));
-        experimentXy.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experimentXy.getConfig().setRouting("xy");
         experimentXy.getConfig().setSelection("random");
         experiments.add(experimentXy);
@@ -55,10 +52,9 @@ public class Experiments {
         Experiment experimentBufferLevel = new Experiment();
         setupCommonConfig(experimentBufferLevel);
         experimentBufferLevel.getConfig().setOutputDirectory(String.format(
-                "results/antPacketInjectionRates/j_%s/r_%s/s_%s/",
-                dataPacketInjectionRate, "oddEven", "bufferLevel"
+                "results/antPacketInjectionRates/r_%s/s_%s/",
+                "oddEven", "bufferLevel"
         ));
-        experimentBufferLevel.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experimentBufferLevel.getConfig().setRouting("oddEven");
         experimentBufferLevel.getConfig().setSelection("bufferLevel");
         experiments.add(experimentBufferLevel);
@@ -67,11 +63,10 @@ public class Experiments {
             Experiment experimentAco = new Experiment();
             setupCommonConfig(experimentAco);
             experimentAco.getConfig().setOutputDirectory(String.format(
-                    "results/antPacketInjectionRates/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
-                    dataPacketInjectionRate, "oddEven", "aco",
+                    "results/antPacketInjectionRates/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
+                    "oddEven", "aco",
                     antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
             ));
-            experimentAco.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
             experimentAco.getConfig().setRouting("oddEven");
             experimentAco.getConfig().setSelection("aco");
             experimentAco.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
@@ -84,8 +79,6 @@ public class Experiments {
     }
 
     private static List<Experiment> testAcoSelectionAlphasAndReinforcementFactors() {
-        double dataPacketInjectionRate  = 0.060;
-
         double antPacketInjectionRate = 0.001;
 
         List<Double> acoSelectionAlphas = Arrays.asList(
@@ -101,10 +94,9 @@ public class Experiments {
         Experiment experimentXy = new Experiment();
         setupCommonConfig(experimentXy);
         experimentXy.getConfig().setOutputDirectory(String.format(
-                "results/acoSelectionAlphasAndReinforcementFactors/j_%s/r_%s/s_%s/",
-                dataPacketInjectionRate, "xy", "random"
+                "results/acoSelectionAlphasAndReinforcementFactors/r_%s/s_%s/",
+                "xy", "random"
         ));
-        experimentXy.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experimentXy.getConfig().setRouting("xy");
         experimentXy.getConfig().setSelection("random");
         experiments.add(experimentXy);
@@ -112,10 +104,9 @@ public class Experiments {
         Experiment experimentBufferLevel = new Experiment();
         setupCommonConfig(experimentBufferLevel);
         experimentBufferLevel.getConfig().setOutputDirectory(String.format(
-                "results/acoSelectionAlphasAndReinforcementFactors/j_%s/r_%s/s_%s/",
-                dataPacketInjectionRate, "oddEven", "bufferLevel"
+                "results/acoSelectionAlphasAndReinforcementFactors/r_%s/s_%s/",
+                "oddEven", "bufferLevel"
         ));
-        experimentBufferLevel.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
         experimentBufferLevel.getConfig().setRouting("oddEven");
         experimentBufferLevel.getConfig().setSelection("bufferLevel");
         experiments.add(experimentBufferLevel);
@@ -125,11 +116,10 @@ public class Experiments {
                 Experiment experimentAco = new Experiment();
                 setupCommonConfig(experimentAco);
                 experimentAco.getConfig().setOutputDirectory(String.format(
-                        "results/acoSelectionAlphasAndReinforcementFactors/j_%s/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
-                        dataPacketInjectionRate, "oddEven", "aco",
+                        "results/acoSelectionAlphasAndReinforcementFactors/r_%s/s_%s/aj_%s/a_%s/rf_%s/",
+                        "oddEven", "aco",
                         antPacketInjectionRate, acoSelectionAlpha, reinforcementFactor
                 ));
-                experimentAco.getConfig().setDataPacketInjectionRate(dataPacketInjectionRate);
                 experimentAco.getConfig().setRouting("oddEven");
                 experimentAco.getConfig().setSelection("aco");
                 experimentAco.getConfig().setAntPacketInjectionRate(antPacketInjectionRate);
