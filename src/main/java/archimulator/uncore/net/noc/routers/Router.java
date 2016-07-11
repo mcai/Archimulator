@@ -26,10 +26,6 @@ public class Router {
 
     private RouteComputation routeComputation;
 
-    private VirtualChannelAllocator virtualChannelAllocator;
-
-    private SwitchAllocator switchAllocator;
-
     private CrossbarSwitch crossbarSwitch;
 
     public Router(Node node) {
@@ -48,8 +44,6 @@ public class Router {
         }
 
         this.routeComputation = new RouteComputation(this);
-        this.virtualChannelAllocator = new VirtualChannelAllocator(this);
-        this.switchAllocator = new SwitchAllocator(this);
         this.crossbarSwitch = new CrossbarSwitch(this);
 
         this.node.getNetwork().getCycleAccurateEventQueue().getPerCycleEvents().add(this::advanceOneCycle);
@@ -62,9 +56,9 @@ public class Router {
 
             this.crossbarSwitch.stageSwitchTraversal();
 
-            this.switchAllocator.stageSwitchAllocation();
+            this.stageSwitchAllocation();
 
-            this.virtualChannelAllocator.stageVirtualChannelAllocation();
+            this.stageVirtualChannelAllocation();
 
             this.routeComputation.stageRouteComputation();
 
@@ -122,6 +116,35 @@ public class Router {
             this.node.getNetwork().getNodes().get(nextHop).getRouter().insertFlit(flit, ip, ivc);
         } else {
             this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> this.nextHopArrived(flit, nextHop, ip, ivc), 1);
+        }
+    }
+
+    private void stageSwitchAllocation() {
+        for(OutputPort outputPort : this.outputPorts.values()) {
+            InputVirtualChannel winnerInputVirtualChannel = outputPort.getArbiter().next();
+
+            if(winnerInputVirtualChannel != null) {
+                Flit flit = winnerInputVirtualChannel.getInputBuffer().peek();
+                flit.setState(FlitState.SWITCH_ALLOCATION);
+            }
+        }
+    }
+
+    private void stageVirtualChannelAllocation() {
+        for(OutputPort outputPort : this.outputPorts.values()) {
+            for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
+                if(outputVirtualChannel.getInputVirtualChannel() == null) {
+                    InputVirtualChannel winnerInputVirtualChannel = outputVirtualChannel.getArbiter().next();
+
+                    if(winnerInputVirtualChannel != null) {
+                        Flit flit = winnerInputVirtualChannel.getInputBuffer().peek();
+                        flit.setState(FlitState.VIRTUAL_CHANNEL_ALLOCATION);
+
+                        winnerInputVirtualChannel.setOutputVirtualChannel(outputVirtualChannel);
+                        outputVirtualChannel.setInputVirtualChannel(winnerInputVirtualChannel);
+                    }
+                }
+            }
         }
     }
 
@@ -201,14 +224,6 @@ public class Router {
 
     public RouteComputation getRouteComputation() {
         return routeComputation;
-    }
-
-    public VirtualChannelAllocator getVirtualChannelAllocator() {
-        return virtualChannelAllocator;
-    }
-
-    public SwitchAllocator getSwitchAllocator() {
-        return switchAllocator;
     }
 
     public CrossbarSwitch getCrossbarSwitch() {
