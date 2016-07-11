@@ -12,7 +12,7 @@ import org.junit.Test;
  */
 public class ExperimentTest {
     @Test
-    public void test() {
+    public void test_mst_ht() {
         Experiment experiment = new Experiment();
 
         experiment.getConfig().setType(ExperimentType.DETAILED);
