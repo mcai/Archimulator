@@ -2,6 +2,7 @@ package archimulator.uncore.net.noc.routers;
 
 import archimulator.uncore.net.noc.util.RoundRobinArbiter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,8 +11,23 @@ import java.util.List;
  * @author Min Cai
  */
 public class VirtualChannelArbiter extends RoundRobinArbiter<OutputVirtualChannel, InputVirtualChannel> {
-    public VirtualChannelArbiter(OutputVirtualChannel outputVirtualChannel, List<InputVirtualChannel> inputVirtualChannels) {
-        super(outputVirtualChannel, inputVirtualChannels);
+    private List<InputVirtualChannel> inputVirtualChannels;
+
+    public VirtualChannelArbiter(OutputVirtualChannel outputVirtualChannel) {
+        super(outputVirtualChannel);
+    }
+
+    @Override
+    protected List<InputVirtualChannel> getRequesters() {
+        if(inputVirtualChannels == null) {
+            inputVirtualChannels = new ArrayList<>();
+
+            for(InputPort inputPort : this.getResource().getOutputPort().getRouter().getInputPorts().values()) {
+                inputVirtualChannels.addAll(inputPort.getVirtualChannels());
+            }
+        }
+
+        return inputVirtualChannels;
     }
 
     @Override

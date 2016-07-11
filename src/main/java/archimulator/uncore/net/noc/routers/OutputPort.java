@@ -17,6 +17,8 @@ public class OutputPort {
 
     private List<OutputVirtualChannel> virtualChannels;
 
+    private SwitchArbiter arbiter;
+
     public OutputPort(Router router, Direction direction) {
         this.router = router;
 
@@ -27,6 +29,8 @@ public class OutputPort {
         for (int i = 0; i < this.router.getNode().getNetwork().getMemoryHierarchy().getExperiment().getConfig().getNumVirtualChannels(); i++) {
             this.virtualChannels.add(new OutputVirtualChannel(this, i));
         }
+
+        this.arbiter = new SwitchArbiter(this);
     }
 
     public Router getRouter() {
@@ -39,5 +43,9 @@ public class OutputPort {
 
     public List<OutputVirtualChannel> getVirtualChannels() {
         return virtualChannels;
+    }
+
+    public SwitchArbiter getArbiter() {
+        return arbiter;
     }
 }

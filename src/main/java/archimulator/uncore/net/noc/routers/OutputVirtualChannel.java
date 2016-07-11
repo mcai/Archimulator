@@ -10,6 +10,7 @@ public class OutputVirtualChannel {
     private int id;
     private InputVirtualChannel inputVirtualChannel;
     private int credits;
+    private VirtualChannelArbiter arbiter;
 
     public OutputVirtualChannel(OutputPort outputPort, int id) {
         this.outputPort = outputPort;
@@ -19,6 +20,8 @@ public class OutputVirtualChannel {
         this.inputVirtualChannel = null;
 
         this.credits = 10;
+
+        this.arbiter = new VirtualChannelArbiter(this);
     }
 
     public OutputPort getOutputPort() {
@@ -43,5 +46,9 @@ public class OutputVirtualChannel {
 
     public void setCredits(int credits) {
         this.credits = credits;
+    }
+
+    public VirtualChannelArbiter getArbiter() {
+        return arbiter;
     }
 }
