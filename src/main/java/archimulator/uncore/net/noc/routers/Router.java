@@ -229,7 +229,7 @@ public class Router {
 
             for(int ivc = 0; ivc < this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getNumVirtualChannels(); ivc++) {
                 if(this.injectionBuffer.isEmpty()) {
-                    continue;
+                    return;
                 }
 
                 Packet packet = this.injectionBuffer.get(0);
