@@ -1,18 +1,17 @@
-Archimulator README
-========
+# Archimulator README
 
 This README briefly describes what Archimulator is and how to setup & run Archimulator.
 
-License Information
-------------------
+## License Information
 
 Copyright (c) 2010-2016 by Min Cai (<min.cai.china@gmail.com>)
 
 This program is free software, licensed under the MIT license.
 Please, read the license file "COPYING" for further information.
 
-Acknowledgements
-------------------
+## Acknowledgements
+
+### YourKit Java Profiler
 
 Archimulator is profiled using the YourKit Java Profiler.
 
@@ -24,18 +23,15 @@ YourKit, LLC is the creator of <a href="https://www.yourkit.com/java/profiler/in
 and <a href="https://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>,
 innovative and intelligent tools for profiling Java and .NET applications.
 
-Archimulator in a Glance
-------------------
+## Archimulator in a Glance
 
 Archimulator is an easy-to-use, feature-rich, and extensible CMP architectural simulator powered by Java on 32/64 bit Linux/Unix..
 
-Web Site
-------------------
+## Web Site
 
 Please obtain the latest Archimulator code from Archimulator on Github: http://github.com/mcai/Archimulator/.
 
-Key Features
-------------------
+## Key Features
 
 - Archimulator is written in 100% Java with the aid of JNA (Java Native Access) for native POSIX syscall implementations,
   which assures its portability and usability across many Linux machine configurations.
@@ -71,8 +67,7 @@ Key Features
 
 - Archimulator currently supports correct execution of all the **Olden benchmark suite** except incorrect output from "health", plus some of CPU2006 benchmarks. Other benchmarks are being tested.
 
-System Requirements
-------------------
+## System Requirements
 
 Archimulator has been tested on 64 bit **Ubuntu Linux 12.04** on an Intel Core i7 machine with 32 GB memory.
 
@@ -84,8 +79,7 @@ For **developing and running Archimulator**, make sure that:
 	- Open JDK 8.0 or higher;
 	- Apache Maven 3.0.4 or higher.
 
-Quick Start
-------------------
+## Quick Start
 
 0. For Debian/Ubuntu based Linux distros (other distros can be similarly prepared):
 	- sudo apt-get install build-essential gcc-multilib git-core
@@ -96,16 +90,14 @@ mvn clean install
 
 2. chmod +x ./archimulator.sh;./archimulator.sh
 
-Customizing Archimulator for Your Needs
-------------------
+## Customizing Archimulator for Your Needs
 
 - Archimulator has shipped a few benchmark binaries under the directory: `benchmarks/` for your convenience.
 So if you use Archimulator for testing purposes only, there is no need to compile benchmarks for Archimulator by yourself.
 
 - As is always true for open source software, the existing Archimulator code are good examples for demonstrating its usage and power.
 
-Contact
-------------------
+## Contact
 
 Please report bugs and send suggestions to:
 
