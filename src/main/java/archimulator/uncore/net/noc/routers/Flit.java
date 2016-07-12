@@ -37,7 +37,7 @@ public class Flit {
 
         this.node = null;
 
-        this.state = FlitState.INPUT_BUFFER;
+        this.state = null;
 
         this.prevStateTimestamp = this.timestamp = this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle();
     }
@@ -70,43 +70,44 @@ public class Flit {
         return node;
     }
 
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
     public FlitState getState() {
         return state;
     }
 
-    public void setState(FlitState state) {
+    public void setNodeAndState(Node node, FlitState state) {
         if(state == this.state) {
             throw new IllegalArgumentException(String.format("Flit is already in the %s state", state));
         }
 
-        this.packet.getNetwork().logFlitPerStateDelay(
-                this.head,
-                this.tail,
-                this.state,
-                (int) (this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle() - this.prevStateTimestamp)
-        );
+        if(this.state != null) {
+            this.packet.getNetwork().logFlitPerStateDelay(
+                    this.head,
+                    this.tail,
+                    this.state,
+                    (int) (this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle() - this.prevStateTimestamp)
+            );
 
-        this.node.getRouter().getNumInflightFlits().put(
-                this.state,
-                this.node.getRouter().getNumInflightFlits().get(this.state) - 1
-        );
+            if(this.node.getRouter().getNumInflightFlits().get(this.state) == 0) {
+                throw new IllegalArgumentException();
+            }
+
+            this.node.getRouter().getNumInflightFlits().put(
+                    this.state,
+                    this.node.getRouter().getNumInflightFlits().get(this.state) - 1
+            );
+        }
 
         this.state = state;
+        this.node = node;
 
-        this.node.getRouter().getNumInflightFlits().put(
-                this.state,
-                this.node.getRouter().getNumInflightFlits().get(this.state) + 1
-        );
+        if(this.state != FlitState.DESTINATION_ARRIVED) {
+            this.node.getRouter().getNumInflightFlits().put(
+                    this.state,
+                    this.node.getRouter().getNumInflightFlits().get(this.state) + 1
+            );
+        }
 
         this.prevStateTimestamp = this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle();
-    }
-
-    public long getPrevStateTimestamp() {
-        return prevStateTimestamp;
     }
 
     public long getTimestamp() {

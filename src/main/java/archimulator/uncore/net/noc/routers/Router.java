@@ -78,7 +78,7 @@ public class Router {
                     Flit flit = inputVirtualChannel.getInputBuffer().peek();
                     if(flit != null && flit.getState() == FlitState.SWITCH_TRAVERSAL) {
                         if(outputPort.getDirection() != Direction.LOCAL) {
-                            flit.setState(FlitState.LINK_TRAVERSAL);
+                            flit.setNodeAndState(this.node, FlitState.LINK_TRAVERSAL);
 
                             int nextHop = this.node.getNeighbors().get(outputPort.getDirection());
                             Direction ip = outputPort.getDirection().getReflexDirection();
@@ -94,7 +94,7 @@ public class Router {
                         if(outputPort.getDirection() != Direction.LOCAL) {
                             outputVirtualChannel.setCredits(outputVirtualChannel.getCredits() - 1);
                         } else {
-                            flit.setState(FlitState.DESTINATION_ARRIVED);
+                            flit.setNodeAndState(this.node, FlitState.DESTINATION_ARRIVED);
                         }
 
                         if(flit.isTail()) {
@@ -116,7 +116,6 @@ public class Router {
                 this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).getVirtualChannels().get(ivc).getInputBuffer();
 
         if(inputBuffer.size() + 1 <= this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()) {
-            flit.setState(FlitState.INPUT_BUFFER);
             this.node.getNetwork().getNodes().get(nextHop).getRouter().insertFlit(flit, ip, ivc);
         } else {
             this.node.getNetwork().getCycleAccurateEventQueue().schedule(this, () -> this.nextHopArrived(flit, nextHop, ip, ivc), 1);
@@ -139,7 +138,7 @@ public class Router {
                             && inputVirtualChannel.getOutputVirtualChannel().getOutputPort() == outputPort) {
                         Flit flit = inputVirtualChannel.getInputBuffer().peek();
                         if(flit != null && flit.getState() == FlitState.SWITCH_ALLOCATION) {
-                            flit.setState(FlitState.SWITCH_TRAVERSAL);
+                            flit.setNodeAndState(this.node, FlitState.SWITCH_TRAVERSAL);
 
                             if(inputPort.getDirection() != Direction.LOCAL) {
                                 Node parent = this.node.getNetwork().getNodes().get(
@@ -170,7 +169,7 @@ public class Router {
 
             if(winnerInputVirtualChannel != null) {
                 Flit flit = winnerInputVirtualChannel.getInputBuffer().peek();
-                flit.setState(FlitState.SWITCH_ALLOCATION);
+                flit.setNodeAndState(this.node, FlitState.SWITCH_ALLOCATION);
             }
         }
     }
@@ -187,7 +186,7 @@ public class Router {
 
                     if(winnerInputVirtualChannel != null) {
                         Flit flit = winnerInputVirtualChannel.getInputBuffer().peek();
-                        flit.setState(FlitState.VIRTUAL_CHANNEL_ALLOCATION);
+                        flit.setNodeAndState(this.node, FlitState.VIRTUAL_CHANNEL_ALLOCATION);
 
                         winnerInputVirtualChannel.setOutputVirtualChannel(outputVirtualChannel);
                         outputVirtualChannel.setInputVirtualChannel(winnerInputVirtualChannel);
@@ -217,7 +216,7 @@ public class Router {
                         );
                     }
 
-                    flit.setState(FlitState.ROUTE_COMPUTATION);
+                    flit.setNodeAndState(this.node, FlitState.ROUTE_COMPUTATION);
                 }
             }
         }
@@ -268,12 +267,7 @@ public class Router {
     public void insertFlit(Flit flit, Direction ip, int ivc) {
         this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().append(flit);
 
-        flit.setNode(this.node);
-
-        this.numInflightFlits.put(
-                flit.getState(),
-                this.numInflightFlits.get(flit.getState()) + 1
-        );
+        flit.setNodeAndState(this.node, FlitState.INPUT_BUFFER);
     }
 
     public int freeSlots(Direction ip, int ivc) {
