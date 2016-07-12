@@ -12,7 +12,8 @@ import java.util.List;
  */
 public abstract class RoundRobinArbiter<ResourceT, RequesterT> {
     private ResourceT resource;
-    private Iterator<RequesterT> requestersIter;
+
+    private Iterator<RequesterT> requestersIterator;
 
     public RoundRobinArbiter(ResourceT resource) {
         this.resource = resource;
@@ -30,7 +31,7 @@ public abstract class RoundRobinArbiter<ResourceT, RequesterT> {
         }
 
         for(int i = 0; i < this.getRequesters().size(); i++) {
-            RequesterT requester = this.getRequestersIter().next();
+            RequesterT requester = this.getRequestersIterator().next();
             if(this.requesterHasRequests(requester)) {
                 return requester;
             }
@@ -43,10 +44,10 @@ public abstract class RoundRobinArbiter<ResourceT, RequesterT> {
         return resource;
     }
 
-    public Iterator<RequesterT> getRequestersIter() {
-        if(requestersIter == null) {
-            this.requestersIter = Iterators.cycle(this.getRequesters());
+    private Iterator<RequesterT> getRequestersIterator() {
+        if(requestersIterator == null) {
+            this.requestersIterator = Iterators.cycle(this.getRequesters());
         }
-        return requestersIter;
+        return requestersIterator;
     }
 }
