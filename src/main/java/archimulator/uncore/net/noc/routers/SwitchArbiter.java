@@ -31,15 +31,15 @@ public class SwitchArbiter extends RoundRobinArbiter<OutputPort, InputVirtualCha
     }
 
     @Override
-    protected boolean resourceAvailable(OutputPort resource) {
+    protected boolean resourceAvailable(OutputPort outputPort) {
         return true;
     }
 
     @Override
-    protected boolean requesterHasRequests(InputVirtualChannel requester) {
-        if(requester.getOutputVirtualChannel() != null
-                && requester.getOutputVirtualChannel().getOutputPort() == this.getResource()) {
-            Flit flit = requester.getInputBuffer().peek();
+    protected boolean requesterHasRequests(InputVirtualChannel inputVirtualChannel) {
+        if(inputVirtualChannel.getOutputVirtualChannel() != null
+                && inputVirtualChannel.getOutputVirtualChannel().getOutputPort() == this.getResource()) {
+            Flit flit = inputVirtualChannel.getInputBuffer().peek();
             return flit != null
                     && (flit.isHead() && flit.getState() == FlitState.VIRTUAL_CHANNEL_ALLOCATION
                     || !flit.isHead() && flit.getState() == FlitState.INPUT_BUFFER);

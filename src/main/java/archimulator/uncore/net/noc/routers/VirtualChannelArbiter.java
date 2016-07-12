@@ -31,14 +31,14 @@ public class VirtualChannelArbiter extends RoundRobinArbiter<OutputVirtualChanne
     }
 
     @Override
-    protected boolean resourceAvailable(OutputVirtualChannel resource) {
-        return resource.getInputVirtualChannel() == null;
+    protected boolean resourceAvailable(OutputVirtualChannel outputVirtualChannel) {
+        return outputVirtualChannel.getInputVirtualChannel() == null;
     }
 
     @Override
-    protected boolean requesterHasRequests(InputVirtualChannel requester) {
-        if(requester.getRoute() == this.getResource().getOutputPort().getDirection()) {
-            Flit flit = requester.getInputBuffer().peek();
+    protected boolean requesterHasRequests(InputVirtualChannel inputVirtualChannel) {
+        if(inputVirtualChannel.getRoute() == this.getResource().getOutputPort().getDirection()) {
+            Flit flit = inputVirtualChannel.getInputBuffer().peek();
             return flit != null && flit.isHead() && flit.getState() == FlitState.ROUTE_CALCULATION;
         }
 
