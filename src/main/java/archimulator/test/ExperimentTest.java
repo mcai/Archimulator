@@ -31,7 +31,7 @@ public class ExperimentTest {
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "100",
-                "test_result/test_mst_ht_100_aco_two_phase",
+                "test_results/mst_ht_100_aco_two_phase",
                 "oddEven",
                 "aco"
         );
@@ -44,13 +44,13 @@ public class ExperimentTest {
                 1000000000,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "1000",
-                "test_result/test_mst_ht_1000_aco_two_phase",
+                "test_results/mst_ht_1000_aco_two_phase",
                 "oddEven",
                 "aco"
         );
     }
 
-    public void test(
+    private void test(
             ExperimentType experimentType,
             long numMaxInstructions, String executable,
             String arguments,
