@@ -90,7 +90,17 @@ public class Flit {
                 (int) (this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle() - this.prevStateTimestamp)
         );
 
+        this.node.getRouter().getNumInflightFlits().put(
+                this.state,
+                this.node.getRouter().getNumInflightFlits().get(this.state) - 1
+        );
+
         this.state = state;
+
+        this.node.getRouter().getNumInflightFlits().put(
+                this.state,
+                this.node.getRouter().getNumInflightFlits().get(this.state) + 1
+        );
 
         this.prevStateTimestamp = this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle();
     }

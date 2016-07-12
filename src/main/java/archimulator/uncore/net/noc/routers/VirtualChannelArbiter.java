@@ -39,7 +39,7 @@ public class VirtualChannelArbiter extends RoundRobinArbiter<OutputVirtualChanne
     protected boolean requesterHasRequests(InputVirtualChannel inputVirtualChannel) {
         if(inputVirtualChannel.getRoute() == this.getResource().getOutputPort().getDirection()) {
             Flit flit = inputVirtualChannel.getInputBuffer().peek();
-            return flit != null && flit.isHead() && flit.getState() == FlitState.ROUTE_CALCULATION;
+            return flit != null && flit.isHead() && flit.getState() == FlitState.ROUTE_COMPUTATION;
         }
 
         return false;

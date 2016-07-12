@@ -24,6 +24,8 @@ public class Router {
 
     private Map<Direction, OutputPort> outputPorts;
 
+    private Map<FlitState, Integer> numInflightFlits;
+
     public Router(Node node) {
         this.node = node;
 
@@ -37,6 +39,11 @@ public class Router {
         this.outputPorts = new TreeMap<>();
         for (Direction direction : Direction.values()) {
             this.outputPorts.put(direction, new OutputPort(this, direction));
+        }
+
+        this.numInflightFlits = new TreeMap<>();
+        for(FlitState flitState : FlitState.values()) {
+            this.numInflightFlits.put(flitState, 0);
         }
 
         this.node.getNetwork().getCycleAccurateEventQueue().getPerCycleEvents().add(this::advanceOneCycle);
@@ -60,6 +67,10 @@ public class Router {
     }
 
     private void stageLinkTraversal() {
+        if(this.numInflightFlits.get(FlitState.SWITCH_TRAVERSAL) == 0) {
+            return;
+        }
+
         for(OutputPort outputPort : this.outputPorts.values()) {
             for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
                 InputVirtualChannel inputVirtualChannel = outputVirtualChannel.getInputVirtualChannel();
@@ -113,6 +124,10 @@ public class Router {
     }
 
     private void stageSwitchTraversal() {
+        if(this.numInflightFlits.get(FlitState.SWITCH_ALLOCATION) == 0) {
+            return;
+        }
+
         for (OutputPort outputPort: this.outputPorts.values()) {
             for (InputPort inputPort : this.inputPorts.values()) {
                 if (outputPort.getDirection() == inputPort.getDirection()) {
@@ -145,6 +160,11 @@ public class Router {
     }
 
     private void stageSwitchAllocation() {
+        if(this.numInflightFlits.get(FlitState.VIRTUAL_CHANNEL_ALLOCATION) == 0
+                && this.numInflightFlits.get(FlitState.INPUT_BUFFER) == 0) {
+            return;
+        }
+
         for(OutputPort outputPort : this.outputPorts.values()) {
             InputVirtualChannel winnerInputVirtualChannel = outputPort.getArbiter().next();
 
@@ -156,6 +176,10 @@ public class Router {
     }
 
     private void stageVirtualChannelAllocation() {
+        if(this.numInflightFlits.get(FlitState.ROUTE_COMPUTATION) == 0) {
+            return;
+        }
+
         for(OutputPort outputPort : this.outputPorts.values()) {
             for(OutputVirtualChannel outputVirtualChannel : outputPort.getVirtualChannels()) {
                 if(outputVirtualChannel.getInputVirtualChannel() == null) {
@@ -174,6 +198,10 @@ public class Router {
     }
 
     private void stageRouteComputation() {
+        if(this.numInflightFlits.get(FlitState.INPUT_BUFFER) == 0) {
+            return;
+        }
+
         for(InputPort inputPort : this.inputPorts.values()) {
             for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
                 Flit flit = inputVirtualChannel.getInputBuffer().peek();
@@ -189,7 +217,7 @@ public class Router {
                         );
                     }
 
-                    flit.setState(FlitState.ROUTE_CALCULATION);
+                    flit.setState(FlitState.ROUTE_COMPUTATION);
                 }
             }
         }
@@ -241,6 +269,11 @@ public class Router {
         this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().append(flit);
 
         flit.setNode(this.node);
+
+        this.numInflightFlits.put(
+                flit.getState(),
+                this.numInflightFlits.get(flit.getState()) + 1
+        );
     }
 
     public int freeSlots(Direction ip, int ivc) {
@@ -267,5 +300,9 @@ public class Router {
 
     public Map<Direction, OutputPort> getOutputPorts() {
         return outputPorts;
+    }
+
+    public Map<FlitState, Integer> getNumInflightFlits() {
+        return numInflightFlits;
     }
 }

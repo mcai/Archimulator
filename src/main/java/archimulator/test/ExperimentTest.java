@@ -18,7 +18,7 @@ public class ExperimentTest {
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "100",
-                "test_result/mst_ht_100_aco_detailed",
+                "test_results/mst_ht_100_aco_detailed",
                 "oddEven",
                 "aco"
         );

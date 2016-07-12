@@ -5,10 +5,10 @@ package archimulator.uncore.net.noc.routers;
  *
  * @author Min Cai
  */
-public enum  FlitState {
+public enum FlitState {
     INPUT_BUFFER,
 
-    ROUTE_CALCULATION,
+    ROUTE_COMPUTATION,
 
     VIRTUAL_CHANNEL_ALLOCATION,
 
