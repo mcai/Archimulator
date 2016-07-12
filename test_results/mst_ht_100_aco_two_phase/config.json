@@ -1,6 +1,6 @@
 {
   "type": "TWO_PHASE",
-  "outputDirectory": "test_result/test_mst_ht_100_aco_two_phase",
+  "outputDirectory": "test_results/mst_ht_100_aco_two_phase",
   "contextMappings": [
     {
       "threadId": 0,

@@ -1,6 +1,6 @@
 {
   "type": "DETAILED",
-  "outputDirectory": "test_result/mst_ht_100_aco_detailed",
+  "outputDirectory": "test_results/mst_ht_100_aco_detailed",
   "contextMappings": [
     {
       "threadId": 0,
