@@ -24,8 +24,15 @@ public class Router {
 
     private Map<Direction, OutputPort> outputPorts;
 
-    private Map<FlitState, Integer> numInflightFlits;
+    private Map<FlitState, Integer> numInflightHeadFlits;
 
+    private Map<FlitState, Integer> numInflightNonHeadFlits;
+
+    /**
+     * Create a router.
+     *
+     * @param node the parent node
+     */
     public Router(Node node) {
         this.node = node;
 
@@ -41,14 +48,22 @@ public class Router {
             this.outputPorts.put(direction, new OutputPort(this, direction));
         }
 
-        this.numInflightFlits = new TreeMap<>();
+        this.numInflightHeadFlits = new TreeMap<>();
         for(FlitState flitState : FlitState.values()) {
-            this.numInflightFlits.put(flitState, 0);
+            this.numInflightHeadFlits.put(flitState, 0);
+        }
+
+        this.numInflightNonHeadFlits = new TreeMap<>();
+        for(FlitState flitState : FlitState.values()) {
+            this.numInflightNonHeadFlits.put(flitState, 0);
         }
 
         this.node.getNetwork().getCycleAccurateEventQueue().getPerCycleEvents().add(this::advanceOneCycle);
     }
 
+    /**
+     * Advance one cycle.
+     */
     private void advanceOneCycle() {
         if (this.getNode().getNetwork().getMemoryHierarchy().getSimulation().getType() == SimulationType.MEASUREMENT
                 || this.getNode().getNetwork().getMemoryHierarchy().getSimulation().getType() == SimulationType.WARMUP) {
@@ -66,8 +81,12 @@ public class Router {
         }
     }
 
+    /**
+     * The link traversal stage.
+     */
     private void stageLinkTraversal() {
-        if(this.numInflightFlits.get(FlitState.SWITCH_TRAVERSAL) == 0) {
+        if(this.numInflightHeadFlits.get(FlitState.SWITCH_TRAVERSAL) == 0
+                && this.numInflightNonHeadFlits.get(FlitState.SWITCH_TRAVERSAL) == 0) {
             return;
         }
 
@@ -111,6 +130,14 @@ public class Router {
         }
     }
 
+    /**
+     * Handle the event when a flit arrives at the next hop node.
+     *
+     * @param flit the flit
+     * @param nextHop the next hop node ID
+     * @param ip the input port direction
+     * @param ivc the input virtual channel
+     */
     private void nextHopArrived(Flit flit, int nextHop, Direction ip, int ivc) {
         InputBuffer inputBuffer =
                 this.node.getNetwork().getNodes().get(nextHop).getRouter().getInputPorts().get(ip).getVirtualChannels().get(ivc).getInputBuffer();
@@ -122,8 +149,12 @@ public class Router {
         }
     }
 
+    /**
+     * The switch traversal stage.
+     */
     private void stageSwitchTraversal() {
-        if(this.numInflightFlits.get(FlitState.SWITCH_ALLOCATION) == 0) {
+        if(this.numInflightHeadFlits.get(FlitState.SWITCH_ALLOCATION) == 0
+                && this.numInflightNonHeadFlits.get(FlitState.SWITCH_ALLOCATION) == 0) {
             return;
         }
 
@@ -158,9 +189,12 @@ public class Router {
         }
     }
 
+    /**
+     * The switch allocation stage.
+     */
     private void stageSwitchAllocation() {
-        if(this.numInflightFlits.get(FlitState.VIRTUAL_CHANNEL_ALLOCATION) == 0
-                && this.numInflightFlits.get(FlitState.INPUT_BUFFER) == 0) {
+        if(this.numInflightHeadFlits.get(FlitState.VIRTUAL_CHANNEL_ALLOCATION) == 0
+                && this.numInflightNonHeadFlits.get(FlitState.INPUT_BUFFER) == 0) {
             return;
         }
 
@@ -174,8 +208,11 @@ public class Router {
         }
     }
 
+    /**
+     * The virtual channel allocation stage.
+     */
     private void stageVirtualChannelAllocation() {
-        if(this.numInflightFlits.get(FlitState.ROUTE_COMPUTATION) == 0) {
+        if(this.numInflightHeadFlits.get(FlitState.ROUTE_COMPUTATION) == 0) {
             return;
         }
 
@@ -196,8 +233,11 @@ public class Router {
         }
     }
 
+    /**
+     * The route computation stage.
+     */
     private void stageRouteComputation() {
-        if(this.numInflightFlits.get(FlitState.INPUT_BUFFER) == 0) {
+        if(this.numInflightHeadFlits.get(FlitState.INPUT_BUFFER) == 0) {
             return;
         }
 
@@ -222,6 +262,9 @@ public class Router {
         }
     }
 
+    /**
+     * Handle the local packet injection.
+     */
     private void localPacketInjection() {
         while (true) {
             boolean requestInserted = false;
@@ -255,6 +298,12 @@ public class Router {
         }
     }
 
+    /**
+     * Inject the specified packet into the router.
+     *
+     * @param packet the packet
+     * @return whether the injection succeeds or not
+     */
     public boolean injectPacket(Packet packet) {
         if(this.injectionBuffer.size() < this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInjectionBufferSize()) {
             this.injectionBuffer.add(packet);
@@ -264,12 +313,26 @@ public class Router {
         return false;
     }
 
+    /**
+     * Insert the flit into the router.
+     *
+     * @param flit the flit
+     * @param ip the input port direction
+     * @param ivc the input virtual channel number
+     */
     public void insertFlit(Flit flit, Direction ip, int ivc) {
         this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().append(flit);
 
         flit.setNodeAndState(this.node, FlitState.INPUT_BUFFER);
     }
 
+    /**
+     * Get the number of free slots in the specified input virtual channel.
+     *
+     * @param ip the input port direction
+     * @param ivc the input virtual channel number
+     * @return the number of free slots in the specified input virtual channel
+     */
     public int freeSlots(Direction ip, int ivc) {
         return this.node.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()
                 - this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().size();
@@ -280,23 +343,57 @@ public class Router {
         return String.format("Router{node=%s}", node);
     }
 
+    /**
+     * Get the node.
+     *
+     * @return the node
+     */
     public Node getNode() {
         return node;
     }
 
+    /**
+     * Get the injection buffer.
+     *
+     * @return the injection buffer
+     */
     public List<Packet> getInjectionBuffer() {
         return injectionBuffer;
     }
 
+    /**
+     * Get the map of input ports.
+     *
+     * @return the map of input ports
+     */
     public Map<Direction, InputPort> getInputPorts() {
         return inputPorts;
     }
 
+    /**
+     * Get the map of output ports.
+     *
+     * @return the map of output ports
+     */
     public Map<Direction, OutputPort> getOutputPorts() {
         return outputPorts;
     }
 
-    public Map<FlitState, Integer> getNumInflightFlits() {
-        return numInflightFlits;
+    /**
+     * Get the number of inflight head flits.
+     *
+     * @return the number of inflight head flits
+     */
+    public Map<FlitState, Integer> getNumInflightHeadFlits() {
+        return numInflightHeadFlits;
+    }
+
+    /**
+     * Get the number of inflight non-head flits.
+     *
+     * @return the number of inflight non-head flits
+     */
+    public Map<FlitState, Integer> getNumInflightNonHeadFlits() {
+        return numInflightNonHeadFlits;
     }
 }

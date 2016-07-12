@@ -13,6 +13,11 @@ import java.util.List;
 public class SwitchArbiter extends RoundRobinArbiter<OutputPort, InputVirtualChannel> {
     private List<InputVirtualChannel> inputVirtualChannels;
 
+    /**
+     * Create a switch arbiter.
+     *
+     * @param outputPort the output port
+     */
     public SwitchArbiter(OutputPort outputPort) {
         super(outputPort);
     }

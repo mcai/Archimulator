@@ -13,6 +13,11 @@ import java.util.List;
 public class VirtualChannelArbiter extends RoundRobinArbiter<OutputVirtualChannel, InputVirtualChannel> {
     private List<InputVirtualChannel> inputVirtualChannels;
 
+    /**
+     * Create a virtual channel arbiter.
+     *
+     * @param outputVirtualChannel the output virtual channel
+     */
     public VirtualChannelArbiter(OutputVirtualChannel outputVirtualChannel) {
         super(outputVirtualChannel);
     }

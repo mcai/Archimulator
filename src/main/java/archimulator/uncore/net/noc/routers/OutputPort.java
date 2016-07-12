@@ -19,6 +19,12 @@ public class OutputPort {
 
     private SwitchArbiter arbiter;
 
+    /**
+     * Create an output port.
+     *
+     * @param router the parent router
+     * @param direction the direction
+     */
     public OutputPort(Router router, Direction direction) {
         this.router = router;
 
@@ -33,18 +39,38 @@ public class OutputPort {
         this.arbiter = new SwitchArbiter(this);
     }
 
+    /**
+     * Get the parent router.
+     *
+     * @return the parent router
+     */
     public Router getRouter() {
         return router;
     }
 
+    /**
+     * Get the direction.
+     *
+     * @return the direction
+     */
     public Direction getDirection() {
         return direction;
     }
 
+    /**
+     * Get the list of output virtual channels.
+     *
+     * @return the list of output virtual channels
+     */
     public List<OutputVirtualChannel> getVirtualChannels() {
         return virtualChannels;
     }
 
+    /**
+     * Get the switch arbiter.
+     *
+     * @return the switch arbiter
+     */
     public SwitchArbiter getArbiter() {
         return arbiter;
     }
