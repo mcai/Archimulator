@@ -13,7 +13,7 @@ Please, read the license file "COPYING" for further information.
 
 ### YourKit Java Profiler
 
-![https://www.yourkit.com/images/yklogo.png](https://www.yourkit.com/images/yklogo.png)
+![https://www.yourkit.com/images/yklogo.png](https://www.yourkit.com/)
 
 Archimulator is profiled using the YourKit Java Profiler.
 
