@@ -1,6 +1,6 @@
 {
   "type": "DETAILED",
-  "outputDirectory": "test_results/mst_ht_100_aco_detailed",
+  "outputDirectory": "test_results/mst_ht_100_buffer_level_detailed_l2_128KB",
   "contextMappings": [
     {
       "threadId": 0,
@@ -76,7 +76,7 @@
   "l1DNumReadPorts": 128,
   "l1DNumWritePorts": 128,
   "l1DReplacementPolicyType": "LRU",
-  "l2Size": 524288,
+  "l2Size": 131072,
   "l2Associativity": 16,
   "l2LineSize": 64,
   "l2HitLatency": 10,
@@ -97,7 +97,7 @@
   "basicMemoryControllerRowSize": 2048,
   "randSeed": 13,
   "routing": "oddEven",
-  "selection": "aco",
+  "selection": "bufferLevel",
   "maxInjectionBufferSize": 32,
   "maxInputBufferSize": 72,
   "numVirtualChannels": 4,
