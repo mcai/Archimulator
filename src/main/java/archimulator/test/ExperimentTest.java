@@ -25,26 +25,13 @@ public class ExperimentTest {
     }
 
     @Test
-    public void test_mst_ht_100_aco_two_phase() {
-        test(
-                ExperimentType.TWO_PHASE,
-                -1,
-                "benchmarks/Olden_Custom1/mst/ht/mst.mips",
-                "100",
-                "test_results/mst_ht_100_aco_two_phase",
-                "oddEven",
-                "aco"
-        );
-    }
-
-    @Test
     public void test_mst_ht_1000_aco_two_phase() {
         test(
                 ExperimentType.TWO_PHASE,
-                1000000000,
+                1000000,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "1000",
-                "test_results/mst_ht_1000_aco_two_phase",
+                "test_results/test_mst_ht_1000_aco_two_phase",
                 "oddEven",
                 "aco"
         );
