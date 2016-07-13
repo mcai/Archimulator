@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ExperimentTest {
     @Test
     public void test_mst_ht_100_aco_detailed() {
-        test(
+        Experiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -22,11 +22,13 @@ public class ExperimentTest {
                 "oddEven",
                 "aco"
         );
+
+        experiment.run();
     }
 
     @Test
     public void test_mst_ht_1000_aco_two_phase() {
-        test(
+        Experiment experiment = test(
                 ExperimentType.TWO_PHASE,
                 1000000,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -35,11 +37,14 @@ public class ExperimentTest {
                 "oddEven",
                 "aco"
         );
+
+        experiment.run();
     }
 
-    private void test(
+    private Experiment test(
             ExperimentType experimentType,
-            long numMaxInstructions, String executable,
+            long numMaxInstructions,
+            String executable,
             String arguments,
             String outputDirectory,
             String routing,
@@ -68,6 +73,6 @@ public class ExperimentTest {
         experiment.getConfig().setAcoSelectionAlpha(0.45);
         experiment.getConfig().setReinforcementFactor(0.001);
 
-        experiment.run();
+        return experiment;
     }
 }
