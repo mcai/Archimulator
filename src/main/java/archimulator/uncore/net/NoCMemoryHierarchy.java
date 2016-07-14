@@ -34,6 +34,7 @@ import archimulator.uncore.net.noc.Network;
 import archimulator.uncore.net.noc.NetworkFactory;
 import archimulator.uncore.net.noc.Node;
 import archimulator.uncore.net.noc.routers.FlitState;
+import archimulator.uncore.net.noc.routers.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.uncore.net.noc.routing.RoutingAlgorithm;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -49,6 +50,8 @@ import java.util.Random;
  */
 public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, Reportable {
     private Network<? extends Node, ? extends RoutingAlgorithm> network;
+
+    private RouterCongestionStatusPredictionHelper routerCongestionStatusPredictionHelper;
 
     private Map<SimulationObject, Integer> devicesToNodeIds;
 
@@ -95,6 +98,8 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
 
         this.network = NetworkFactory.setupNetwork(this, this.getCycleAccurateEventQueue(), i);
 
+        this.routerCongestionStatusPredictionHelper = new RouterCongestionStatusPredictionHelper(this.network);
+
         this.getExperiment().getConfig().setMaxInputBufferSize(this.getL2Controller().getCache().getLineSize() + 8);
 
         this.random = this.getExperiment().getConfig().getRandSeed() != -1 ? new Random(this.getExperiment().getConfig().getRandSeed()) : new Random();
@@ -116,17 +121,10 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
     }
 
     @Override
-    public String getName() {
-        return "net";
-    }
-
-    public Random getRandom() {
-        return random;
-    }
-
-    @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
+            routerCongestionStatusPredictionHelper.dumpStats(this);
+
             getChildren().add(
                     new ReportNode(
                             this,
@@ -259,5 +257,28 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
                 );
             }
         }});
+    }
+
+    @Override
+    public String getName() {
+        return "net";
+    }
+
+    /**
+     * Get the random.
+     *
+     * @return the random
+     */
+    public Random getRandom() {
+        return random;
+    }
+
+    /**
+     * Get the network.
+     *
+     * @return the network
+     */
+    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
+        return network;
     }
 }
