@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class CPUExperimentConfig {
+public class CPUExperimentConfig implements NoCConfig {
     private ExperimentType type;
 
     private String outputDirectory;
@@ -1645,6 +1645,7 @@ public class CPUExperimentConfig {
      *
      * @return the random seed
      */
+    @Override
     public int getRandSeed() {
         return randSeed;
     }
@@ -1663,6 +1664,7 @@ public class CPUExperimentConfig {
      *
      * @return the routing algorithm in the NoCs
      */
+    @Override
     public String getRouting() {
         return routing;
     }
@@ -1681,6 +1683,7 @@ public class CPUExperimentConfig {
      *
      * @return the selection policy in the NoCs
      */
+    @Override
     public String getSelection() {
         return selection;
     }
@@ -1699,6 +1702,7 @@ public class CPUExperimentConfig {
      *
      * @return the maximum size of the injection buffer
      */
+    @Override
     public int getMaxInjectionBufferSize() {
         return maxInjectionBufferSize;
     }
@@ -1717,6 +1721,7 @@ public class CPUExperimentConfig {
      *
      * @return the maximum size of the input buffer
      */
+    @Override
     public int getMaxInputBufferSize() {
         return maxInputBufferSize;
     }
@@ -1735,6 +1740,7 @@ public class CPUExperimentConfig {
      *
      * @return the number of virtual channels
      */
+    @Override
     public int getNumVirtualChannels() {
         return numVirtualChannels;
     }
@@ -1753,6 +1759,7 @@ public class CPUExperimentConfig {
      *
      * @return the link width
      */
+    @Override
     public int getLinkWidth() {
         return linkWidth;
     }
@@ -1771,6 +1778,7 @@ public class CPUExperimentConfig {
      *
      * @return the link delay
      */
+    @Override
     public int getLinkDelay() {
         return linkDelay;
     }
@@ -1789,6 +1797,7 @@ public class CPUExperimentConfig {
      *
      * @return the size of an ant packet
      */
+    @Override
     public int getAntPacketSize() {
         return antPacketSize;
     }
@@ -1807,6 +1816,7 @@ public class CPUExperimentConfig {
      *
      * @return the ant packet injection rate
      */
+    @Override
     public double getAntPacketInjectionRate() {
         return antPacketInjectionRate;
     }
@@ -1825,6 +1835,7 @@ public class CPUExperimentConfig {
      *
      * @return the ACO selection alpha
      */
+    @Override
     public double getAcoSelectionAlpha() {
         return acoSelectionAlpha;
     }
@@ -1843,6 +1854,7 @@ public class CPUExperimentConfig {
      *
      * @return the reinforcement factor
      */
+    @Override
     public double getReinforcementFactor() {
         return reinforcementFactor;
     }

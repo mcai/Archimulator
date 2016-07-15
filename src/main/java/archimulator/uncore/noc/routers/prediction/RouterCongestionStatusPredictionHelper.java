@@ -33,7 +33,7 @@ public class RouterCongestionStatusPredictionHelper implements Reportable {
                 RouterCongestionStatus.NOT_CONGESTED
         );
 
-        network.getMemoryHierarchy().getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
+        network.getCycleAccurateEventQueue().getPerCycleEvents().add(() -> {
             for(Node node : network.getNodes()) {
                 int freeSlots = 0;
 

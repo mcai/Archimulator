@@ -20,15 +20,13 @@
  */
 package archimulator.uncore.noc;
 
-import archimulator.common.CPUExperiment;
-import archimulator.common.Simulation;
-import archimulator.common.SimulationObject;
+import archimulator.common.*;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.AbstractMemoryHierarchy;
 import archimulator.uncore.MemoryDevice;
-import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.Net;
+import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.noc.routers.FlitState;
 import archimulator.uncore.noc.routers.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.uncore.noc.routing.RoutingAlgorithm;
@@ -45,7 +43,7 @@ import java.util.Random;
  *
  * @author Min Cai
  */
-public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, Reportable {
+public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, NoCEnvironment, Reportable {
     private Network<? extends Node, ? extends RoutingAlgorithm> network;
 
     private RouterCongestionStatusPredictionHelper routerCongestionStatusPredictionHelper;
@@ -261,13 +259,25 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
         return "net";
     }
 
+    @Override
+    public NoCConfig getConfig() {
+        return getExperiment().getConfig();
+    }
+
     /**
      * Get the random.
      *
      * @return the random
      */
+    @Override
     public Random getRandom() {
         return random;
+    }
+
+    @Override
+    public boolean isInDetailedSimulationMode() {
+        return this.getSimulation().getType() == SimulationType.MEASUREMENT
+                || this.getSimulation().getType() == SimulationType.WARMUP;
     }
 
     /**
