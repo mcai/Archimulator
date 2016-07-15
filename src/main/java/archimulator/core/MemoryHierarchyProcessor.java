@@ -20,6 +20,8 @@
  */
 package archimulator.core;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
 import archimulator.os.Kernel;
@@ -32,7 +34,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public interface MemoryHierarchyProcessor extends SimulationObject, Reportable {
+public interface MemoryHierarchyProcessor extends SimulationObject<CPUExperiment, Simulation>, Reportable {
     /**
      * Get the list of cores.
      *

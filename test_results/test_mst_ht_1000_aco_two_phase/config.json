@@ -1,29 +1,29 @@
 {
-  "type": "DETAILED",
-  "outputDirectory": "test_results/mst_ht_100_aco_detailed",
+  "type": "TWO_PHASE",
+  "outputDirectory": "test_results/test_mst_ht_1000_aco_two_phase",
   "contextMappings": [
     {
       "threadId": 0,
       "executable": "benchmarks/Olden_Custom1/mst/ht/mst.mips",
-      "arguments": "100"
+      "arguments": "1000"
     },
     {
       "threadId": 4,
       "executable": "benchmarks/Olden_Custom1/mst/ht/mst.mips",
-      "arguments": "100"
+      "arguments": "1000"
     },
     {
       "threadId": 8,
       "executable": "benchmarks/Olden_Custom1/mst/ht/mst.mips",
-      "arguments": "100"
+      "arguments": "1000"
     },
     {
       "threadId": 12,
       "executable": "benchmarks/Olden_Custom1/mst/ht/mst.mips",
-      "arguments": "100"
+      "arguments": "1000"
     }
   ],
-  "numMaxInstructions": -1,
+  "numMaxInstructions": 1000000,
   "helperThreadPthreadSpawnIndex": 3720,
   "dynamicSpeculativePrecomputationEnabled": false,
   "numMainThreadWaysInStaticPartitionedLRUPolicy": -1,

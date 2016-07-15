@@ -20,7 +20,9 @@
  */
 package archimulator.uncore.tlb;
 
+import archimulator.common.CPUExperiment;
 import archimulator.common.Named;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
@@ -50,7 +52,7 @@ public class TranslationLookasideBuffer implements Named, Reportable {
      * @param parent the parent simulation object
      * @param name   the name
      */
-    public TranslationLookasideBuffer(SimulationObject parent, String name) {
+    public TranslationLookasideBuffer(SimulationObject<CPUExperiment, Simulation> parent, String name) {
         this.name = name;
 
         this.cache = new BasicEvictableCache<>(

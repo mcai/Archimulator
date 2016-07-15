@@ -20,6 +20,7 @@
  */
 package archimulator.common;
 
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -28,11 +29,12 @@ import archimulator.util.event.CycleAccurateEventQueue;
  *
  * @author Min Cai
  */
-public abstract class BasicSimulationObject implements SimulationObject {
-    private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
+public abstract class BasicSimulationObject<ExperimentT extends Experiment<?>, SimulationT>
+        implements SimulationObject<ExperimentT, SimulationT> {
+    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
-    private Experiment experiment;
-    private Simulation simulation;
+    private ExperimentT experiment;
+    private SimulationT simulation;
 
     /**
      * Create a basic simulation object.
@@ -42,7 +44,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public BasicSimulationObject(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicSimulationObject(ExperimentT experiment, SimulationT simulation, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
         this.simulation = simulation;
         this.blockingEventDispatcher = blockingEventDispatcher;
@@ -54,7 +56,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      *
      * @param parent the parent simulation object
      */
-    public BasicSimulationObject(SimulationObject parent) {
+    public BasicSimulationObject(SimulationObject<ExperimentT, SimulationT> parent) {
         this(parent.getExperiment(), parent.getSimulation(), parent.getBlockingEventDispatcher(), parent.getCycleAccurateEventQueue());
     }
 
@@ -63,7 +65,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      *
      * @return the blocking event dispatcher
      */
-    public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return blockingEventDispatcher;
     }
 
@@ -81,7 +83,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      *
      * @return the parent experiment
      */
-    public Experiment getExperiment() {
+    public ExperimentT getExperiment() {
         return experiment;
     }
 
@@ -90,7 +92,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      *
      * @return the parent simulation
      */
-    public Simulation getSimulation() {
+    public SimulationT getSimulation() {
         return simulation;
     }
 }

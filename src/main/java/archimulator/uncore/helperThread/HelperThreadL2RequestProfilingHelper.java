@@ -20,6 +20,7 @@
  */
 package archimulator.uncore.helperThread;
 
+import archimulator.common.CPUExperiment;
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
 import archimulator.common.report.ReportNode;
@@ -674,7 +675,7 @@ public class HelperThreadL2RequestProfilingHelper implements Reportable, HelperT
     /**
      * L2 cache request event.
      */
-    public abstract class L2RequestEvent extends SimulationEvent {
+    public abstract class L2RequestEvent extends SimulationEvent<CPUExperiment, Simulation> {
         private int set;
         private int threadId;
         private int pc;

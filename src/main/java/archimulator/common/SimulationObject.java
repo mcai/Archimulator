@@ -20,6 +20,7 @@
  */
 package archimulator.common;
 
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -28,13 +29,13 @@ import archimulator.util.event.CycleAccurateEventQueue;
  *
  * @author Min Cai
  */
-public interface SimulationObject extends Named {
+public interface SimulationObject<ExperimentT extends Experiment<?>, SimulationT> extends Named {
     /**
      * Get the blocking event dispatcher.
      *
      * @return the blocking event dispatcher
      */
-    BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher();
+    BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher();
 
     /**
      * Get the cycle accurate event queue.
@@ -48,12 +49,12 @@ public interface SimulationObject extends Named {
      *
      * @return the parent experiment
      */
-    Experiment getExperiment();
+    ExperimentT getExperiment();
 
     /**
      * Get the parent simulation.
      *
      * @return the parent simulation
      */
-    Simulation getSimulation();
+    SimulationT getSimulation();
 }

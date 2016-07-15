@@ -21,6 +21,8 @@
 package archimulator.core;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.core.bpred.*;
 import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.Mnemonic;
@@ -37,7 +39,7 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public abstract class AbstractBasicThread extends BasicSimulationObject implements Thread {
+public abstract class AbstractBasicThread extends BasicSimulationObject<CPUExperiment, Simulation> implements Thread {
     /**
      * The number of the thread.
      */

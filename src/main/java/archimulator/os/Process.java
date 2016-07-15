@@ -24,9 +24,7 @@ import archimulator.analysis.BasicBlock;
 import archimulator.analysis.ElfAnalyzer;
 import archimulator.analysis.Function;
 import archimulator.analysis.Instruction;
-import archimulator.common.BasicSimulationObject;
-import archimulator.common.ContextMapping;
-import archimulator.common.SimulationObject;
+import archimulator.common.*;
 import archimulator.isa.*;
 
 import java.io.File;
@@ -41,7 +39,9 @@ import java.util.stream.Collectors;
  *
  * @author Min Cai
  */
-public abstract class Process extends BasicSimulationObject implements SimulationObject, Serializable {
+public abstract class Process
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation>, Serializable {
     private List<String> environments;
 
     private int standardInFileDescriptor;

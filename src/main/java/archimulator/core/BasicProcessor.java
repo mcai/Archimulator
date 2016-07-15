@@ -21,14 +21,14 @@
 package archimulator.core;
 
 import archimulator.common.BasicSimulationObject;
-import archimulator.common.Experiment;
+import archimulator.common.CPUExperiment;
 import archimulator.common.Simulation;
-import archimulator.common.SimulationEvent;
 import archimulator.os.Context;
 import archimulator.os.ContextKilledEvent;
 import archimulator.os.ContextState;
 import archimulator.os.Kernel;
 import archimulator.uncore.MemoryHierarchy;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -39,7 +39,7 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class BasicProcessor extends BasicSimulationObject implements Processor {
+public class BasicProcessor extends BasicSimulationObject<CPUExperiment, Simulation> implements Processor {
     private List<Core> cores;
 
     private Kernel kernel;
@@ -59,9 +59,9 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
      * @param memoryHierarchy         the memory hierarchy
      */
     public BasicProcessor(
-            Experiment experiment,
+            CPUExperiment experiment,
             Simulation simulation,
-            BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher,
+            BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             Kernel kernel,
             MemoryHierarchy memoryHierarchy

@@ -1,6 +1,6 @@
 package archimulator.startup;
 
-import archimulator.common.Experiment;
+import archimulator.common.CPUExperiment;
 import archimulator.uncore.net.noc.routers.FlitState;
 import archimulator.util.csv.CSVField;
 import archimulator.util.csv.CSVHelper;
@@ -15,7 +15,7 @@ import java.util.List;
  * @author Min Cai
  */
 public class Analyze {
-    private static List<CSVField<Experiment>> csvFields = new ArrayList<>();
+    private static List<CSVField<CPUExperiment>> csvFields = new ArrayList<>();
 
     static {
         csvFields.add(new CSVField<>("Routing_Algorithm", CSVFields::getRouting));
@@ -51,7 +51,7 @@ public class Analyze {
     }
 
     public static void analyzeAntPacketInjectionRates() {
-        Experiments.antPacketInjectionRates.forEach(Experiment::loadStats);
+        Experiments.antPacketInjectionRates.forEach(CPUExperiment::loadStats);
         CSVHelper.toCsv(
                 "results/antPacketInjectionRates/result.csv",
                 Experiments.antPacketInjectionRates,
@@ -108,7 +108,7 @@ public class Analyze {
     }
 
     public static void analyzeAcoSelectionAlphasAndReinforcementFactors() {
-        Experiments.acoSelectionAlphasAndReinforcementFactors.forEach(Experiment::loadStats);
+        Experiments.acoSelectionAlphasAndReinforcementFactors.forEach(CPUExperiment::loadStats);
         CSVHelper.toCsv(
                 "results/acoSelectionAlphasAndReinforcementFactors/result.csv",
                 Experiments.acoSelectionAlphasAndReinforcementFactors,

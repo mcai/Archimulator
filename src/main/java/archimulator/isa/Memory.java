@@ -21,6 +21,9 @@
 package archimulator.isa;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
+import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.os.Kernel;
@@ -35,7 +38,8 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class Memory extends BasicSimulationObject implements Reportable {
+public class Memory extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation>, Reportable {
     private int id;
     private boolean littleEndian;
 

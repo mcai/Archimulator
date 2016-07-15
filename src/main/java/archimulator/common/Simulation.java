@@ -47,6 +47,7 @@ import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.Reference;
 import archimulator.util.collection.tree.NodeHelper;
 import archimulator.util.dateTime.DateHelper;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -61,7 +62,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public abstract class Simulation implements SimulationObject, Reportable {
+public abstract class Simulation implements SimulationObject<CPUExperiment, Simulation>, Reportable {
     protected Reference<Kernel> kernelRef;
 
     private long beginTime;
@@ -72,9 +73,9 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     private Processor processor;
 
-    private Experiment experiment;
+    private CPUExperiment experiment;
 
-    private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
+    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
@@ -146,7 +147,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public Simulation(SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public Simulation(SimulationType type, CPUExperiment experiment, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
@@ -500,7 +501,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      *
      * @return the experiment object
      */
-    public Experiment getExperiment() {
+    public CPUExperiment getExperiment() {
         return experiment;
     }
 
@@ -523,7 +524,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      *
      * @return the blocking event dispatcher
      */
-    public BlockingEventDispatcher<SimulationEvent> getBlockingEventDispatcher() {
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
         return this.blockingEventDispatcher;
     }
 

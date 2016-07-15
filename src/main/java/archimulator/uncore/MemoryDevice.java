@@ -21,6 +21,8 @@
 package archimulator.uncore;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.uncore.cache.MemoryDeviceType;
 
@@ -31,7 +33,9 @@ import java.io.Serializable;
  *
  * @author Min Cai
  */
-public abstract class MemoryDevice extends BasicSimulationObject implements SimulationObject, Serializable {
+public abstract class MemoryDevice
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation>, Serializable {
     private MemoryHierarchy memoryHierarchy;
     private String name;
     private MemoryDeviceType type;

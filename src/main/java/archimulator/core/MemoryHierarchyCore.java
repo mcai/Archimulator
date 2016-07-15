@@ -20,6 +20,8 @@
  */
 package archimulator.core;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.coherence.msi.controller.L1DController;
@@ -30,7 +32,7 @@ import archimulator.uncore.coherence.msi.controller.L1IController;
  *
  * @author Min Cai
  */
-public interface MemoryHierarchyCore extends SimulationObject, Reportable {
+public interface MemoryHierarchyCore extends SimulationObject<CPUExperiment, Simulation>, Reportable {
     /**
      * Get a value indicating whether the specified thread can fetch the instruction at the specified address.
      *

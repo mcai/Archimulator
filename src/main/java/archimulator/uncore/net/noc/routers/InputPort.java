@@ -17,6 +17,12 @@ public class InputPort {
 
     private List<InputVirtualChannel> virtualChannels;
 
+    /**
+     * Create an input port.
+     *
+     * @param router the parent router
+     * @param direction the direction
+     */
     public InputPort(Router router, Direction direction) {
         this.router = router;
 
@@ -29,14 +35,29 @@ public class InputPort {
         }
     }
 
+    /**
+     * Get the parent router.
+     *
+     * @return the parent router
+     */
     public Router getRouter() {
         return router;
     }
 
+    /**
+     * Get the direction.
+     *
+     * @return the parent router
+     */
     public Direction getDirection() {
         return direction;
     }
 
+    /**
+     * Get the list of input virtual channels.
+     *
+     * @return the list of input virtual channels
+     */
     public List<InputVirtualChannel> getVirtualChannels() {
         return virtualChannels;
     }
