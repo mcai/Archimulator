@@ -69,6 +69,15 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     private Map<FlitState, Long> totalFlitPerStateDelays;
     private Map<FlitState, Long> maxFlitPerStateDelay;
 
+    /**
+     * Create a network.
+     *
+     * @param memoryHierarchy the memory hierarchy
+     * @param cycleAccurateEventQueue the cycle accurate event queue
+     * @param numNodes the number of nodes
+     * @param nodeFactory the node factory
+     * @param routingAlgorithmFactory the routing algorithm factory
+     */
     public Network(
             NoCMemoryHierarchy memoryHierarchy,
             CycleAccurateEventQueue cycleAccurateEventQueue,
@@ -138,6 +147,11 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.maxFlitPerStateDelay = new HashMap<>();
     }
 
+    /**
+     * Log the event when a packet is received.
+     *
+     * @param packet the packet that is received
+     */
     public void logPacketReceived(Packet packet) {
         this.numPacketsReceived++;
 
@@ -155,6 +169,11 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
                 this.numPacketsReceivedPerType.get(packetCls) + 1);
     }
 
+    /**
+     * Log the event when a packet is transmitted.
+     *
+     * @param packet the packet that is transmitted
+     */
     public void logPacketTransmitted(Packet packet) {
         this.numPacketsTransmitted++;
 
@@ -215,6 +234,14 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
                 Math.max(this.maxPacketHopsPerType.get(packetCls), packet.hops()));
     }
 
+    /**
+     * Log the flit per-state delay.
+     *
+     * @param head a boolean value indicating whether the flit is head flit or not
+     * @param tail a boolean value indicating whether the flit is tail flit or not
+     * @param state the flit state
+     * @param delay the delay that the flit is spent in the state
+     */
     public void logFlitPerStateDelay(boolean head, boolean tail, FlitState state, int delay) {
         if(!this.numFlitPerStateDelaySamples.containsKey(state)) {
             this.numFlitPerStateDelaySamples.put(state, 0L);
@@ -235,6 +262,12 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         this.maxFlitPerStateDelay.put(state, Math.max(this.maxFlitPerStateDelay.get(state), delay));
     }
 
+    /**
+     * Receives a packet.
+     *
+     * @param packet the packet that is received
+     * @return a boolean value indicating whether the packet is received or not
+     */
     public boolean receive(Packet packet) {
         if(!this.nodes.get(packet.getSrc()).getRouter().injectPacket(packet)) {
             this.cycleAccurateEventQueue.schedule(this, () -> receive(packet), 1);
@@ -247,6 +280,12 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return true;
     }
 
+    /**
+     * Calculate a random destination node ID for the specified source node ID.
+     *
+     * @param src the source node ID
+     * @return a newly calculated random destination node ID for the specified source node ID
+     */
     public int randDest(int src) {
         while (true) {
             int i = this.memoryHierarchy.getRandom().nextInt(this.numNodes);
@@ -256,10 +295,20 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         }
     }
 
+    /**
+     * Get the throughput.
+     *
+     * @return the throughput
+     */
     public double throughput() {
         return (double) this.numPacketsTransmitted / this.cycleAccurateEventQueue.getCurrentCycle() / this.numNodes;
     }
 
+    /**
+     * Get the average packet delay.
+     *
+     * @return the average packet delay
+     */
     public double averagePacketDelay() {
         if(this.numPacketsTransmitted > 0) {
             return (double) this.totalPacketDelays / this.numPacketsTransmitted;
@@ -268,6 +317,11 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the average number of hops that a packet traverses.
+     *
+     * @return the average number of hops that a packet traverses
+     */
     public double averagePacketHops() {
         if(this.numPacketsTransmitted > 0) {
             return (double) this.totalPacketHops / this.numPacketsTransmitted;
@@ -276,10 +330,20 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the payload throughput.
+     *
+     * @return the payload throughput
+     */
     public double payloadThroughput() {
         return (double) this.numPayloadPacketsTransmitted / this.cycleAccurateEventQueue.getCurrentCycle() / this.numNodes;
     }
 
+    /**
+     * Get the average payload packet delay.
+     *
+     * @return the average payload packet delay
+     */
     public double averagePayloadPacketDelay() {
         if(this.numPayloadPacketsTransmitted > 0) {
             return (double) this.totalPayloadPacketDelays / this.numPayloadPacketsTransmitted;
@@ -288,6 +352,11 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the average number of hops that a payload packet traverses.
+     *
+     * @return the average number of hops that a payload packet traverses
+     */
     public double averagePayloadPacketHops() {
         if(this.numPayloadPacketsTransmitted > 0) {
             return (double) this.totalPayloadPacketHops / this.numPayloadPacketsTransmitted;
@@ -296,12 +365,24 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the throughput for the specified packet type.
+     *
+     * @param packetCls the packet type
+     * @return the throughput for the specified packet type
+     */
     public double throughputPerType(Class<? extends Packet> packetCls) {
         return (double) this.numPacketsTransmittedPerType.get(packetCls)
                 / this.cycleAccurateEventQueue.getCurrentCycle()
                 / this.numNodes;
     }
 
+    /**
+     * Get the average delay for the specified packet type.
+     *
+     * @param packetCls the packet type
+     * @return the average delay for the specified packet type
+     */
     public double averagePacketDelayPerType(Class<? extends Packet> packetCls) {
         if(this.numPacketsTransmittedPerType.get(packetCls) > 0) {
             return (double) this.totalPacketDelaysPerType.get(packetCls)
@@ -311,6 +392,12 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the average number of hops that a packet of the specified type traverses.
+     *
+     * @param packetCls the packet type
+     * @return the average number of hops that a packet of the specified type traverses
+     */
     public double averagePacketHopsPerType(Class<? extends Packet> packetCls) {
         if(this.numPacketsTransmittedPerType.get(packetCls) > 0) {
             return (double) this.totalPacketHopsPerType.get(packetCls)
@@ -320,6 +407,12 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the average delay that a flit spends in the specified state.
+     *
+     * @param state the flit state
+     * @return the average delay that a flit spends in the specified state
+     */
     public double averageFlitPerStateDelay(FlitState state) {
         if(this.numFlitPerStateDelaySamples.containsKey(state) && this.numFlitPerStateDelaySamples.get(state) > 0) {
             return (double) this.totalFlitPerStateDelays.get(state)
@@ -329,98 +422,218 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
         return 0.0;
     }
 
+    /**
+     * Get the cycle accurate event queue.
+     *
+     * @return the cycle accurate event queue
+     */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
     }
 
+    /**
+     * Get the number of nodes.
+     *
+     * @return the number of nodes
+     */
     public int getNumNodes() {
         return numNodes;
     }
 
+    /**
+     * Get the list of nodes.
+     *
+     * @return the list of nodes
+     */
     public List<NodeT> getNodes() {
         return nodes;
     }
 
+    /**
+     * Get the node factory.
+     *
+     * @return the node factory
+     */
     public NodeFactory<NodeT> getNodeFactory() {
         return nodeFactory;
     }
 
+    /**
+     * Get the routing algorithm factory.
+     *
+     * @return the routing algorithm factory
+     */
     public RoutingAlgorithmFactory<RoutingAlgorithmT> getRoutingAlgorithmFactory() {
         return routingAlgorithmFactory;
     }
 
+    /**
+     * Get the routing algorithm.
+     *
+     * @return the routing algorithm
+     */
     public RoutingAlgorithmT getRoutingAlgorithm() {
         return routingAlgorithm;
     }
 
+    /**
+     * Get the width.
+     *
+     * @return the width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Get the list of inflight packets.
+     *
+     * @return the list of inflight packets
+     */
     public List<Packet> getInflightPackets() {
         return inflightPackets;
     }
 
+    /**
+     * Get a boolean value indicating whether the network can accept new packets or not.
+     *
+     * @return a boolean value indicating whether the network can accept new packets or not
+     */
     public boolean isAcceptPacket() {
         return acceptPacket;
     }
 
+    /**
+     * Set a boolean value indicating whether the network can accept new packets or not.
+     *
+     * @param acceptPacket a boolean value indicating whether the network can accept new packets or not
+     */
     public void setAcceptPacket(boolean acceptPacket) {
         this.acceptPacket = acceptPacket;
     }
 
+    /**
+     * Get the number of packets that the network has received.
+     *
+     * @return the number of packets that the network has received
+     */
     public long getNumPacketsReceived() {
         return numPacketsReceived;
     }
 
+    /**
+     * Get the number of packets that the network has transmitted.
+     *
+     * @return the number of packets that the network has transmitted
+     */
     public long getNumPacketsTransmitted() {
         return numPacketsTransmitted;
     }
 
+    /**
+     * Get the maximum delay that a packet experiences.
+     *
+     * @return the maximum delay that a packet experiences
+     */
     public long getMaxPacketDelay() {
         return maxPacketDelay;
     }
 
+    /**
+     * Get the maximum number of hops that a packet traverses.
+     *
+     * @return the maximum number of hops that a packet traverses
+     */
     public long getMaxPacketHops() {
         return maxPacketHops;
     }
 
+    /**
+     * Get the number of payload packets that the network has received.
+     *
+     * @return the number of payload packets that the network has received
+     */
     public long getNumPayloadPacketsReceived() {
         return numPayloadPacketsReceived;
     }
 
+    /**
+     * Get the number of payload packets that the network has transmitted.
+     *
+     * @return the number of payload packets that the network has transmitted
+     */
     public long getNumPayloadPacketsTransmitted() {
         return numPayloadPacketsTransmitted;
     }
 
+    /**
+     * Get the maximum delay that a payload packet experiences.
+     *
+     * @return the maximum delay that a payload packet experiences
+     */
     public long getMaxPayloadPacketDelay() {
         return maxPayloadPacketDelay;
     }
 
+    /**
+     * Get the maximum number of hops that a payload packet traverses.
+     *
+     * @return the maximum number of hops that a payload packet traverses
+     */
     public long getMaxPayloadPacketHops() {
         return maxPayloadPacketHops;
     }
 
+    /**
+     * Get the map of the number of packets that the network has received.
+     *
+     * @return the map of the number of packets that the network has received
+     */
     public Map<Class<? extends Packet>, Long> getNumPacketsReceivedPerType() {
         return numPacketsReceivedPerType;
     }
 
+    /**
+     * Get the map of the number of packets that the network has transmitted.
+     *
+     * @return the map of the number of packets that the network has transmitted
+     */
     public Map<Class<? extends Packet>, Long> getNumPacketsTransmittedPerType() {
         return numPacketsTransmittedPerType;
     }
 
+    /**
+     * Get the map of the maximum delay that a packet experiences.
+     *
+     * @return the map of the maximum delay that a packet experiences
+     */
     public Map<Class<? extends Packet>, Long> getMaxPacketDelayPerType() {
         return maxPacketDelayPerType;
     }
 
+    /**
+     * Get the map of the maximum number of hops that a packet traverses.
+     *
+     * @return the map of the maximum number of hops that a packet traverses
+     */
     public Map<Class<? extends Packet>, Long> getMaxPacketHopsPerType() {
         return maxPacketHopsPerType;
     }
 
+    /**
+     * Get the map of the maximum per-state delay that a flit spends.
+     *
+     * @return the map of the maximum per-state delay that a flit spends
+     */
     public Map<FlitState, Long> getMaxFlitPerStateDelay() {
         return maxFlitPerStateDelay;
     }
 
+    /**
+     * Get the memory hierarchy.
+     *
+     * @return the memory hierarchy
+     */
     public NoCMemoryHierarchy getMemoryHierarchy() {
         return memoryHierarchy;
     }
