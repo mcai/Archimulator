@@ -21,7 +21,7 @@
 package archimulator.core;
 
 import archimulator.common.BasicSimulationObject;
-import archimulator.common.Experiment;
+import archimulator.common.CPUExperiment;
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
 import archimulator.os.Context;
@@ -59,7 +59,7 @@ public class BasicProcessor extends BasicSimulationObject implements Processor {
      * @param memoryHierarchy         the memory hierarchy
      */
     public BasicProcessor(
-            Experiment experiment,
+            CPUExperiment experiment,
             Simulation simulation,
             BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher,
             CycleAccurateEventQueue cycleAccurateEventQueue,

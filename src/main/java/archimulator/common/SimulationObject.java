@@ -48,7 +48,7 @@ public interface SimulationObject extends Named {
      *
      * @return the parent experiment
      */
-    Experiment getExperiment();
+    CPUExperiment getExperiment();
 
     /**
      * Get the parent simulation.

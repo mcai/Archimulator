@@ -42,7 +42,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public ToRoiFastForwardSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public ToRoiFastForwardSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 

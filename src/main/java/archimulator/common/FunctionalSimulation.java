@@ -36,7 +36,7 @@ public class FunctionalSimulation extends Simulation {
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public FunctionalSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public FunctionalSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
     }
 

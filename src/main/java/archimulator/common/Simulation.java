@@ -72,7 +72,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
 
     private Processor processor;
 
-    private Experiment experiment;
+    private CPUExperiment experiment;
 
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
 
@@ -146,7 +146,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public Simulation(SimulationType type, Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public Simulation(SimulationType type, CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         this.experiment = experiment;
         this.blockingEventDispatcher = blockingEventDispatcher;
         this.cycleAccurateEventQueue = cycleAccurateEventQueue;
@@ -500,7 +500,7 @@ public abstract class Simulation implements SimulationObject, Reportable {
      *
      * @return the experiment object
      */
-    public Experiment getExperiment() {
+    public CPUExperiment getExperiment() {
         return experiment;
     }
 

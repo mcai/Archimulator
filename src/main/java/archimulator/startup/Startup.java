@@ -34,7 +34,7 @@ public class Startup {
      * @param args arguments
      */
     public static void main(String[] args) {
-        Experiment experiment = new Experiment();
+        CPUExperiment experiment = new CPUExperiment();
 
         experiment.getConfig().setType(ExperimentType.DETAILED);
         experiment.getConfig().setOutputDirectory("results/mst_ht_100x4");

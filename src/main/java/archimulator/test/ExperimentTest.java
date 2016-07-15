@@ -1,7 +1,7 @@
 package archimulator.test;
 
+import archimulator.common.CPUExperiment;
 import archimulator.common.ContextMapping;
-import archimulator.common.Experiment;
 import archimulator.common.ExperimentType;
 import archimulator.util.StorageUnitHelper;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.junit.Test;
 public class ExperimentTest {
     @Test
     public void test_mst_ht_100_aco_detailed_l2_128KB() {
-        Experiment experiment = test(
+        CPUExperiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -31,7 +31,7 @@ public class ExperimentTest {
 
     @Test
     public void test_mst_ht_100_buffer_level_detailed_l2_128KB() {
-        Experiment experiment = test(
+        CPUExperiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -48,7 +48,7 @@ public class ExperimentTest {
 
     @Test
     public void test_mst_ht_100_xy_detailed_l2_128KB() {
-        Experiment experiment = test(
+        CPUExperiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -65,7 +65,7 @@ public class ExperimentTest {
 
     @Test
     public void test_mst_ht_1000_aco_two_phase() {
-        Experiment experiment = test(
+        CPUExperiment experiment = test(
                 ExperimentType.TWO_PHASE,
                 1000000,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
@@ -78,7 +78,7 @@ public class ExperimentTest {
         experiment.run();
     }
 
-    private Experiment test(
+    private CPUExperiment test(
             ExperimentType experimentType,
             long numMaxInstructions,
             String executable,
@@ -87,7 +87,7 @@ public class ExperimentTest {
             String routing,
             String selection
     ) {
-        Experiment experiment = new Experiment();
+        CPUExperiment experiment = new CPUExperiment();
 
         experiment.getConfig().setType(experimentType);
 

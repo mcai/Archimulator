@@ -36,7 +36,7 @@ public class DetailedSimulation extends Simulation {
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public DetailedSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public DetailedSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, null);
     }
 

@@ -1,30 +1,8 @@
-/**
- * ****************************************************************************
- * Copyright (c) 2010-2016 by Min Cai (min.cai.china@gmail.com).
- * <p>
- * This file is part of the Archimulator multicore architectural simulator.
- * <p>
- * Archimulator is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * <p>
- * Archimulator is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * <p>
- * You should have received a copy of the GNU General Public License
- * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
- * ****************************************************************************
- */
-package archimulator.common;
+package archimulator.experiment;
 
-import archimulator.os.Kernel;
-import archimulator.util.Reference;
+import archimulator.common.ExperimentStat;
+import archimulator.common.ExperimentState;
 import archimulator.util.dateTime.DateHelper;
-import archimulator.util.event.BlockingEventDispatcher;
-import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.serialization.JsonSerializationHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -38,10 +16,10 @@ import java.util.*;
  *
  * @author Min Cai
  */
-public class Experiment {
+public abstract class Experiment<ExperimentConfigT> {
     private long createTime;
 
-    private ExperimentConfig config;
+    private ExperimentConfigT config;
 
     private ExperimentState state;
 
@@ -52,20 +30,10 @@ public class Experiment {
     private Map<String, Object> statsMap;
 
     /**
-     * Current (max) memory page ID.
-     */
-    public transient int currentMemoryPageId;
-
-    /**
-     * Current (max) process ID.
-     */
-    public transient int currentProcessId;
-
-    /**
      * Create an experiment.
      */
-    public Experiment() {
-        this.config = new ExperimentConfig();
+    public Experiment(ExperimentConfigT config) {
+        this.config = config;
         this.state = ExperimentState.PENDING;
         this.failedReason = "";
 
@@ -78,27 +46,7 @@ public class Experiment {
      */
     public void run() {
         try {
-            CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
-
-            if (config.getType() == ExperimentType.FUNCTIONAL) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
-                new FunctionalSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
-            } else if (config.getType() == ExperimentType.DETAILED) {
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
-                new DetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
-            } else if (config.getType() == ExperimentType.TWO_PHASE) {
-                Reference<Kernel> kernelRef = new Reference<>();
-
-                BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
-
-                new ToRoiFastForwardSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
-
-                blockingEventDispatcher.clearListeners();
-
-                cycleAccurateEventQueue.resetCurrentCycle();
-
-                new FromRoiDetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
-            }
+            simulate();
 
             this.setState(ExperimentState.COMPLETED);
             this.setFailedReason("");
@@ -109,7 +57,7 @@ public class Experiment {
         }
 
         if (this.getState() == ExperimentState.COMPLETED) {
-            File resultDirFile = new File(this.getConfig().getOutputDirectory());
+            File resultDirFile = new File(this.getOutputDirectory());
 
             if (!resultDirFile.exists()) {
                 if (!resultDirFile.mkdirs()) {
@@ -117,10 +65,15 @@ public class Experiment {
                 }
             }
 
-            JsonSerializationHelper.writeJsonFile(this.getConfig(), this.getConfig().getOutputDirectory(), "config.json");
-            JsonSerializationHelper.writeJsonFile(this.getStatsMap(), this.getConfig().getOutputDirectory(), "stats.json");
+            JsonSerializationHelper.writeJsonFile(this.getConfig(), this.getOutputDirectory(), "config.json");
+            JsonSerializationHelper.writeJsonFile(this.getStatsMap(), this.getOutputDirectory(), "stats.json");
         }
     }
+
+    /**
+     * Simulate.
+     */
+    protected abstract void simulate();
 
     /**
      * Get the time in ticks when the experiment is created.
@@ -145,7 +98,7 @@ public class Experiment {
      *
      * @return the experiment config
      */
-    public ExperimentConfig getConfig() {
+    public ExperimentConfigT getConfig() {
         return config;
     }
 
@@ -194,6 +147,11 @@ public class Experiment {
         return stats;
     }
 
+    /**
+     * Get the map of statistics.
+     *
+     * @return the map of statistics
+     */
     public Map<String, Object> getStatsMap() {
         if (statsMap != null) {
             return statsMap;
@@ -226,9 +184,19 @@ public class Experiment {
         return this.state == ExperimentState.COMPLETED || this.state == ExperimentState.ABORTED;
     }
 
+    /**
+     * Get the output directory.
+     *
+     * @return the output directory
+     */
+    protected abstract String getOutputDirectory();
+
+    /**
+     * Load statistics.
+     */
     @SuppressWarnings("unchecked")
     public void loadStats() {
-        File file = new File(config.getOutputDirectory(), "stats.json");
+        File file = new File(getOutputDirectory(), "stats.json");
 
         try {
             String json = FileUtils.readFileToString(file);
@@ -239,7 +207,13 @@ public class Experiment {
         }
     }
 
-    public static void runExperiments(List<Experiment> experiments, boolean parallel) {
+    /**
+     * Run the specified list of experiments.
+     *
+     * @param experiments the list of experiments
+     * @param parallel a boolean value indicating whether runs the experiments in parallel or not
+     */
+    public static void runExperiments(List<? extends Experiment> experiments, boolean parallel) {
         if(parallel) {
             experiments.parallelStream().forEach(Experiment::run);
         } else {

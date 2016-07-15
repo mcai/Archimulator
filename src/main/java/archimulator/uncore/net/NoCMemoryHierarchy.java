@@ -20,7 +20,7 @@
  */
 package archimulator.uncore.net;
 
-import archimulator.common.Experiment;
+import archimulator.common.CPUExperiment;
 import archimulator.common.Simulation;
 import archimulator.common.SimulationEvent;
 import archimulator.common.SimulationObject;
@@ -65,7 +65,7 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public NoCMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public NoCMemoryHierarchy(CPUExperiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         this.devicesToNodeIds = new HashMap<>();

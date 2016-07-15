@@ -61,7 +61,7 @@ public abstract class AbstractMemoryHierarchy extends BasicSimulationObject impl
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public AbstractMemoryHierarchy(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public AbstractMemoryHierarchy(CPUExperiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (getExperiment().getConfig().getMemoryControllerType()) {

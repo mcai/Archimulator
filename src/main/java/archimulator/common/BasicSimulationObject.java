@@ -31,7 +31,7 @@ import archimulator.util.event.CycleAccurateEventQueue;
 public abstract class BasicSimulationObject implements SimulationObject {
     private BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher;
     private CycleAccurateEventQueue cycleAccurateEventQueue;
-    private Experiment experiment;
+    private CPUExperiment experiment;
     private Simulation simulation;
 
     /**
@@ -42,7 +42,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public BasicSimulationObject(Experiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public BasicSimulationObject(CPUExperiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         this.experiment = experiment;
         this.simulation = simulation;
         this.blockingEventDispatcher = blockingEventDispatcher;
@@ -81,7 +81,7 @@ public abstract class BasicSimulationObject implements SimulationObject {
      *
      * @return the parent experiment
      */
-    public Experiment getExperiment() {
+    public CPUExperiment getExperiment() {
         return experiment;
     }
 

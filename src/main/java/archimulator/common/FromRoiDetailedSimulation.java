@@ -39,7 +39,7 @@ public class FromRoiDetailedSimulation extends Simulation {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public FromRoiDetailedSimulation(Experiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public FromRoiDetailedSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 

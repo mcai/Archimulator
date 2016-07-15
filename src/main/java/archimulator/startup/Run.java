@@ -1,6 +1,6 @@
 package archimulator.startup;
 
-import archimulator.common.Experiment;
+import archimulator.common.CPUExperiment;
 
 /**
  * Run.
@@ -9,8 +9,8 @@ import archimulator.common.Experiment;
  */
 public class Run {
     public static void main(String[] args) {
-        Experiment.runExperiments(Experiments.antPacketInjectionRates, true);
+        CPUExperiment.runExperiments(Experiments.antPacketInjectionRates, true);
 
-        Experiment.runExperiments(Experiments.acoSelectionAlphasAndReinforcementFactors, true);
+        CPUExperiment.runExperiments(Experiments.acoSelectionAlphasAndReinforcementFactors, true);
     }
 }
