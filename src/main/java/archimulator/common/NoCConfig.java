@@ -63,6 +63,13 @@ public interface NoCConfig {
     int getLinkDelay();
 
     /**
+     * Get the ant packet traffic.
+     *
+     * @return the ant packet traffic
+     */
+    String getAntPacketTraffic();
+
+    /**
      * Get the size of an ant packet.
      *
      * @return the size of an ant packet

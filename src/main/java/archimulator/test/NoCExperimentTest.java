@@ -13,7 +13,10 @@ public class NoCExperimentTest {
     public void test() {
         NoCExperiment experiment = new NoCExperiment(
                 "test_results/synthetic/test",
-                25
+                64,
+                -1,
+                10000,
+                false
         );
 
         experiment.getConfig().setAntPacketInjectionRate(0.001);

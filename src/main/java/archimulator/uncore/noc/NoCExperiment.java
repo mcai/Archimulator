@@ -9,6 +9,9 @@ import archimulator.common.report.Reportable;
 import archimulator.uncore.noc.routers.FlitState;
 import archimulator.uncore.noc.routers.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.uncore.noc.routing.RoutingAlgorithm;
+import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
+import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
+import archimulator.uncore.noc.traffics.UniformTrafficGenerator;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.event.CycleAccurateEventQueue;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -30,6 +33,12 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
     private int numNodes;
 
+    private int maxCycles;
+
+    private int maxPackets;
+
+    private boolean noDrain;
+
     private long beginTime;
 
     private long endTime;
@@ -41,20 +50,52 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
     private RouterCongestionStatusPredictionHelper routerCongestionStatusPredictionHelper;
 
     /**
-     * Create an NoC experiment.
+     * Create a NoC experiment.
      */
-    public NoCExperiment(String outputDirectory, int numNodes) {
+    public NoCExperiment(String outputDirectory, int numNodes, int maxCycles, int maxPackets, boolean noDrain) {
         super(new NoCExperimentConfig());
 
         this.outputDirectory = outputDirectory;
-
         this.numNodes = numNodes;
+        this.maxCycles = maxCycles;
+        this.maxPackets = maxPackets;
+        this.noDrain = noDrain;
 
         this.random = this.getConfig().getRandSeed() != -1 ? new Random(this.getConfig().getRandSeed()) : new Random();
 
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
         this.network = NetworkFactory.setupNetwork(this, this.cycleAccurateEventQueue, this.numNodes);
+
+        switch (this.getConfig().getDataPacketTraffic()) {
+            case "uniform":
+                new UniformTrafficGenerator<>(
+                        network,
+                        this.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.getConfig().getDataPacketSize(),
+                        maxPackets
+                );
+                break;
+            case "transpose":
+                new TransposeTrafficGenerator<>(
+                        network,
+                        this.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.getConfig().getDataPacketSize(),
+                        maxPackets
+                );
+                break;
+            case "hotspot":
+                new HotspotTrafficGenerator<>(
+                        network,
+                        this.getConfig().getDataPacketInjectionRate(),
+                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        this.getConfig().getDataPacketSize(),
+                        maxPackets
+                );
+                break;
+        }
 
         this.routerCongestionStatusPredictionHelper = new RouterCongestionStatusPredictionHelper(this.network);
     }
@@ -68,7 +109,18 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
         this.beginTime = DateHelper.toTick(new Date());
 
-        //TODO: do simulation
+        while ((this.getMaxCycles() == -1 || cycleAccurateEventQueue.getCurrentCycle() < this.getMaxCycles())
+                && (this.getMaxPackets() == -1 || network.getNumPacketsReceived() < this.getMaxPackets())) {
+            cycleAccurateEventQueue.advanceOneCycle();
+        }
+
+        if (!this.isNoDrain()) {
+            network.setAcceptPacket(false);
+
+            while(network.getNumPacketsReceived() != network.getNumPacketsTransmitted()) {
+                cycleAccurateEventQueue.advanceOneCycle();
+            }
+        }
 
         this.endTime = DateHelper.toTick(new Date());
 
@@ -241,6 +293,24 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
     }
 
     /**
+     * Get the network.
+     *
+     * @return the network
+     */
+    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
+        return network;
+    }
+
+    /**
+     * Get the router congestion status prediction helper.
+     *
+     * @return the router congestion status prediction helper
+     */
+    public RouterCongestionStatusPredictionHelper getRouterCongestionStatusPredictionHelper() {
+        return routerCongestionStatusPredictionHelper;
+    }
+
+    /**
      * Get the output directory.
      *
      * @return the output directory
@@ -335,5 +405,32 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
+    }
+
+    /**
+     * Get the maximum number of cycles to be simulated.
+     *
+     * @return the maximum number of cycles to be simulated
+     */
+    public int getMaxCycles() {
+        return maxCycles;
+    }
+
+    /**
+     * Get the maximum number of packets to be simulated.
+     *
+     * @return the maximum number of packets to be simulated
+     */
+    public int getMaxPackets() {
+        return maxPackets;
+    }
+
+    /**
+     * Get a boolean value indicating whether draining  packets is disabled or not.
+     *
+     * @return a boolean value indicating whether draining packets is disabled or not
+     */
+    public boolean isNoDrain() {
+        return noDrain;
     }
 }

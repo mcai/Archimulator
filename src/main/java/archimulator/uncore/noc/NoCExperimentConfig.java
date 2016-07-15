@@ -2,6 +2,11 @@ package archimulator.uncore.noc;
 
 import archimulator.common.NoCConfig;
 
+/**
+ * NoC experiment config.
+ *
+ * @author Min Cai
+ */
 public class NoCExperimentConfig implements NoCConfig {
     private int randSeed;
 
@@ -18,12 +23,20 @@ public class NoCExperimentConfig implements NoCConfig {
     private int linkWidth;
     private int linkDelay;
 
+    private String antPacketTraffic;
     private int antPacketSize;
     private double antPacketInjectionRate;
 
     private double acoSelectionAlpha;
     private double reinforcementFactor;
 
+    private String dataPacketTraffic;
+    private double dataPacketInjectionRate;
+    private int dataPacketSize;
+
+    /**
+     * Create a NoC experiment config.
+     */
     public NoCExperimentConfig() {
         this.randSeed = 13;
         this.routing = "oddEven";
@@ -33,10 +46,15 @@ public class NoCExperimentConfig implements NoCConfig {
         this.numVirtualChannels = 4;
         this.linkWidth = 4;
         this.linkDelay = 1;
+        this.antPacketTraffic = "uniform";
         this.antPacketSize = 4;
         this.antPacketInjectionRate = 0.01;
         this.acoSelectionAlpha = 0.5;
         this.reinforcementFactor = 0.05;
+
+        this.dataPacketTraffic = "uniform";
+        this.dataPacketInjectionRate = 0.01;
+        this.dataPacketSize = 16;
     }
 
     /**
@@ -192,6 +210,25 @@ public class NoCExperimentConfig implements NoCConfig {
     }
 
     /**
+     * Get the ant packet traffic.
+     *
+     * @return the ant packet traffic
+     */
+    @Override
+    public String getAntPacketTraffic() {
+        return antPacketTraffic;
+    }
+
+    /**
+     * Set the ant packet traffic.
+     *
+     * @param antPacketTraffic the ant packet traffic
+     */
+    public void setAntPacketTraffic(String antPacketTraffic) {
+        this.antPacketTraffic = antPacketTraffic;
+    }
+
+    /**
      * Get the size of an ant packet.
      *
      * @return the size of an ant packet
@@ -265,5 +302,59 @@ public class NoCExperimentConfig implements NoCConfig {
      */
     public void setReinforcementFactor(double reinforcementFactor) {
         this.reinforcementFactor = reinforcementFactor;
+    }
+
+    /**
+     * Get the data packet traffic.
+     *
+     * @return the data packet traffic
+     */
+    public String getDataPacketTraffic() {
+        return dataPacketTraffic;
+    }
+
+    /**
+     * Set the data packet traffic.
+     *
+     * @param dataPacketTraffic the data packet traffic
+     */
+    public void setDataPacketTraffic(String dataPacketTraffic) {
+        this.dataPacketTraffic = dataPacketTraffic;
+    }
+
+    /**
+     * Get the data packet injection rate.
+     *
+     * @return the data packet injection rate
+     */
+    public double getDataPacketInjectionRate() {
+        return dataPacketInjectionRate;
+    }
+
+    /**
+     * Set the data packet injection rate.
+     *
+     * @param dataPacketInjectionRate the data packet injection rate
+     */
+    public void setDataPacketInjectionRate(double dataPacketInjectionRate) {
+        this.dataPacketInjectionRate = dataPacketInjectionRate;
+    }
+
+    /**
+     * Get the size of a data packet
+     *
+     * @return the size of a data packet
+     */
+    public int getDataPacketSize() {
+        return dataPacketSize;
+    }
+
+    /**
+     * Set the size of a data packet.
+     *
+     * @param dataPacketSize the size of a data packet
+     */
+    public void setDataPacketSize(int dataPacketSize) {
+        this.dataPacketSize = dataPacketSize;
     }
 }

@@ -8,6 +8,10 @@ import archimulator.uncore.noc.selection.BufferLevelSelectionBasedNode;
 import archimulator.uncore.noc.selection.NeighborOnPathSelectionBasedNode;
 import archimulator.uncore.noc.selection.RandomSelectionBasedNode;
 import archimulator.uncore.noc.selection.aco.ACONode;
+import archimulator.uncore.noc.selection.aco.ForwardAntPacket;
+import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
+import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
+import archimulator.uncore.noc.traffics.UniformTrafficGenerator;
 import archimulator.util.event.CycleAccurateEventQueue;
 
 /**
@@ -93,7 +97,7 @@ public class NetworkFactory {
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     ) {
-        return new Network<>(
+        Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network = new Network<>(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
@@ -104,6 +108,38 @@ public class NetworkFactory {
                     }
                 },
                 OddEvenTurnBasedRoutingAlgorithm::new);
+
+        switch (environment.getConfig().getAntPacketTraffic()) {
+            case "uniform":
+                new UniformTrafficGenerator<>(
+                        network,
+                        environment.getConfig().getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        environment.getConfig().getAntPacketSize(),
+                        -1
+                );
+                break;
+            case "transpose":
+                new TransposeTrafficGenerator<>(
+                        network,
+                        environment.getConfig().getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        environment.getConfig().getAntPacketSize(),
+                        -1
+                );
+                break;
+            case "hotspot":
+                new HotspotTrafficGenerator<>(
+                        network,
+                        environment.getConfig().getAntPacketInjectionRate(),
+                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        environment.getConfig().getAntPacketSize(),
+                        -1
+                );
+                break;
+        }
+
+        return network;
     }
 
     public static Network<? extends Node, ? extends RoutingAlgorithm> setupNetwork(

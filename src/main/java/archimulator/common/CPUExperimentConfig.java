@@ -179,6 +179,7 @@ public class CPUExperimentConfig implements NoCConfig {
     private int linkWidth;
     private int linkDelay;
 
+    private String antPacketTraffic;
     private int antPacketSize;
     private double antPacketInjectionRate;
 
@@ -293,6 +294,7 @@ public class CPUExperimentConfig implements NoCConfig {
         this.numVirtualChannels = 4;
         this.linkWidth = 4;
         this.linkDelay = 1;
+        this.antPacketTraffic = "uniform";
         this.antPacketSize = 4;
         this.antPacketInjectionRate = 0.01;
         this.acoSelectionAlpha = 0.5;
@@ -1790,6 +1792,25 @@ public class CPUExperimentConfig implements NoCConfig {
      */
     public void setLinkDelay(int linkDelay) {
         this.linkDelay = linkDelay;
+    }
+
+    /**
+     * Get the ant packet traffic.
+     *
+     * @return the ant packet traffic
+     */
+    @Override
+    public String getAntPacketTraffic() {
+        return antPacketTraffic;
+    }
+
+    /**
+     * Set the ant packet traffic.
+     *
+     * @param antPacketTraffic the ant packet traffic
+     */
+    public void setAntPacketTraffic(String antPacketTraffic) {
+        this.antPacketTraffic = antPacketTraffic;
     }
 
     /**
