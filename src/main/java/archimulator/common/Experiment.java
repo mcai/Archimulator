@@ -1,7 +1,5 @@
-package archimulator.experiment;
+package archimulator.common;
 
-import archimulator.common.ExperimentStat;
-import archimulator.common.ExperimentState;
 import archimulator.util.dateTime.DateHelper;
 import archimulator.util.serialization.JsonSerializationHelper;
 import org.apache.commons.io.FileUtils;

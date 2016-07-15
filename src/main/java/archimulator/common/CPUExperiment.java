@@ -20,7 +20,6 @@
  */
 package archimulator.common;
 
-import archimulator.experiment.Experiment;
 import archimulator.os.Kernel;
 import archimulator.util.Reference;
 import archimulator.util.event.BlockingEvent;

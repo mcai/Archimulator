@@ -20,7 +20,6 @@
  */
 package archimulator.common;
 
-import archimulator.experiment.Experiment;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
