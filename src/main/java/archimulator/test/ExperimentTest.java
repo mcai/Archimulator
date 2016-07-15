@@ -13,15 +13,15 @@ import org.junit.Test;
  */
 public class ExperimentTest {
     @Test
-    public void test_mst_ht_100_aco_detailed_l2_128KB() {
+    public void test_mst_ht_100_xy_detailed_l2_128KB() {
         CPUExperiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "100",
-                "test_results/mst_ht_100_aco_detailed_l2_128KB",
-                "oddEven",
-                "aco"
+                "test_results/mst_ht_100_xy_detailed_l2_128KB",
+                "xy",
+                "random"
         );
 
         experiment.getConfig().setL2Size((int) StorageUnitHelper.displaySizeToByteCount("128 KB"));
@@ -47,15 +47,15 @@ public class ExperimentTest {
     }
 
     @Test
-    public void test_mst_ht_100_xy_detailed_l2_128KB() {
+    public void test_mst_ht_100_aco_detailed_l2_128KB() {
         CPUExperiment experiment = test(
                 ExperimentType.DETAILED,
                 -1,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "100",
-                "test_results/mst_ht_100_xy_detailed_l2_128KB",
-                "xy",
-                "random"
+                "test_results/mst_ht_100_aco_detailed_l2_128KB",
+                "oddEven",
+                "aco"
         );
 
         experiment.getConfig().setL2Size((int) StorageUnitHelper.displaySizeToByteCount("128 KB"));

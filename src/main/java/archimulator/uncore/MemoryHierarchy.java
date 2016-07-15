@@ -28,7 +28,6 @@ import archimulator.core.Core;
 import archimulator.uncore.coherence.msi.controller.*;
 import archimulator.uncore.coherence.msi.message.CoherenceMessage;
 import archimulator.uncore.dram.MemoryController;
-import archimulator.uncore.net.Net;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 
 import java.util.ArrayList;

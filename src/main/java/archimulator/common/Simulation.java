@@ -42,7 +42,7 @@ import archimulator.uncore.helperThread.HelperThreadL2RequestProfilingHelper;
 import archimulator.uncore.helperThread.hotspot.HotspotProfilingHelper;
 import archimulator.uncore.mlp.BLPProfilingHelper;
 import archimulator.uncore.mlp.MLPProfilingHelper;
-import archimulator.uncore.net.NoCMemoryHierarchy;
+import archimulator.uncore.noc.NoCMemoryHierarchy;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
 import archimulator.util.Reference;
 import archimulator.util.collection.tree.NodeHelper;

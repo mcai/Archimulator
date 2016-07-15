@@ -1,7 +1,7 @@
 package archimulator.startup;
 
 import archimulator.common.CPUExperiment;
-import archimulator.uncore.net.noc.routers.FlitState;
+import archimulator.uncore.noc.routers.FlitState;
 
 /**
  * CSV fields.
