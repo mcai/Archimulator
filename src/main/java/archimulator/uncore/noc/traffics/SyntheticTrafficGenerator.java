@@ -53,7 +53,7 @@ public abstract class SyntheticTrafficGenerator<NodeT extends Node, RoutingAlgor
                 break;
             }
 
-            boolean valid = this.network.getMemoryHierarchy().getRandom().nextDouble() <= this.packetInjectionRate;
+            boolean valid = this.network.getEnvironment().getRandom().nextDouble() <= this.packetInjectionRate;
             if(valid) {
                 int src = node.getId();
                 int dest = this.dest(src);

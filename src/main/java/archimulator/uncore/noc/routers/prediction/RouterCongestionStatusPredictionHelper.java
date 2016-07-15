@@ -1,5 +1,7 @@
 package archimulator.uncore.noc.routers.prediction;
 
+import archimulator.common.Experiment;
+import archimulator.common.SimulationObject;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.cache.prediction.CacheBasedPredictor;
@@ -9,6 +11,9 @@ import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.routers.InputPort;
 import archimulator.uncore.noc.routers.InputVirtualChannel;
 import archimulator.uncore.noc.routing.RoutingAlgorithm;
+import archimulator.util.event.BlockingEvent;
+import archimulator.util.event.BlockingEventDispatcher;
+import archimulator.util.event.CycleAccurateEventQueue;
 
 /**
  * Router congestion status prediction helper.
@@ -25,7 +30,32 @@ public class RouterCongestionStatusPredictionHelper implements Reportable {
      */
     public RouterCongestionStatusPredictionHelper(Network<? extends Node, ? extends RoutingAlgorithm> network) {
         this.routerCongestionStatusPredictor = new CacheBasedPredictor<>(
-                network.getMemoryHierarchy(),
+                new SimulationObject() {
+                    @Override
+                    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+                        return null; //TODO
+                    }
+
+                    @Override
+                    public CycleAccurateEventQueue getCycleAccurateEventQueue() {
+                        return network.getCycleAccurateEventQueue();
+                    }
+
+                    @Override
+                    public Experiment<?> getExperiment() {
+                        return null; //TODO
+                    }
+
+                    @Override
+                    public Object getSimulation() {
+                        return null; //TODO
+                    }
+
+                    @Override
+                    public String getName() {
+                        return "noc";
+                    }
+                },
                 "routerCongestionStatusPredictor",
                 network.getNumNodes(),
                 4,

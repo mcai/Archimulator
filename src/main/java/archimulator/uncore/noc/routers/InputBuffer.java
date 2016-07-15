@@ -30,7 +30,7 @@ public class InputBuffer {
      */
     public void append(Flit flit) {
         if(this.flits.size() + 1 >
-                this.inputVirtualChannel.getInputPort().getRouter().getNode().getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize()) {
+                this.inputVirtualChannel.getInputPort().getRouter().getNode().getNetwork().getEnvironment().getConfig().getMaxInputBufferSize()) {
             throw new IllegalArgumentException();
         }
 
@@ -64,7 +64,7 @@ public class InputBuffer {
      */
     public boolean full() {
         return this.flits.size() >=
-                this.inputVirtualChannel.getInputPort().getRouter().getNode().getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize();
+                this.inputVirtualChannel.getInputPort().getRouter().getNode().getNetwork().getEnvironment().getConfig().getMaxInputBufferSize();
     }
 
     /**

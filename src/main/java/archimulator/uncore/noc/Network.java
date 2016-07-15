@@ -1,5 +1,6 @@
 package archimulator.uncore.noc;
 
+import archimulator.common.NoCEnvironment;
 import archimulator.uncore.noc.routers.FlitState;
 import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.routing.RoutingAlgorithmFactory;
@@ -18,7 +19,7 @@ import java.util.Map;
 public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
     long currentPacketId;
 
-    private NoCMemoryHierarchy memoryHierarchy;
+    private NoCEnvironment environment;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
@@ -72,20 +73,20 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     /**
      * Create a network.
      *
-     * @param memoryHierarchy the memory hierarchy
+     * @param environment the environment
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param numNodes the number of nodes
      * @param nodeFactory the node factory
      * @param routingAlgorithmFactory the routing algorithm factory
      */
     public Network(
-            NoCMemoryHierarchy memoryHierarchy,
+            NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
             NodeFactory<NodeT> nodeFactory,
             RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
     ) {
-        this.memoryHierarchy = memoryHierarchy;
+        this.environment = environment;
 
         this.currentPacketId = 0;
 
@@ -288,7 +289,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
      */
     public int randDest(int src) {
         while (true) {
-            int i = this.memoryHierarchy.getRandom().nextInt(this.numNodes);
+            int i = this.environment.getRandom().nextInt(this.numNodes);
             if(i != src) {
                 return i;
             }
@@ -630,11 +631,11 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
     }
 
     /**
-     * Get the memory hierarchy.
+     * Get the environment.
      *
-     * @return the memory hierarchy
+     * @return the environment
      */
-    public NoCMemoryHierarchy getMemoryHierarchy() {
-        return memoryHierarchy;
+    public NoCEnvironment getEnvironment() {
+        return environment;
     }
 }

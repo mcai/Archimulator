@@ -36,12 +36,12 @@ public class HotspotTrafficGenerator<NodeT extends Node, RoutingAlgorithmT exten
     ) {
         super(network, packetInjectionRate, packetFactory, packetSize, maxPackets);
 
-        int numHotspots = this.getNetwork().getMemoryHierarchy().getRandom().nextInt(this.getNetwork().getWidth()) + 1;
+        int numHotspots = this.getNetwork().getEnvironment().getRandom().nextInt(this.getNetwork().getWidth()) + 1;
 
         this.hotspots = new ArrayList<>();
 
         for(int i = 0; i < numHotspots; i++) {
-            int hotspot = this.getNetwork().getMemoryHierarchy().getRandom().nextInt(this.getNetwork().getNumNodes());
+            int hotspot = this.getNetwork().getEnvironment().getRandom().nextInt(this.getNetwork().getNumNodes());
 
             if(!this.hotspots.contains(hotspot)) {
                 this.hotspots.add(hotspot);

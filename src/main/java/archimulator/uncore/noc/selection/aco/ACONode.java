@@ -81,7 +81,7 @@ public class ACONode extends Node {
                 packet.getNetwork(),
                 packet.getDest(),
                 packet.getSrc(),
-                this.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getAntPacketSize(),
+                this.getNetwork().getEnvironment().getConfig().getAntPacketSize(),
                 null);
 
         newPacket.getMemory().addAll(packet.getMemory());
@@ -139,8 +139,8 @@ public class ACONode extends Node {
             Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
             int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
 
-            double alpha = this.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getAcoSelectionAlpha();
-            double qTotal = this.getNetwork().getMemoryHierarchy().getExperiment().getConfig().getMaxInputBufferSize();
+            double alpha = this.getNetwork().getEnvironment().getConfig().getAcoSelectionAlpha();
+            double qTotal = this.getNetwork().getEnvironment().getConfig().getMaxInputBufferSize();
             int n = this.getNeighbors().size();
 
             double probability = (pheromone.getValue() + alpha * ((double) (freeSlots) / qTotal)) / (1 + alpha * (n - 1));
