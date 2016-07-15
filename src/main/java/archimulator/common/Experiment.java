@@ -157,7 +157,7 @@ public abstract class Experiment<ExperimentConfigT> {
             Map<String, Object> result = new LinkedHashMap<>();
 
             for(ExperimentStat stat : stats) {
-                result.put(stat.getPrefix() + "/" + stat.getKey(), stat.getValue());
+                result.put((stat.getPrefix() == null || stat.getPrefix().isEmpty() ? "" : stat.getPrefix() + "/") + stat.getKey(), stat.getValue());
             }
 
             return result;

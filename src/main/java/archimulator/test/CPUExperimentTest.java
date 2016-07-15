@@ -7,11 +7,11 @@ import archimulator.util.StorageUnitHelper;
 import org.junit.Test;
 
 /**
- * Experiment test.
+ * CPU experiment test.
  *
  * @author Min Cai
  */
-public class ExperimentTest {
+public class CPUExperimentTest {
     @Test
     public void test_mst_ht_100_xy_detailed_l2_128KB() {
         CPUExperiment experiment = test(
@@ -70,7 +70,7 @@ public class ExperimentTest {
                 1000000,
                 "benchmarks/Olden_Custom1/mst/ht/mst.mips",
                 "1000",
-                "test_results/test_mst_ht_1000_aco_two_phase",
+                "test_results/mst_ht_1000_aco_two_phase",
                 "oddEven",
                 "aco"
         );
