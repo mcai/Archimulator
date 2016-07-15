@@ -22,6 +22,7 @@ package archimulator.common;
 
 import archimulator.os.Kernel;
 import archimulator.util.Reference;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -39,7 +40,7 @@ public class FromRoiDetailedSimulation extends Simulation {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public FromRoiDetailedSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public FromRoiDetailedSimulation(CPUExperiment experiment, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.MEASUREMENT, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 

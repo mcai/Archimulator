@@ -20,9 +20,7 @@
  */
 package archimulator.uncore.cache.replacement.reuseDistancePrediction;
 
-import archimulator.common.BasicSimulationObject;
-import archimulator.common.SimulationEvent;
-import archimulator.common.SimulationObject;
+import archimulator.common.*;
 import archimulator.util.math.Quantizer;
 
 import java.util.ArrayList;
@@ -33,7 +31,9 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class ReuseDistanceSampler extends BasicSimulationObject {
+public class ReuseDistanceSampler
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation> {
     private String name;
 
     protected List<ReuseDistanceSamplerEntry> entries;

@@ -29,6 +29,7 @@ import archimulator.uncore.dram.FixedLatencyMemoryController;
 import archimulator.uncore.dram.MemoryController;
 import archimulator.uncore.dram.SimpleMemoryController;
 import archimulator.uncore.tlb.TranslationLookasideBuffer;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import archimulator.util.fsm.BasicFiniteStateMachine;
@@ -42,7 +43,9 @@ import java.util.stream.Collectors;
  *
  * @author Min Cai
  */
-public abstract class AbstractMemoryHierarchy extends BasicSimulationObject implements MemoryHierarchy {
+public abstract class AbstractMemoryHierarchy
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements MemoryHierarchy {
     private MemoryController memoryController;
     private DirectoryController l2Controller;
     private List<L1IController> l1IControllers;
@@ -61,7 +64,7 @@ public abstract class AbstractMemoryHierarchy extends BasicSimulationObject impl
      * @param blockingEventDispatcher the blocking event dispatcher
      * @param cycleAccurateEventQueue the cycle accurate event queue
      */
-    public AbstractMemoryHierarchy(CPUExperiment experiment, Simulation simulation, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
+    public AbstractMemoryHierarchy(CPUExperiment experiment, Simulation simulation, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue) {
         super(experiment, simulation, blockingEventDispatcher, cycleAccurateEventQueue);
 
         switch (getExperiment().getConfig().getMemoryControllerType()) {

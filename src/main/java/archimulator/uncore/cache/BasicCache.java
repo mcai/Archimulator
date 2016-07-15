@@ -21,6 +21,8 @@
 package archimulator.uncore.cache;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.util.ValueProvider;
 import archimulator.util.ValueProviderFactory;
@@ -35,7 +37,9 @@ import java.util.List;
  * @param <StateT> state
  * @author Min Cai
  */
-public class BasicCache<StateT extends Serializable> extends BasicSimulationObject implements Cache<StateT> {
+public class BasicCache<StateT extends Serializable>
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements Cache<StateT> {
     private String name;
     private CacheGeometry geometry;
     private List<CacheSet<StateT>> sets;

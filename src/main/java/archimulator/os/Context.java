@@ -20,9 +20,7 @@
  */
 package archimulator.os;
 
-import archimulator.common.BasicSimulationObject;
-import archimulator.common.ContextMapping;
-import archimulator.common.SimulationObject;
+import archimulator.common.*;
 import archimulator.core.Processor;
 import archimulator.core.Thread;
 import archimulator.isa.ArchitecturalRegisterFile;
@@ -37,7 +35,8 @@ import java.util.Stack;
  *
  * @author Min Cai
  */
-public class Context extends BasicSimulationObject implements SimulationObject, Serializable {
+public class Context extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation>, Serializable {
     private int id;
 
     private ContextState state;

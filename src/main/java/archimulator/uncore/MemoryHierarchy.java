@@ -20,7 +20,9 @@
  */
 package archimulator.uncore;
 
+import archimulator.common.CPUExperiment;
 import archimulator.common.ExperimentStat;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.core.Core;
 import archimulator.uncore.coherence.msi.controller.*;
@@ -37,7 +39,7 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public interface MemoryHierarchy extends SimulationObject {
+public interface MemoryHierarchy extends SimulationObject<CPUExperiment, Simulation> {
     /**
      * Transfer a message of the specified size from the source controller to the destination controller.
      *

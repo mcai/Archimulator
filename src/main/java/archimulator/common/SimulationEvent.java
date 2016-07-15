@@ -20,6 +20,7 @@
  */
 package archimulator.common;
 
+import archimulator.experiment.Experiment;
 import archimulator.util.event.BlockingEvent;
 
 /**
@@ -27,15 +28,15 @@ import archimulator.util.event.BlockingEvent;
  *
  * @author Min Cai
  */
-public abstract class SimulationEvent implements BlockingEvent {
-    private SimulationObject sender;
+public abstract class SimulationEvent<ExperimentT extends Experiment<?>, SimulationT> implements BlockingEvent {
+    private SimulationObject<ExperimentT, SimulationT> sender;
 
     /**
      * Create a simulation event.
      *
      * @param sender the sender simulation object
      */
-    public SimulationEvent(SimulationObject sender) {
+    public SimulationEvent(SimulationObject<ExperimentT, SimulationT> sender) {
         this.sender = sender;
     }
 
@@ -44,7 +45,7 @@ public abstract class SimulationEvent implements BlockingEvent {
      *
      * @return the sender simulation object
      */
-    public SimulationObject getSender() {
+    public SimulationObject<ExperimentT, SimulationT> getSender() {
         return sender;
     }
 }

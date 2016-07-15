@@ -20,6 +20,8 @@
  */
 package archimulator.uncore.cache;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 
 import java.io.Serializable;
@@ -31,7 +33,7 @@ import java.util.List;
  * @param <StateT> state
  * @author Min Cai
  */
-public interface Cache<StateT extends Serializable> extends SimulationObject {
+public interface Cache<StateT extends Serializable> extends SimulationObject<CPUExperiment, Simulation> {
     /**
      * Get lines in the specified set.
      *

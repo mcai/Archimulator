@@ -21,13 +21,17 @@
 package archimulator.core;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 
 /**
  * Abstract memory hierarchy core.
  *
  * @author Min Cai
  */
-public abstract class AbstractMemoryHierarchyCore extends BasicSimulationObject implements MemoryHierarchyCore {
+public abstract class AbstractMemoryHierarchyCore
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements MemoryHierarchyCore {
     /**
      * The number of the core.
      */

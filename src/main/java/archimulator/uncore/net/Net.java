@@ -20,6 +20,8 @@
  */
 package archimulator.uncore.net;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.uncore.MemoryDevice;
 
@@ -28,7 +30,7 @@ import archimulator.uncore.MemoryDevice;
  *
  * @author Min Cai
  */
-public interface Net extends SimulationObject {
+public interface Net extends SimulationObject<CPUExperiment, Simulation> {
     /**
      * Transfer a message of the specified size from the source device to the destination device.
      *

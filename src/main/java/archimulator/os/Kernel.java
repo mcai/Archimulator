@@ -21,6 +21,7 @@
 package archimulator.os;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
 import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.isa.ArchitecturalRegisterFile;
@@ -41,7 +42,8 @@ import java.util.stream.Collectors;
  *
  * @author Min Cai
  */
-public class Kernel extends BasicSimulationObject implements SimulationObject {
+public class Kernel extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation> {
     private List<Pipe> pipes;
     private List<SystemEvent> systemEvents;
     private List<SignalAction> signalActions;

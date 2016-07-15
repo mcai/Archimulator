@@ -20,6 +20,8 @@
  */
 package archimulator.core;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.common.report.Reportable;
 
@@ -28,7 +30,7 @@ import archimulator.common.report.Reportable;
  *
  * @author Min Cai
  */
-public interface MemoryHierarchyThread extends SimulationObject, Reportable {
+public interface MemoryHierarchyThread extends SimulationObject<CPUExperiment, Simulation>, Reportable {
     /**
      * Get the number of the thread.
      *

@@ -23,6 +23,7 @@ package archimulator.common;
 import archimulator.experiment.Experiment;
 import archimulator.os.Kernel;
 import archimulator.util.Reference;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -57,15 +58,15 @@ public class CPUExperiment extends Experiment<CPUExperimentConfig> {
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
         if (getConfig().getType() == ExperimentType.FUNCTIONAL) {
-            BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
+            BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
             new FunctionalSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
         } else if (getConfig().getType() == ExperimentType.DETAILED) {
-            BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
+            BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
             new DetailedSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue).simulate();
         } else if (getConfig().getType() == ExperimentType.TWO_PHASE) {
             Reference<Kernel> kernelRef = new Reference<>();
 
-            BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
+            BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
 
             new ToRoiFastForwardSimulation(this, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef).simulate();
 

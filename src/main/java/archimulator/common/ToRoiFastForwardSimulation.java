@@ -23,6 +23,7 @@ package archimulator.common;
 import archimulator.isa.event.PseudoCallEncounteredEvent;
 import archimulator.os.Kernel;
 import archimulator.util.Reference;
+import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 
@@ -42,7 +43,7 @@ public class ToRoiFastForwardSimulation extends Simulation {
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param kernelRef               the kernel reference
      */
-    public ToRoiFastForwardSimulation(CPUExperiment experiment, BlockingEventDispatcher<SimulationEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
+    public ToRoiFastForwardSimulation(CPUExperiment experiment, BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher, CycleAccurateEventQueue cycleAccurateEventQueue, Reference<Kernel> kernelRef) {
         super(SimulationType.FAST_FORWARD, experiment, blockingEventDispatcher, cycleAccurateEventQueue, kernelRef);
     }
 

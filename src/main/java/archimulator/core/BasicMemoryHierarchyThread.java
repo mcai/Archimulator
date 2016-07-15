@@ -1,6 +1,8 @@
 package archimulator.core;
 
 import archimulator.common.BasicSimulationObject;
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.report.ReportNode;
 
 /**
@@ -8,7 +10,7 @@ import archimulator.common.report.ReportNode;
  *
  * @author Min Cai
  */
-public class BasicMemoryHierarchyThread extends BasicSimulationObject implements MemoryHierarchyThread {
+public class BasicMemoryHierarchyThread extends BasicSimulationObject<CPUExperiment, Simulation> implements MemoryHierarchyThread {
     /**
      * The number of the thread.
      */

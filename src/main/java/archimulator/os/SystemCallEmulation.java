@@ -20,9 +20,7 @@
  */
 package archimulator.os;
 
-import archimulator.common.BasicSimulationObject;
-import archimulator.common.Logger;
-import archimulator.common.SimulationObject;
+import archimulator.common.*;
 import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.event.SystemCallExecutedEvent;
 import archimulator.os.event.*;
@@ -45,7 +43,9 @@ import java.util.TreeMap;
  *
  * @author Min Cai
  */
-public class SystemCallEmulation extends BasicSimulationObject implements SimulationObject {
+public class SystemCallEmulation
+        extends BasicSimulationObject<CPUExperiment, Simulation>
+        implements SimulationObject<CPUExperiment, Simulation> {
     /**
      * System control arguments.
      */

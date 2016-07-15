@@ -20,6 +20,8 @@
  */
 package archimulator.uncore.cache.partitioning;
 
+import archimulator.common.CPUExperiment;
+import archimulator.common.Simulation;
 import archimulator.common.SimulationObject;
 import archimulator.common.SimulationType;
 import archimulator.core.Thread;
@@ -98,7 +100,7 @@ public abstract class CachePartitioningHelper implements Partitioner {
      * @param simulationObject the simulation object
      * @return a value indicating whether cache partitioning is needed or not
      */
-    public static boolean canPartition(SimulationObject simulationObject) {
+    public static boolean canPartition(SimulationObject<CPUExperiment, Simulation> simulationObject) {
         return simulationObject.getExperiment().getConfig().getNumCores() == 2
                 && simulationObject.getExperiment().getConfig().getNumThreadsPerCore() == 2
                 && simulationObject.getSimulation().getProcessor().getCores().get(1).getThreads().get(0).getContext() != null;
