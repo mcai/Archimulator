@@ -103,6 +103,7 @@
   "numVirtualChannels": 4,
   "linkWidth": 4,
   "linkDelay": 1,
+  "antPacketTraffic": "uniform",
   "antPacketSize": 4,
   "antPacketInjectionRate": 0.001,
   "acoSelectionAlpha": 0.45,
