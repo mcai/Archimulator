@@ -24,7 +24,7 @@ public class Experiments {
                 0.030, 0.045, 0.060, 0.075, 0.090, 0.105, 0.120
         );
 
-        double antPacketInjectionRate = 0.001;
+        double antPacketInjectionRate = 0.0002;
 
         double acoSelectionAlpha = 0.45;
         double reinforcementFactor = 0.001;
