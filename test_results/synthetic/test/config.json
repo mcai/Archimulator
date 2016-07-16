@@ -1,7 +1,7 @@
 {
   "randSeed": 13,
-  "routing": "oddEven",
-  "selection": "aco",
+  "routing": "xy",
+  "selection": "random",
   "maxInjectionBufferSize": 32,
   "maxInputBufferSize": 4,
   "numVirtualChannels": 4,

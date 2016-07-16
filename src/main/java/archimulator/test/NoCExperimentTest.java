@@ -19,6 +19,8 @@ public class NoCExperimentTest {
                 false
         );
 
+        experiment.getConfig().setRouting("xy");
+        experiment.getConfig().setSelection("random");
         experiment.getConfig().setAntPacketInjectionRate(0.001);
         experiment.getConfig().setAcoSelectionAlpha(0.45);
         experiment.getConfig().setReinforcementFactor(0.001);

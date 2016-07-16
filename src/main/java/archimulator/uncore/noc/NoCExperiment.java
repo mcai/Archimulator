@@ -64,6 +64,14 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
         this.random = this.getConfig().getRandSeed() != -1 ? new Random(this.getConfig().getRandSeed()) : new Random();
 
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
+    }
+
+    /**
+     * Simulate.
+     */
+    @Override
+    protected void simulate() {
+        Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
         this.network = NetworkFactory.setupNetwork(this, this.cycleAccurateEventQueue, this.numNodes);
 
@@ -98,14 +106,6 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
         }
 
         this.routerCongestionStatusPredictionHelper = new RouterCongestionStatusPredictionHelper(this.network);
-    }
-
-    /**
-     * Simulate.
-     */
-    @Override
-    protected void simulate() {
-        Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
         this.beginTime = DateHelper.toTick(new Date());
 
