@@ -7,13 +7,29 @@ import archimulator.uncore.noc.routers.InputVirtualChannel;
 
 import java.util.List;
 
+/**
+ * Abstract selection algorithm.
+ *
+ * @author Min Cai
+ */
 public class AbstractSelectionAlgorithm implements SelectionAlgorithm {
     private Node node;
 
+    /**
+     * Create an abstract selection algorithm for the specified node.
+     *
+     * @param node the node
+     */
     public AbstractSelectionAlgorithm(Node node) {
         this.node = node;
     }
 
+    /**
+     * Handle the event when a packet has arrived at its destination node.
+     *
+     * @param packet the packet
+     * @param inputVirtualChannel the input virtual channel
+     */
     @Override
     public void handleDestArrived(Packet packet, InputVirtualChannel inputVirtualChannel) {
         packet.memorize(this.node.getId());
@@ -28,6 +44,13 @@ public class AbstractSelectionAlgorithm implements SelectionAlgorithm {
         }
     }
 
+    /**
+     * Do route calculation for a packet.
+     *
+     * @param packet the packet
+     * @param inputVirtualChannel input virtual channel
+     * @return the newly calculated output direction for routing the packet
+     */
     @Override
     public Direction doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
         int parent = !packet.getMemory().isEmpty() ? packet.getMemory().get(packet.getMemory().size() - 1).getFirst() : -1;
@@ -40,11 +63,25 @@ public class AbstractSelectionAlgorithm implements SelectionAlgorithm {
         return this.select(packet.getSrc(), packet.getDest(), inputVirtualChannel.getId(), directions);
     }
 
+    /**
+     * Select the best output direction from a list of candidate output directions.
+     *
+     * @param src the source node ID
+     * @param dest the destination node ID
+     * @param ivc the input virtual channel ID
+     * @param directions the list of candidate output directions
+     * @return the best output direction selected from a list of candidate output directions
+     */
     @Override
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
         return directions.get(0);
     }
 
+    /**
+     * Get the node.
+     *
+     * @return the node
+     */
     public Node getNode() {
         return node;
     }

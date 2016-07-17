@@ -10,13 +10,16 @@ import archimulator.util.Pair;
 
 import java.util.List;
 
+/**
+ * TODO...
+ */
 public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
     private PheromoneTable pheromoneTable;
 
     public ACOSelectionAlgorithm(Node node) {
         super(node);
 
-        this.pheromoneTable = new PheromoneTable(this);
+        this.pheromoneTable = new PheromoneTable(this.getNode());
 
         double pheromoneValue = 1.0 / this.getNode().getNeighbors().size();
 

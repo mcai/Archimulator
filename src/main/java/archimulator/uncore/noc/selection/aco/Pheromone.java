@@ -8,7 +8,7 @@ import archimulator.uncore.noc.Direction;
  * @author Min Cai
  */
 public class Pheromone {
-    private PheromoneTable routingTable;
+    private PheromoneTable pheromoneTable;
     private int dest;
     private Direction direction;
     private double value;
@@ -16,13 +16,13 @@ public class Pheromone {
     /**
      * Create a pheromone.
      *
-     * @param routingTable the parent routing table
+     * @param pheromoneTable the parent pheromone table
      * @param dest the destination node ID
      * @param direction the direction
      * @param value the pheromone value
      */
-    public Pheromone(PheromoneTable routingTable, int dest, Direction direction, double value) {
-        this.routingTable = routingTable;
+    public Pheromone(PheromoneTable pheromoneTable, int dest, Direction direction, double value) {
+        this.pheromoneTable = pheromoneTable;
         this.dest = dest;
         this.direction = direction;
         this.value = value;
@@ -31,16 +31,16 @@ public class Pheromone {
     @Override
     public String toString() {
         return String.format("Pheromone{node.id=%s, dest=%d, direction=%s, value=%s}",
-                routingTable.getSelectionAlgorithm().getNode().getId(), dest, direction, value);
+                pheromoneTable.getNode().getId(), dest, direction, value);
     }
 
     /**
-     * Get the parent routing table.
+     * Get the parent pheromone table.
      *
-     * @return the parent routing table
+     * @return the parent pheromone table
      */
-    public PheromoneTable getRoutingTable() {
-        return routingTable;
+    public PheromoneTable getPheromoneTable() {
+        return pheromoneTable;
     }
 
     /**
