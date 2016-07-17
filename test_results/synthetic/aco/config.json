@@ -1,7 +1,7 @@
 {
   "randSeed": 13,
-  "routing": "xy",
-  "selection": "random",
+  "routing": "oddEven",
+  "selection": "aco",
   "maxInjectionBufferSize": 32,
   "maxInputBufferSize": 4,
   "numVirtualChannels": 4,
@@ -9,10 +9,10 @@
   "linkDelay": 1,
   "antPacketTraffic": "uniform",
   "antPacketSize": 4,
-  "antPacketInjectionRate": 0.001,
+  "antPacketInjectionRate": 2.0E-4,
   "acoSelectionAlpha": 0.45,
   "reinforcementFactor": 0.001,
-  "dataPacketTraffic": "uniform",
-  "dataPacketInjectionRate": 0.01,
+  "dataPacketTraffic": "transpose",
+  "dataPacketInjectionRate": 0.06,
   "dataPacketSize": 16
 }

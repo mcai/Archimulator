@@ -10,21 +10,64 @@ import org.junit.Test;
  */
 public class NoCExperimentTest {
     @Test
-    public void test() {
-        NoCExperiment experiment = new NoCExperiment(
-                "test_results/synthetic/test",
+    public void testXy() {
+        NoCExperiment experimentXy = new NoCExperiment(
+                "test_results/synthetic/xy",
                 64,
+                20000,
                 -1,
-                10000,
                 false
         );
 
-        experiment.getConfig().setRouting("xy");
-        experiment.getConfig().setSelection("random");
-        experiment.getConfig().setAntPacketInjectionRate(0.001);
-        experiment.getConfig().setAcoSelectionAlpha(0.45);
-        experiment.getConfig().setReinforcementFactor(0.001);
+        experimentXy.getConfig().setRouting("xy");
+        experimentXy.getConfig().setSelection("random");
 
-        experiment.run();
+        experimentXy.getConfig().setDataPacketTraffic("transpose");
+        experimentXy.getConfig().setDataPacketInjectionRate(0.06);
+
+        experimentXy.run();
+    }
+
+    @Test
+    public void testBufferLevel() {
+        NoCExperiment experimentBufferLevel = new NoCExperiment(
+                "test_results/synthetic/bufferLevel",
+                64,
+                20000,
+                -1,
+                false
+        );
+
+        experimentBufferLevel.getConfig().setRouting("oddEven");
+        experimentBufferLevel.getConfig().setSelection("bufferLevel");
+
+        experimentBufferLevel.getConfig().setDataPacketTraffic("transpose");
+        experimentBufferLevel.getConfig().setDataPacketInjectionRate(0.06);
+
+        experimentBufferLevel.run();
+    }
+
+    @Test
+    public void testAco() {
+        NoCExperiment experimentAco = new NoCExperiment(
+                "test_results/synthetic/aco",
+                64,
+                20000,
+                -1,
+                false
+        );
+
+        experimentAco.getConfig().setRouting("oddEven");
+        experimentAco.getConfig().setSelection("aco");
+
+        experimentAco.getConfig().setDataPacketTraffic("transpose");
+        experimentAco.getConfig().setDataPacketInjectionRate(0.06);
+
+        experimentAco.getConfig().setAntPacketTraffic("uniform");
+        experimentAco.getConfig().setAntPacketInjectionRate(0.0002);
+        experimentAco.getConfig().setAcoSelectionAlpha(0.45);
+        experimentAco.getConfig().setReinforcementFactor(0.001);
+
+        experimentAco.run();
     }
 }

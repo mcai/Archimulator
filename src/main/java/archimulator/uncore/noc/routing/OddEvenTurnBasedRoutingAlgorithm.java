@@ -11,19 +11,23 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class OddEvenTurnBasedRoutingAlgorithm implements RoutingAlgorithm {
+public class OddEvenTurnBasedRoutingAlgorithm extends AbstractRoutingAlgorithm {
+    public OddEvenTurnBasedRoutingAlgorithm(Node node) {
+        super(node);
+    }
+
     @Override
-    public List<Direction> nextHop(Node node, int src, int dest, int parent) {
+    public List<Direction> nextHop(int src, int dest, int parent) {
         List<Direction> directions = new ArrayList<>();
 
-        int c0 = node.getX();
-        int c1 = node.getY();
+        int c0 = getNode().getX();
+        int c1 = getNode().getY();
 
-        int s0 = Node.getX(node.getNetwork(), src);
-        int s1 = Node.getY(node.getNetwork(), src);
+        int s0 = Node.getX(getNode().getNetwork(), src);
+        int s1 = Node.getY(getNode().getNetwork(), src);
 
-        int d0 = Node.getX(node.getNetwork(), dest);
-        int d1 = Node.getY(node.getNetwork(), dest);
+        int d0 = Node.getX(getNode().getNetwork(), dest);
+        int d1 = Node.getY(getNode().getNetwork(), dest);
 
         int e0 = d0 - c0;
         int e1 = -(d1 - c1);

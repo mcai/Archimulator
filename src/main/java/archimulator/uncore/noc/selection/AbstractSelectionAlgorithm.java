@@ -35,7 +35,7 @@ public class AbstractSelectionAlgorithm implements SelectionAlgorithm {
         packet.memorize(this.node.getId());
 
         List<Direction> directions =
-                this.node.getNetwork().getRoutingAlgorithm().nextHop(this.node, packet.getSrc(), packet.getDest(), parent);
+                this.node.getRoutingAlgorithm().nextHop(packet.getSrc(), packet.getDest(), parent);
 
         return this.select(packet.getSrc(), packet.getDest(), inputVirtualChannel.getId(), directions);
     }

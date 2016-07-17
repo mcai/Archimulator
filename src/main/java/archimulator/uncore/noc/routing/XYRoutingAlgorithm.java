@@ -11,35 +11,31 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class XYRoutingAlgorithm implements RoutingAlgorithm {
+public class XYRoutingAlgorithm extends AbstractRoutingAlgorithm {
+    public XYRoutingAlgorithm(Node node) {
+        super(node);
+    }
+
     @Override
-    public List<Direction> nextHop(Node node, int src, int dest, int parent) {
+    public List<Direction> nextHop(int src, int dest, int parent) {
         List<Direction> directions = new ArrayList<>();
 
-        int destX = Node.getX(node.getNetwork(), dest);
-        int destY = Node.getY(node.getNetwork(), dest);
+        int destX = Node.getX(getNode().getNetwork(), dest);
+        int destY = Node.getY(getNode().getNetwork(), dest);
 
-        if(destX != node.getX()) {
-            if(destX > node.getX()) {
+        if(destX != getNode().getX()) {
+            if(destX > getNode().getX()) {
                 directions.add(Direction.EAST);
             } else {
                 directions.add(Direction.WEST);
             }
         } else {
-            if(destY > node.getY()) {
+            if(destY > getNode().getY()) {
                 directions.add(Direction.SOUTH);
             } else {
                 directions.add(Direction.NORTH);
             }
         }
-
-//        System.out.println(String.format("[%d] node#%d::next_hop(dest=%d, parent=%d, neighbors=%s) = %s",
-//                node.getNetwork().getCycleAccurateEventQueue().getCurrentCycle(),
-//                node.getId(),
-//                dest,
-//                parent,
-//                node.getNeighbors(),
-//                directions));
 
         return directions;
     }

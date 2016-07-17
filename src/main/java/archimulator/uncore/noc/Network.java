@@ -2,7 +2,6 @@ package archimulator.uncore.noc;
 
 import archimulator.common.NoCEnvironment;
 import archimulator.uncore.noc.routers.FlitState;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.routing.RoutingAlgorithmFactory;
 import archimulator.uncore.noc.selection.SelectionAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -28,11 +27,9 @@ public class Network {
 
     private List<Node> nodes;
 
-    private SelectionAlgorithmFactory selectionAlgorithmFactory;
-
     private RoutingAlgorithmFactory routingAlgorithmFactory;
 
-    private RoutingAlgorithm routingAlgorithm;
+    private SelectionAlgorithmFactory selectionAlgorithmFactory;
 
     private int width;
 
@@ -97,23 +94,25 @@ public class Network {
 
         this.width = (int) Math.sqrt(this.numNodes);
 
+        if(this.width * this.width != this.numNodes) {
+            throw new RuntimeException("Only 2D meshes are supported");
+        }
+
         this.selectionAlgorithmFactory = selectionAlgorithmFactory;
+
+        this.routingAlgorithmFactory = routingAlgorithmFactory;
 
         this.nodes = new ArrayList<>();
 
         for(int i = 0; i < this.numNodes; i++) {
             Node node = new Node(this, i);
+
             node.setSelectionAlgorithm(this.selectionAlgorithmFactory.create(node));
+
+            node.setRoutingAlgorithm(this.routingAlgorithmFactory.create(node));
+
             this.nodes.add(node);
         }
-
-        if(this.width * this.width != this.numNodes) {
-            throw new RuntimeException("Only 2D meshes are supported");
-        }
-
-        this.routingAlgorithmFactory = routingAlgorithmFactory;
-
-        this.routingAlgorithm = this.routingAlgorithmFactory.createRoutingAlgorithm();
 
         this.inflightPackets = new ArrayList<>();
 
@@ -454,30 +453,21 @@ public class Network {
     }
 
     /**
+     * Get the routing algorithm factory.
+     *
+     * @return the routing algorithm factory
+     */
+    public RoutingAlgorithmFactory getRoutingAlgorithmFactory() {
+        return routingAlgorithmFactory;
+    }
+
+    /**
      * Get the selection algorithm factory.
      *
      * @return the selection algorithm factory
      */
     public SelectionAlgorithmFactory getSelectionAlgorithmFactory() {
         return selectionAlgorithmFactory;
-    }
-
-    /**
-     * Get the routing algorithm factory.
-     *
-     * @return the routing algorithm factory
-     */
-    public RoutingAlgorithmFactory<RoutingAlgorithm> getRoutingAlgorithmFactory() {
-        return routingAlgorithmFactory;
-    }
-
-    /**
-     * Get the routing algorithm.
-     *
-     * @return the routing algorithm
-     */
-    public RoutingAlgorithm getRoutingAlgorithm() {
-        return routingAlgorithm;
     }
 
     /**

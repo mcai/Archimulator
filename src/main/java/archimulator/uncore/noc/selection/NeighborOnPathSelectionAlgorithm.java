@@ -41,8 +41,8 @@ public class NeighborOnPathSelectionAlgorithm extends AbstractSelectionAlgorithm
     }
 
     private double nopScore(int src, int dest, int parent, int ivc) {
-        List<Direction> directions = this.getNode().getNetwork().getRoutingAlgorithm().nextHop(
-                this.getNode(), src, dest, parent
+        List<Direction> directions = this.getNode().getRoutingAlgorithm().nextHop(
+                src, dest, parent
         );
 
         double score = 0.0;

@@ -1,7 +1,6 @@
 package archimulator.uncore.noc.routing;
 
 import archimulator.uncore.noc.Direction;
-import archimulator.uncore.noc.Node;
 
 import java.util.List;
 
@@ -11,5 +10,5 @@ import java.util.List;
  * @author Min Cai
  */
 public interface RoutingAlgorithm {
-    List<Direction> nextHop(Node node, int src, int dest, int parent);
+    List<Direction> nextHop(int src, int dest, int parent);
 }

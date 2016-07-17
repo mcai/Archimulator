@@ -1,11 +1,10 @@
 package archimulator.uncore.noc;
 
-import archimulator.uncore.noc.routers.InputVirtualChannel;
 import archimulator.uncore.noc.routers.Router;
+import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.selection.SelectionAlgorithm;
 
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +23,8 @@ public class Node {
     private Map<Direction, Integer> neighbors;
 
     private Router router;
+
+    private RoutingAlgorithm routingAlgorithm;
 
     private SelectionAlgorithm selectionAlgorithm;
 
@@ -91,6 +92,14 @@ public class Node {
 
     public Router getRouter() {
         return router;
+    }
+
+    public RoutingAlgorithm getRoutingAlgorithm() {
+        return routingAlgorithm;
+    }
+
+    public void setRoutingAlgorithm(RoutingAlgorithm routingAlgorithm) {
+        this.routingAlgorithm = routingAlgorithm;
     }
 
     public SelectionAlgorithm getSelectionAlgorithm() {
