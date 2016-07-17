@@ -1,4 +1,4 @@
-package archimulator.uncore.noc.routers.prediction;
+package archimulator.uncore.noc.prediction;
 
 /**
  * Router congestion status.

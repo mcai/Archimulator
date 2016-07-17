@@ -8,13 +8,11 @@ import archimulator.uncore.noc.routing.RoutingAlgorithm;
 /**
  * Uniform traffic generator.
  *
- * @param <NodeT>             the node type
- * @param <RoutingAlgorithmT> the routing algorithm type
  * @param <PacketT>           the packet type
  * @author Min Cai
  */
-public class UniformTrafficGenerator<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm, PacketT extends Packet>
-        extends SyntheticTrafficGenerator<NodeT, RoutingAlgorithmT, PacketT> {
+public class UniformTrafficGenerator<PacketT extends Packet>
+        extends SyntheticTrafficGenerator<PacketT> {
     /**
      * Create a uniform traffic generator.
      *
@@ -25,7 +23,7 @@ public class UniformTrafficGenerator<NodeT extends Node, RoutingAlgorithmT exten
      * @param maxPackets the maximum number of packets to be generated
      */
     public UniformTrafficGenerator(
-            Network<NodeT, RoutingAlgorithmT> network,
+            Network network,
             double packetInjectionRate,
             PacketFactory<PacketT> packetFactory,
             int packetSize,

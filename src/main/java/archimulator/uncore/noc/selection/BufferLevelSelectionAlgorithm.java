@@ -1,10 +1,8 @@
 package archimulator.uncore.noc.selection;
 
 import archimulator.uncore.noc.Direction;
-import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.routers.Router;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +12,9 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class BufferLevelSelectionBasedNode extends Node {
-    public BufferLevelSelectionBasedNode(Network<? extends Node, ? extends RoutingAlgorithm> network, int id) {
-        super(network, id);
+public class BufferLevelSelectionAlgorithm extends AbstractSelectionAlgorithm {
+    public BufferLevelSelectionAlgorithm(Node node) {
+        super(node);
     }
 
     @Override
@@ -26,7 +24,7 @@ public class BufferLevelSelectionBasedNode extends Node {
         double maxFreeSlots = -1.0;
 
         for(Direction direction : directions) {
-            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
+            Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
             int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
 
             if(freeSlots > maxFreeSlots) {
@@ -39,7 +37,7 @@ public class BufferLevelSelectionBasedNode extends Node {
         }
 
         if(!bestDirections.isEmpty()) {
-            return bestDirections.get(this.getNetwork().getEnvironment().getRandom().nextInt(bestDirections.size()));
+            return bestDirections.get(this.getNode().getNetwork().getEnvironment().getRandom().nextInt(bestDirections.size()));
         }
 
         return super.select(src, dest, ivc, directions);

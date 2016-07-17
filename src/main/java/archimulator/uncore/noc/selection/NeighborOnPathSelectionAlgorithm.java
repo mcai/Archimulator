@@ -1,10 +1,8 @@
 package archimulator.uncore.noc.selection;
 
 import archimulator.uncore.noc.Direction;
-import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.routers.Router;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 import java.util.List;
 
@@ -13,9 +11,9 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public class NeighborOnPathSelectionBasedNode extends Node {
-    public NeighborOnPathSelectionBasedNode(Network<? extends Node, ? extends RoutingAlgorithm> network, int id) {
-        super(network, id);
+public class NeighborOnPathSelectionAlgorithm extends AbstractSelectionAlgorithm {
+    public NeighborOnPathSelectionAlgorithm(Node node) {
+        super(node);
     }
 
     @Override
@@ -24,13 +22,15 @@ public class NeighborOnPathSelectionBasedNode extends Node {
         Direction directionWithMaxScore = null;
 
         for(Direction direction : directions) {
-            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
+            Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
 
             if(neighborRouter.getNode().getId() == dest) {
                 return direction;
             }
 
-            double score = ((NeighborOnPathSelectionBasedNode) (neighborRouter.getNode())).nopScore(src, dest, this.getId(), ivc);
+            double score = ((NeighborOnPathSelectionAlgorithm) (neighborRouter.getNode().getSelectionAlgorithm())).nopScore(
+                    src, dest, this.getNode().getId(), ivc
+            );
             if(score > maxScore) {
                 maxScore = score;
                 directionWithMaxScore = direction;
@@ -41,14 +41,14 @@ public class NeighborOnPathSelectionBasedNode extends Node {
     }
 
     private double nopScore(int src, int dest, int parent, int ivc) {
-        List<Direction> directions = this.getNetwork().getRoutingAlgorithm().nextHop(
-                this, src, dest, parent
+        List<Direction> directions = this.getNode().getNetwork().getRoutingAlgorithm().nextHop(
+                this.getNode(), src, dest, parent
         );
 
         double score = 0.0;
 
         for(Direction direction : directions) {
-            Router neighborRouter = this.getNetwork().getNodes().get(this.getNeighbors().get(direction)).getRouter();
+            Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
             score += neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
         }
 

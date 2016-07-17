@@ -6,9 +6,8 @@ import archimulator.common.Logger;
 import archimulator.common.NoCEnvironment;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
+import archimulator.uncore.noc.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.uncore.noc.routers.FlitState;
-import archimulator.uncore.noc.routers.prediction.RouterCongestionStatusPredictionHelper;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
 import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
 import archimulator.uncore.noc.traffics.UniformTrafficGenerator;
@@ -45,7 +44,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
 
-    private Network<? extends Node, ? extends RoutingAlgorithm> network;
+    private Network network;
 
     private RouterCongestionStatusPredictionHelper routerCongestionStatusPredictionHelper;
 
@@ -73,7 +72,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
     protected void simulate() {
         Logger.info(Logger.SIMULATOR, "", this.cycleAccurateEventQueue.getCurrentCycle());
 
-        this.network = NetworkFactory.setupNetwork(this, this.cycleAccurateEventQueue, this.numNodes);
+        this.network = NetworkFactory.create(this, this.cycleAccurateEventQueue, this.numNodes);
 
         switch (this.getConfig().getDataPacketTraffic()) {
             case "uniform":
@@ -297,7 +296,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
      *
      * @return the network
      */
-    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
+    public Network getNetwork() {
         return network;
     }
 

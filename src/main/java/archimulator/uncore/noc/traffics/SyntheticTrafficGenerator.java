@@ -3,7 +3,6 @@ package archimulator.uncore.noc.traffics;
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.Packet;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 import java.util.List;
 
@@ -12,8 +11,8 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public abstract class SyntheticTrafficGenerator<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm, PacketT extends Packet> {
-    private Network<NodeT, RoutingAlgorithmT> network;
+public abstract class SyntheticTrafficGenerator<PacketT extends Packet> {
+    private Network network;
     private double packetInjectionRate;
     private PacketFactory<PacketT> packetFactory;
     private int packetSize;
@@ -29,7 +28,7 @@ public abstract class SyntheticTrafficGenerator<NodeT extends Node, RoutingAlgor
      * @param maxPackets the maximum number of packets to be generated
      */
     public SyntheticTrafficGenerator(
-            Network<NodeT, RoutingAlgorithmT> network,
+            Network network,
             double packetInjectionRate,
             PacketFactory<PacketT> packetFactory,
             int packetSize,
@@ -70,7 +69,7 @@ public abstract class SyntheticTrafficGenerator<NodeT extends Node, RoutingAlgor
      *
      * @return the list of source nodes
      */
-    protected List<NodeT> getSrcNodes() {
+    protected List<Node> getSrcNodes() {
         return this.network.getNodes();
     }
 
@@ -99,7 +98,7 @@ public abstract class SyntheticTrafficGenerator<NodeT extends Node, RoutingAlgor
      *
      * @return the parent network
      */
-    public Network<NodeT, RoutingAlgorithmT> getNetwork() {
+    public Network getNetwork() {
         return network;
     }
 

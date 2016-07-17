@@ -3,7 +3,6 @@ package archimulator.uncore.noc.traffics;
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.Packet;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +13,8 @@ import java.util.List;
  * @param <PacketT> packet type
  * @author Min Cai
  */
-public class HotspotTrafficGenerator<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm, PacketT extends Packet>
-        extends UniformTrafficGenerator<NodeT, RoutingAlgorithmT, PacketT> {
+public class HotspotTrafficGenerator<PacketT extends Packet>
+        extends UniformTrafficGenerator<PacketT> {
     private List<Integer> hotspots;
 
     /**
@@ -28,7 +27,7 @@ public class HotspotTrafficGenerator<NodeT extends Node, RoutingAlgorithmT exten
      * @param maxPackets the maximum number of packets to be generated
      */
     public HotspotTrafficGenerator(
-            Network<NodeT, RoutingAlgorithmT> network,
+            Network network,
             double packetInjectionRate,
             PacketFactory<PacketT> packetFactory,
             int packetSize,
@@ -55,8 +54,8 @@ public class HotspotTrafficGenerator<NodeT extends Node, RoutingAlgorithmT exten
      * @return the list of source nodes
      */
     @Override
-    protected List<NodeT> getSrcNodes() {
-        List<NodeT> srcNodes = new ArrayList<>();
+    protected List<Node> getSrcNodes() {
+        List<Node> srcNodes = new ArrayList<>();
 
         srcNodes.addAll(this.getNetwork().getNodes());
 

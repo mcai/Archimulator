@@ -1,4 +1,4 @@
-package archimulator.uncore.noc.routers.prediction;
+package archimulator.uncore.noc.prediction;
 
 import archimulator.common.Experiment;
 import archimulator.common.SimulationObject;
@@ -28,7 +28,7 @@ public class RouterCongestionStatusPredictionHelper implements Reportable {
      *
      * @param network the parent network
      */
-    public RouterCongestionStatusPredictionHelper(Network<? extends Node, ? extends RoutingAlgorithm> network) {
+    public RouterCongestionStatusPredictionHelper(Network network) {
         this.routerCongestionStatusPredictor = new CacheBasedPredictor<>(
                 new SimulationObject() {
                     @Override

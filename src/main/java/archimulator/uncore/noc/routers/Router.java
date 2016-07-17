@@ -119,7 +119,7 @@ public class Router {
                             outputVirtualChannel.setInputVirtualChannel(null);
 
                             if(outputPort.getDirection() == Direction.LOCAL) {
-                                this.node.handleDestArrived(flit.getPacket(), inputVirtualChannel);
+                                this.node.getSelectionAlgorithm().handleDestArrived(flit.getPacket(), inputVirtualChannel);
                             }
                         }
                     }
@@ -248,7 +248,7 @@ public class Router {
                         inputVirtualChannel.setRoute(Direction.LOCAL);
                     } else {
                         inputVirtualChannel.setRoute(
-                                this.node.doRouteCalculation(
+                                this.node.getSelectionAlgorithm().doRouteCalculation(
                                         flit.getPacket(), inputVirtualChannel
                                 )
                         );

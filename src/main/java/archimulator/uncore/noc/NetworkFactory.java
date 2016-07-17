@@ -2,12 +2,11 @@ package archimulator.uncore.noc;
 
 import archimulator.common.NoCEnvironment;
 import archimulator.uncore.noc.routing.OddEvenTurnBasedRoutingAlgorithm;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.routing.XYRoutingAlgorithm;
-import archimulator.uncore.noc.selection.BufferLevelSelectionBasedNode;
-import archimulator.uncore.noc.selection.NeighborOnPathSelectionBasedNode;
-import archimulator.uncore.noc.selection.RandomSelectionBasedNode;
-import archimulator.uncore.noc.selection.aco.ACONode;
+import archimulator.uncore.noc.selection.BufferLevelSelectionAlgorithm;
+import archimulator.uncore.noc.selection.NeighborOnPathSelectionAlgorithm;
+import archimulator.uncore.noc.selection.RandomSelectionAlgorithm;
+import archimulator.uncore.noc.selection.aco.ACOSelectionAlgorithm;
 import archimulator.uncore.noc.selection.aco.ForwardAntPacket;
 import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
 import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
@@ -20,94 +19,74 @@ import archimulator.util.event.CycleAccurateEventQueue;
  * @author Min Cai
  */
 public class NetworkFactory {
-    private static Network<? extends Node, ? extends RoutingAlgorithm> xy(
+    private static Network xy(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     )  {
-        return new Network<>(
+        return new Network(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
-                new NodeFactory<RandomSelectionBasedNode>() {
-                    @Override
-                    public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network, int i) {
-                        return new RandomSelectionBasedNode(network, i);
-                    }
-                },
-                XYRoutingAlgorithm::new);
+                RandomSelectionAlgorithm::new,
+                XYRoutingAlgorithm::new
+        );
     }
 
-    private static Network<? extends Node, ? extends RoutingAlgorithm> random(
+    private static Network random(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     )  {
-        return new Network<>(
+        return new Network(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
-                new NodeFactory<RandomSelectionBasedNode>() {
-                    @Override
-                    public RandomSelectionBasedNode createNode(Network<RandomSelectionBasedNode, ?> network, int i) {
-                        return new RandomSelectionBasedNode(network, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
+                RandomSelectionAlgorithm::new,
+                OddEvenTurnBasedRoutingAlgorithm::new
+        );
     }
 
-    private static Network<? extends Node, ? extends RoutingAlgorithm> bufferLevel(
+    private static Network bufferLevel(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     )  {
-        return new Network<>(
+        return new Network(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
-                new NodeFactory<BufferLevelSelectionBasedNode>() {
-                    @Override
-                    public BufferLevelSelectionBasedNode createNode(Network<BufferLevelSelectionBasedNode, ?> network, int i) {
-                        return new BufferLevelSelectionBasedNode(network, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
+                BufferLevelSelectionAlgorithm::new,
+                OddEvenTurnBasedRoutingAlgorithm::new
+        );
     }
 
-    private static Network<? extends Node, ? extends RoutingAlgorithm> neighborOnPath(
+    private static Network neighborOnPath(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     ) {
-        return new Network<>(
+        return new Network(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
-                new NodeFactory<NeighborOnPathSelectionBasedNode>() {
-                    @Override
-                    public NeighborOnPathSelectionBasedNode createNode(Network<NeighborOnPathSelectionBasedNode, ?> network, int i) {
-                        return new NeighborOnPathSelectionBasedNode(network, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
+                NeighborOnPathSelectionAlgorithm::new,
+                OddEvenTurnBasedRoutingAlgorithm::new
+        );
     }
 
-    private static Network<? extends Node, ? extends RoutingAlgorithm> aco(
+    private static Network aco(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     ) {
-        Network<ACONode, OddEvenTurnBasedRoutingAlgorithm> network = new Network<>(
+        Network network = new Network(
                 environment,
                 cycleAccurateEventQueue,
                 numNodes,
-                new NodeFactory<ACONode>() {
-                    @Override
-                    public ACONode createNode(Network<ACONode, ?> network1, int i) {
-                        return new ACONode(network1, i);
-                    }
-                },
-                OddEvenTurnBasedRoutingAlgorithm::new);
+                ACOSelectionAlgorithm::new,
+                OddEvenTurnBasedRoutingAlgorithm::new
+        );
 
         switch (environment.getConfig().getAntPacketTraffic()) {
             case "uniform":
@@ -142,12 +121,12 @@ public class NetworkFactory {
         return network;
     }
 
-    public static Network<? extends Node, ? extends RoutingAlgorithm> setupNetwork(
+    public static Network create(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes
     ) {
-        Network<? extends Node, ? extends RoutingAlgorithm> network;
+        Network network;
 
         switch (environment.getConfig().getRouting()) {
             case "xy":

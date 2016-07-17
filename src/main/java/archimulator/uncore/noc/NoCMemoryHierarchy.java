@@ -28,8 +28,7 @@ import archimulator.uncore.MemoryDevice;
 import archimulator.uncore.Net;
 import archimulator.uncore.coherence.msi.controller.L1IController;
 import archimulator.uncore.noc.routers.FlitState;
-import archimulator.uncore.noc.routers.prediction.RouterCongestionStatusPredictionHelper;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
+import archimulator.uncore.noc.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -44,7 +43,7 @@ import java.util.Random;
  * @author Min Cai
  */
 public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, NoCEnvironment, Reportable {
-    private Network<? extends Node, ? extends RoutingAlgorithm> network;
+    private Network network;
 
     private RouterCongestionStatusPredictionHelper routerCongestionStatusPredictionHelper;
 
@@ -91,7 +90,7 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
             i = (width + 1) * (width + 1);
         }
 
-        this.network = NetworkFactory.setupNetwork(this, this.getCycleAccurateEventQueue(), i);
+        this.network = NetworkFactory.create(this, this.getCycleAccurateEventQueue(), i);
 
         this.routerCongestionStatusPredictionHelper = new RouterCongestionStatusPredictionHelper(this.network);
 
@@ -285,7 +284,7 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
      *
      * @return the network
      */
-    public Network<? extends Node, ? extends RoutingAlgorithm> getNetwork() {
+    public Network getNetwork() {
         return network;
     }
 }

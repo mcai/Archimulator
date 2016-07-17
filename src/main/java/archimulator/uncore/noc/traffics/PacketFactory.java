@@ -1,9 +1,7 @@
 package archimulator.uncore.noc.traffics;
 
 import archimulator.uncore.noc.Network;
-import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.Packet;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 /**
  * Packet factory.
@@ -21,5 +19,5 @@ public interface PacketFactory<PacketT extends Packet> {
      * @param size the size of the packet
      * @return the newly created packet
      */
-    PacketT create(Network<? extends Node, ? extends RoutingAlgorithm> network, int src, int dest, int size);
+    PacketT create(Network network, int src, int dest, int size);
 }

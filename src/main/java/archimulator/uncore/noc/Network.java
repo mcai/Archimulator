@@ -4,6 +4,7 @@ import archimulator.common.NoCEnvironment;
 import archimulator.uncore.noc.routers.FlitState;
 import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.uncore.noc.routing.RoutingAlgorithmFactory;
+import archimulator.uncore.noc.selection.SelectionAlgorithmFactory;
 import archimulator.util.event.CycleAccurateEventQueue;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Map;
  *
  * @author  Min Cai
  */
-public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm> {
+public class Network {
     long currentPacketId;
 
     private NoCEnvironment environment;
@@ -25,13 +26,13 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
     private int numNodes;
 
-    private List<NodeT> nodes;
+    private List<Node> nodes;
 
-    private NodeFactory<NodeT> nodeFactory;
+    private SelectionAlgorithmFactory selectionAlgorithmFactory;
 
-    private RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory;
+    private RoutingAlgorithmFactory routingAlgorithmFactory;
 
-    private RoutingAlgorithmT routingAlgorithm;
+    private RoutingAlgorithm routingAlgorithm;
 
     private int width;
 
@@ -76,15 +77,15 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
      * @param environment the environment
      * @param cycleAccurateEventQueue the cycle accurate event queue
      * @param numNodes the number of nodes
-     * @param nodeFactory the node factory
+     * @param selectionAlgorithmFactory the node factory
      * @param routingAlgorithmFactory the routing algorithm factory
      */
     public Network(
             NoCEnvironment environment,
             CycleAccurateEventQueue cycleAccurateEventQueue,
             int numNodes,
-            NodeFactory<NodeT> nodeFactory,
-            RoutingAlgorithmFactory<RoutingAlgorithmT> routingAlgorithmFactory
+            SelectionAlgorithmFactory selectionAlgorithmFactory,
+            RoutingAlgorithmFactory routingAlgorithmFactory
     ) {
         this.environment = environment;
 
@@ -96,12 +97,14 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
 
         this.width = (int) Math.sqrt(this.numNodes);
 
-        this.nodeFactory = nodeFactory;
+        this.selectionAlgorithmFactory = selectionAlgorithmFactory;
 
         this.nodes = new ArrayList<>();
 
         for(int i = 0; i < this.numNodes; i++) {
-            this.nodes.add(this.nodeFactory.createNode(this, i));
+            Node node = new Node(this, i);
+            node.setSelectionAlgorithm(this.selectionAlgorithmFactory.create(node));
+            this.nodes.add(node);
         }
 
         if(this.width * this.width != this.numNodes) {
@@ -446,17 +449,17 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
      *
      * @return the list of nodes
      */
-    public List<NodeT> getNodes() {
+    public List<Node> getNodes() {
         return nodes;
     }
 
     /**
-     * Get the node factory.
+     * Get the selection algorithm factory.
      *
-     * @return the node factory
+     * @return the selection algorithm factory
      */
-    public NodeFactory<NodeT> getNodeFactory() {
-        return nodeFactory;
+    public SelectionAlgorithmFactory getSelectionAlgorithmFactory() {
+        return selectionAlgorithmFactory;
     }
 
     /**
@@ -464,7 +467,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
      *
      * @return the routing algorithm factory
      */
-    public RoutingAlgorithmFactory<RoutingAlgorithmT> getRoutingAlgorithmFactory() {
+    public RoutingAlgorithmFactory<RoutingAlgorithm> getRoutingAlgorithmFactory() {
         return routingAlgorithmFactory;
     }
 
@@ -473,7 +476,7 @@ public class Network<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgori
      *
      * @return the routing algorithm
      */
-    public RoutingAlgorithmT getRoutingAlgorithm() {
+    public RoutingAlgorithm getRoutingAlgorithm() {
         return routingAlgorithm;
     }
 

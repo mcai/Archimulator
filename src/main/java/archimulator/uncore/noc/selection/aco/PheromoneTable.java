@@ -7,17 +7,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * ACO routing table.
+ * Pheromone table.
  *
  * @author Min Cai
  */
-public class ACORoutingTable {
-    private ACONode node;
+public class PheromoneTable {
+    private ACOSelectionAlgorithm selectionAlgorithm;
 
     private Map<Integer, Map<Direction, Pheromone>> pheromones;
 
-    public ACORoutingTable(ACONode node) {
-        this.node = node;
+    public PheromoneTable(ACOSelectionAlgorithm selectionAlgorithm) {
+        this.selectionAlgorithm = selectionAlgorithm;
 
         this.pheromones = new TreeMap<>();
     }
@@ -37,19 +37,19 @@ public class ACORoutingTable {
             if(pheromone.getDirection() == direction) {
                 pheromone.setValue(
                         pheromone.getValue()
-                                + this.node.getNetwork().getEnvironment().getConfig().getReinforcementFactor() * (1 - pheromone.getValue())
+                                + this.selectionAlgorithm.getNode().getNetwork().getEnvironment().getConfig().getReinforcementFactor() * (1 - pheromone.getValue())
                 );
             } else {
                 pheromone.setValue(
                         pheromone.getValue()
-                                - this.node.getNetwork().getEnvironment().getConfig().getReinforcementFactor() * pheromone.getValue()
+                                - this.selectionAlgorithm.getNode().getNetwork().getEnvironment().getConfig().getReinforcementFactor() * pheromone.getValue()
                 );
             }
         }
     }
 
-    public ACONode getNode() {
-        return node;
+    public ACOSelectionAlgorithm getSelectionAlgorithm() {
+        return selectionAlgorithm;
     }
 
     public Map<Integer, Map<Direction, Pheromone>> getPheromones() {

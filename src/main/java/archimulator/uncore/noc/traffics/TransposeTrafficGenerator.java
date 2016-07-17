@@ -3,18 +3,15 @@ package archimulator.uncore.noc.traffics;
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.Packet;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 /**
  * Transpose traffic generator.
  *
- * @param <NodeT>             the node type
- * @param <RoutingAlgorithmT> the routing algorithm type
  * @param <PacketT>           the packet type
  * @author Min Cai
  */
-public class TransposeTrafficGenerator<NodeT extends Node, RoutingAlgorithmT extends RoutingAlgorithm, PacketT extends Packet>
-        extends SyntheticTrafficGenerator<NodeT, RoutingAlgorithmT, PacketT> {
+public class TransposeTrafficGenerator<PacketT extends Packet>
+        extends SyntheticTrafficGenerator<PacketT> {
     /**
      * Create a transpose traffic generator.
      *
@@ -25,7 +22,7 @@ public class TransposeTrafficGenerator<NodeT extends Node, RoutingAlgorithmT ext
      * @param maxPackets the maximum number of packets to be generated
      */
     public TransposeTrafficGenerator(
-            Network<NodeT, RoutingAlgorithmT> network,
+            Network network,
             double packetInjectionRate,
             PacketFactory<PacketT> packetFactory,
             int packetSize,
