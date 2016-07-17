@@ -1,7 +1,15 @@
 package archimulator.test;
 
+import archimulator.common.Experiment;
+import archimulator.startup.CSVFields;
 import archimulator.uncore.noc.NoCExperiment;
+import archimulator.util.csv.CSVHelper;
+import archimulator.util.plots.PlotHelper;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * NoC experiment test.
@@ -9,8 +17,24 @@ import org.junit.Test;
  * @author Min Cai
  */
 public class NoCExperimentTest {
-    @Test
-    public void testXy() {
+    private List<NoCExperiment> experiments;
+
+    @Before
+    public void setUp() throws Exception {
+        NoCExperiment experimentXy = xy();
+
+        NoCExperiment experimentBufferLevel = bufferLevel();
+
+        NoCExperiment experimentAco = aco();
+
+        experiments = Arrays.asList(
+                experimentXy,
+                experimentBufferLevel,
+                experimentAco
+        );
+    }
+
+    private NoCExperiment xy() {
         NoCExperiment experimentXy = new NoCExperiment(
                 "test_results/synthetic/xy",
                 64,
@@ -25,11 +49,10 @@ public class NoCExperimentTest {
         experimentXy.getConfig().setDataPacketTraffic("transpose");
         experimentXy.getConfig().setDataPacketInjectionRate(0.06);
 
-        experimentXy.run();
+        return experimentXy;
     }
 
-    @Test
-    public void testBufferLevel() {
+    private NoCExperiment bufferLevel() {
         NoCExperiment experimentBufferLevel = new NoCExperiment(
                 "test_results/synthetic/bufferLevel",
                 64,
@@ -44,11 +67,10 @@ public class NoCExperimentTest {
         experimentBufferLevel.getConfig().setDataPacketTraffic("transpose");
         experimentBufferLevel.getConfig().setDataPacketInjectionRate(0.06);
 
-        experimentBufferLevel.run();
+        return experimentBufferLevel;
     }
 
-    @Test
-    public void testAco() {
+    private NoCExperiment aco() {
         NoCExperiment experimentAco = new NoCExperiment(
                 "test_results/synthetic/aco",
                 64,
@@ -68,6 +90,70 @@ public class NoCExperimentTest {
         experimentAco.getConfig().setAcoSelectionAlpha(0.45);
         experimentAco.getConfig().setReinforcementFactor(0.001);
 
-        experimentAco.run();
+        return experimentAco;
+    }
+
+    @Test
+    public void run() {
+        Experiment.runExperiments(experiments, true);
+    }
+
+    @Test
+    public void analyze() {
+        experiments.forEach(Experiment::loadStats);
+
+        CSVHelper.toCsv(
+                "test_results/synthetic/result.csv",
+                experiments,
+                CSVFields.csvFields
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/throughput.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Throughput_(packets/cycle/node)"
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/average_packet_delay.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Avg._Packet_Delay_(cycles)"
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/average_packet_hops.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Avg._Packet_Hops"
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/payload_throughput.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Payload_Throughput_(packets/cycle/node)"
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/average_payload_packet_delay.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Avg._Payload_Packet_Delay_(cycles)"
+        );
+
+        PlotHelper.generatePlot(
+                "test_results/synthetic/result.csv",
+                "test_results/synthetic/average_payload_packet_hops.pdf",
+                "Data_Packet_Injection_Rate_(packets/cycle/node)",
+                "NoC_Routing_Solution",
+                "Avg._Payload_Packet_Hops"
+        );
     }
 }

@@ -4,6 +4,10 @@ import archimulator.common.Experiment;
 import archimulator.common.NoCConfig;
 import archimulator.uncore.noc.NoCExperiment;
 import archimulator.uncore.noc.routers.FlitState;
+import archimulator.util.csv.CSVField;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CSV fields.
@@ -13,6 +17,38 @@ import archimulator.uncore.noc.routers.FlitState;
 public class CSVFields {
     public static final String NOC_PREFIX = "noc/";
     public static final String SIMULATION_PREFIX = "simulation/";
+
+    public static List<CSVField<NoCExperiment>> csvFields = new ArrayList<>();
+
+    static {
+        csvFields.add(new CSVField<>("Data_Packet_Traffic", CSVFields::getDataPacketTraffic));
+        csvFields.add(new CSVField<>("Data_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getDataPacketInjectionRate));
+        csvFields.add(new CSVField<>("Routing_Algorithm", CSVFields::getRouting));
+        csvFields.add(new CSVField<>("Selection_Policy", CSVFields::getSelection));
+        csvFields.add(new CSVField<>("Routing+Selection", CSVFields::getRoutingAndSelection));
+        csvFields.add(new CSVField<>("Ant_Packet_Traffic", CSVFields::getAntPacketTraffic));
+        csvFields.add(new CSVField<>("Ant_Packet_Injection_Rate_(packets/cycle/node)", CSVFields::getAntPacketInjectionRate));
+        csvFields.add(new CSVField<>("Alpha", CSVFields::getAcoSelectionAlpha));
+        csvFields.add(new CSVField<>("Reinforcement_Factor", CSVFields::getReinforcementFactor));
+        csvFields.add(new CSVField<>("NoC_Routing_Solution", CSVFields::getNoCRoutingSolution));
+        csvFields.add(new CSVField<>("Simulation_Time", CSVFields::getSimulationTime));
+        csvFields.add(new CSVField<>("Total_Cycles", CSVFields::getTotalCycles));
+        csvFields.add(new CSVField<>("Packets_Transmitted", CSVFields::getNumPacketsTransmitted));
+        csvFields.add(new CSVField<>("Throughput_(packets/cycle/node)", CSVFields::getThroughput));
+        csvFields.add(new CSVField<>("Avg._Packet_Delay_(cycles)", CSVFields::getAveragePacketDelay));
+        csvFields.add(new CSVField<>("Avg._Packet_Hops", CSVFields::getAveragePacketHops));
+        csvFields.add(new CSVField<>("Payload_Packets_Transmitted", CSVFields::getNumPayloadPacketsTransmitted));
+        csvFields.add(new CSVField<>("Payload_Throughput_(packets/cycle/node)", CSVFields::getPayloadThroughput));
+        csvFields.add(new CSVField<>("Avg._Payload_Packet_Delay_(cycles)", CSVFields::getAveragePayloadPacketDelay));
+        csvFields.add(new CSVField<>("Avg._Payload_Packet_Hops", CSVFields::getAveragePayloadPacketHops));
+
+        for (FlitState state : FlitState.values()) {
+            csvFields.add(new CSVField<>(String.format("Average_Flit_per_State_Delay::%s", state),
+                    e -> getAverageFlitPerStateDelay(e, state)));
+            csvFields.add(new CSVField<>(String.format("Max_Flit_per_State_Delay::%s", state),
+                    e -> getMaxFlitPerStateDelay(e, state)));
+        }
+    }
 
     public static String getDataPacketTraffic(NoCExperiment experiment) {
         return experiment.getConfig().getDataPacketTraffic();
