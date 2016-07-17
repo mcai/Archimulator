@@ -1,18 +1,14 @@
 package archimulator.uncore.noc.traffics;
 
 import archimulator.uncore.noc.Network;
-import archimulator.uncore.noc.Node;
-import archimulator.uncore.noc.Packet;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 
 /**
  * Uniform traffic generator.
  *
- * @param <PacketT>           the packet type
  * @author Min Cai
  */
-public class UniformTrafficGenerator<PacketT extends Packet>
-        extends SyntheticTrafficGenerator<PacketT> {
+public class UniformTrafficGenerator
+        extends SyntheticTrafficGenerator {
     /**
      * Create a uniform traffic generator.
      *
@@ -25,7 +21,7 @@ public class UniformTrafficGenerator<PacketT extends Packet>
     public UniformTrafficGenerator(
             Network network,
             double packetInjectionRate,
-            PacketFactory<PacketT> packetFactory,
+            PacketFactory packetFactory,
             int packetSize,
             long maxPackets
     ) {

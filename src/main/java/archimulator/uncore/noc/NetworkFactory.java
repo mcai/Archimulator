@@ -90,28 +90,28 @@ public class NetworkFactory {
 
         switch (environment.getConfig().getAntPacketTraffic()) {
             case "uniform":
-                new UniformTrafficGenerator<>(
+                new UniformTrafficGenerator(
                         network,
                         environment.getConfig().getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new ForwardAntPacket(network, src, dest, size, () -> {}),
                         environment.getConfig().getAntPacketSize(),
                         -1
                 );
                 break;
             case "transpose":
-                new TransposeTrafficGenerator<>(
+                new TransposeTrafficGenerator(
                         network,
                         environment.getConfig().getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new ForwardAntPacket(network, src, dest, size, () -> {}),
                         environment.getConfig().getAntPacketSize(),
                         -1
                 );
                 break;
             case "hotspot":
-                new HotspotTrafficGenerator<>(
+                new HotspotTrafficGenerator(
                         network,
                         environment.getConfig().getAntPacketInjectionRate(),
-                        (n, src, dest, size) -> new ForwardAntPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new ForwardAntPacket(network, src, dest, size, () -> {}),
                         environment.getConfig().getAntPacketSize(),
                         -1
                 );

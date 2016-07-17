@@ -2,7 +2,6 @@ package archimulator.uncore.noc.traffics;
 
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
-import archimulator.uncore.noc.Packet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +9,9 @@ import java.util.List;
 /**
  * Hotspot traffic generator.
  *
- * @param <PacketT> packet type
  * @author Min Cai
  */
-public class HotspotTrafficGenerator<PacketT extends Packet>
-        extends UniformTrafficGenerator<PacketT> {
+public class HotspotTrafficGenerator extends UniformTrafficGenerator {
     private List<Integer> hotspots;
 
     /**
@@ -29,7 +26,7 @@ public class HotspotTrafficGenerator<PacketT extends Packet>
     public HotspotTrafficGenerator(
             Network network,
             double packetInjectionRate,
-            PacketFactory<PacketT> packetFactory,
+            PacketFactory packetFactory,
             int packetSize,
             long maxPackets
     ) {

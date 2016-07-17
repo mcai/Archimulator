@@ -2,16 +2,14 @@ package archimulator.uncore.noc.traffics;
 
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
-import archimulator.uncore.noc.Packet;
 
 /**
  * Transpose traffic generator.
  *
- * @param <PacketT>           the packet type
  * @author Min Cai
  */
-public class TransposeTrafficGenerator<PacketT extends Packet>
-        extends SyntheticTrafficGenerator<PacketT> {
+public class TransposeTrafficGenerator
+        extends SyntheticTrafficGenerator {
     /**
      * Create a transpose traffic generator.
      *
@@ -24,7 +22,7 @@ public class TransposeTrafficGenerator<PacketT extends Packet>
     public TransposeTrafficGenerator(
             Network network,
             double packetInjectionRate,
-            PacketFactory<PacketT> packetFactory,
+            PacketFactory packetFactory,
             int packetSize,
             long maxPackets
     ) {

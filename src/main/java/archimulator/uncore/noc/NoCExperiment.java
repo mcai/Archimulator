@@ -76,28 +76,28 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
         switch (this.getConfig().getDataPacketTraffic()) {
             case "uniform":
-                new UniformTrafficGenerator<>(
+                new UniformTrafficGenerator(
                         network,
                         this.getConfig().getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new DataPacket(network, src, dest, size, () -> {}),
                         this.getConfig().getDataPacketSize(),
                         maxPackets
                 );
                 break;
             case "transpose":
-                new TransposeTrafficGenerator<>(
+                new TransposeTrafficGenerator(
                         network,
                         this.getConfig().getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new DataPacket(network, src, dest, size, () -> {}),
                         this.getConfig().getDataPacketSize(),
                         maxPackets
                 );
                 break;
             case "hotspot":
-                new HotspotTrafficGenerator<>(
+                new HotspotTrafficGenerator(
                         network,
                         this.getConfig().getDataPacketInjectionRate(),
-                        (n, src, dest, size) -> new DataPacket(n, src, dest, size, () -> {}),
+                        (src, dest, size) -> new DataPacket(network, src, dest, size, () -> {}),
                         this.getConfig().getDataPacketSize(),
                         maxPackets
                 );

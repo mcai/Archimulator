@@ -2,7 +2,6 @@ package archimulator.uncore.noc.traffics;
 
 import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
-import archimulator.uncore.noc.Packet;
 
 import java.util.List;
 
@@ -11,10 +10,10 @@ import java.util.List;
  *
  * @author Min Cai
  */
-public abstract class SyntheticTrafficGenerator<PacketT extends Packet> {
+public abstract class SyntheticTrafficGenerator {
     private Network network;
     private double packetInjectionRate;
-    private PacketFactory<PacketT> packetFactory;
+    private PacketFactory packetFactory;
     private int packetSize;
     private long maxPackets;
 
@@ -30,7 +29,7 @@ public abstract class SyntheticTrafficGenerator<PacketT extends Packet> {
     public SyntheticTrafficGenerator(
             Network network,
             double packetInjectionRate,
-            PacketFactory<PacketT> packetFactory,
+            PacketFactory packetFactory,
             int packetSize,
             long maxPackets
     ) {
@@ -87,10 +86,12 @@ public abstract class SyntheticTrafficGenerator<PacketT extends Packet> {
      * @param src the source node ID
      * @param dest the target node ID
      */
-    protected void injectPacketWithDelay(int src, int dest) {
-        this.network.getCycleAccurateEventQueue().schedule(this, () -> {
-            this.network.receive(this.packetFactory.create(this.network, src, dest, this.packetSize));
-        }, 1);
+    private void injectPacketWithDelay(int src, int dest) {
+        this.network.getCycleAccurateEventQueue().schedule(
+                this,
+                () -> this.network.receive(this.packetFactory.create(src, dest, this.packetSize)),
+                1
+        );
     }
 
     /**
@@ -116,7 +117,7 @@ public abstract class SyntheticTrafficGenerator<PacketT extends Packet> {
      *
      * @return the packet factory
      */
-    public PacketFactory<PacketT> getPacketFactory() {
+    public PacketFactory getPacketFactory() {
         return packetFactory;
     }
 
