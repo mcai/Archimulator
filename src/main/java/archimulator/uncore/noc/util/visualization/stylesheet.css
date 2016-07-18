@@ -1,0 +1,29 @@
+graph {
+    fill-mode: none;
+    fill-color: white;
+}
+node {
+    size: 30px, 30px;
+    shape: circle;
+    fill-mode: dyn-plain;
+    fill-color: gray, yellow, red;
+    stroke-mode: plain;
+    stroke-color: black;
+}
+node:clicked {
+    fill-color: red;
+}
+edge {
+    shape: line;
+    stroke-mode: none;
+    fill-color: gray;
+    z-index: 0;
+}
+edge.shortestPath {
+    shape: blob;
+    stroke-mode: plain;
+    stroke-color: black;
+    stroke-width: 3;
+    fill-color: black;
+    z-index: 1;
+}

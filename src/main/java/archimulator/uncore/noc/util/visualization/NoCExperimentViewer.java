@@ -3,22 +3,27 @@ package archimulator.uncore.noc.util.visualization;
 import archimulator.uncore.noc.Direction;
 import archimulator.uncore.noc.NoCExperiment;
 import archimulator.uncore.noc.Node;
+import archimulator.uncore.noc.routers.FlitState;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
+
+import java.util.Random;
 
 public class NoCExperimentViewer {
     private NoCExperiment experiment;
 
     private Graph graph;
 
-//    static {
-//        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-//    }
+    static {
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+    }
 
     public NoCExperimentViewer(NoCExperiment experiment) {
         this.experiment = experiment;
 
         this.graph = new SingleGraph("NoC Experiment");
+
+        this.graph.addAttribute("ui.stylesheet", "url('archimulator/uncore/noc/util/visualization/stylesheet.css')");
 
         experiment.getBlockingEventDispatcher().addListener(
                 NoCExperiment.NoCExperimentStartedEvent.class,
@@ -44,13 +49,30 @@ public class NoCExperimentViewer {
                     this.graph.display(false);
                 });
 
+        Random random = new Random();
+
         experiment.getBlockingEventDispatcher().addListener(
                 NoCExperiment.NoCExperimentAdvanceOneCycleEvent.class,
                 e -> {
+                    for(Node node : experiment.getNetwork().getNodes()) {
+                        org.graphstream.graph.Node graphNode = graph.getNode(String.format("%d", node.getId()));
 
+                        double v = random.nextDouble();
+
+                        v = (double) node.getRouter().getNumInflightHeadFlits().get(FlitState.INPUT_BUFFER) /
+                                experiment.getConfig().getMaxInputBufferSize();
+
+                        graphNode.setAttribute("ui.color", v);
+
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e1) {
+                        }
+                    }
                 });
     }
 
+    //TODO: displaying hotspots, ant packets and data packets distributions, pheromones distribution.
     public static void main(String[] args) {
         int numNodes = 64;
         int maxCycles = 20000;
@@ -65,8 +87,8 @@ public class NoCExperimentViewer {
                 noDrain
         );
 
-        experimentAco.getConfig().setRouting("oddEven");
-        experimentAco.getConfig().setSelection("aco");
+        experimentAco.getConfig().setRouting("xy");
+        experimentAco.getConfig().setSelection("random");
 
         experimentAco.getConfig().setDataPacketTraffic("transpose");
         experimentAco.getConfig().setDataPacketInjectionRate(0.06);

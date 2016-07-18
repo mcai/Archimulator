@@ -70,7 +70,7 @@ public class GraphStreamViewer {
 //            graphEdge.addAttribute("ui.style", "fill-color: white;");
         });
 
-        graph.addAttribute("ui.stylesheet", "url('/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/stylesheet')");
+        graph.addAttribute("ui.stylesheet", "url('src/main/java/archimulator/util/ai/aco/stylesheet.css')");
 
         this.graph.display(false);
     }
