@@ -152,8 +152,6 @@ public class Flit {
 
         if(this.state != null) {
             this.packet.getNetwork().logFlitPerStateDelay(
-                    this.head,
-                    this.tail,
                     this.state,
                     (int) (this.packet.getNetwork().getCycleAccurateEventQueue().getCurrentCycle() - this.prevStateTimestamp)
             );

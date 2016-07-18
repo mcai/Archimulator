@@ -260,12 +260,10 @@ public class Network {
     /**
      * Log the flit per-state delay.
      *
-     * @param head a boolean value indicating whether the flit is head flit or not
-     * @param tail a boolean value indicating whether the flit is tail flit or not
      * @param state the flit state
      * @param delay the delay that the flit is spent in the state
      */
-    public void logFlitPerStateDelay(boolean head, boolean tail, FlitState state, int delay) {
+    public void logFlitPerStateDelay(FlitState state, int delay) {
         if(!this.numFlitPerStateDelaySamples.containsKey(state)) {
             this.numFlitPerStateDelaySamples.put(state, 0L);
         }
