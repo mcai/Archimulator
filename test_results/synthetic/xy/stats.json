@@ -1,8 +1,8 @@
 {
-  "simulation/beginTimeAsString": "2016/07/17 11:13:09",
-  "simulation/endTimeAsString": "2016/07/17 11:14:59",
-  "simulation/duration": "0:01:50.147",
-  "simulation/durationInSeconds": "110",
+  "simulation/beginTimeAsString": "2016/07/18 11:44:34",
+  "simulation/endTimeAsString": "2016/07/18 11:46:08",
+  "simulation/duration": "0:01:33.816",
+  "simulation/durationInSeconds": "93",
   "simulation/cycleAccurateEventQueue/currentCycle": "33643",
   "noc/routerCongestionStatusPredictionHelper/routerCongestionStatusPredictor/numHits": "2152832",
   "noc/routerCongestionStatusPredictionHelper/routerCongestionStatusPredictor/numMisses": "320",

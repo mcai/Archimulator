@@ -28,6 +28,8 @@ import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.noc.prediction.RouterCongestionStatusPredictionHelper;
 import archimulator.uncore.noc.routers.FlitState;
+import archimulator.uncore.noc.selection.aco.ACOSelectionAlgorithm;
+import archimulator.uncore.noc.selection.aco.Pheromone;
 import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
 import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
 import archimulator.uncore.noc.traffics.UniformTrafficGenerator;
@@ -136,7 +138,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
         if (!this.isNoDrain()) {
             network.setAcceptPacket(false);
 
-            while(network.getNumPacketsReceived() != network.getNumPacketsTransmitted()) {
+            while (network.getNumPacketsReceived() != network.getNumPacketsTransmitted()) {
                 cycleAccurateEventQueue.advanceOneCycle();
             }
         }
@@ -294,7 +296,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
                     )
             );
 
-            for(FlitState state : FlitState.values()) {
+            for (FlitState state : FlitState.values()) {
                 getChildren().add(
                         new ReportNode(
                                 this,
@@ -304,7 +306,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
                 );
             }
 
-            for(FlitState state : FlitState.values()) {
+            for (FlitState state : FlitState.values()) {
                 getChildren().add(
                         new ReportNode(
                                 this,
@@ -312,6 +314,29 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
                                 network.getMaxFlitPerStateDelay().containsKey(state) ? String.format("%d", network.getMaxFlitPerStateDelay().get(state)) : String.format("%s", 0.0)
                         )
                 );
+            }
+
+            if (getConfig().getSelection().equals("aco")) {
+                for (Node srcNode : getNetwork().getNodes()) {
+                    for (Node destNode : getNetwork().getNodes()) {
+                        if (srcNode != destNode) {
+                            ACOSelectionAlgorithm selectionAlgorithm =
+                                    (ACOSelectionAlgorithm) srcNode.getSelectionAlgorithm();
+
+                            for (Pheromone pheromone :
+                                    selectionAlgorithm.getPheromoneTable().getPheromones().get(destNode.getId()).values()) {
+                                getChildren().add(
+                                        new ReportNode(
+                                                this,
+                                                String.format("node_%d.pheromones[node_%d][%s]", srcNode.getId(), destNode.getId(), pheromone.getDirection()),
+                                                String.format("%s", pheromone.getValue())
+                                        )
+                                );
+                            }
+                        }
+                    }
+                }
+
             }
         }});
     }

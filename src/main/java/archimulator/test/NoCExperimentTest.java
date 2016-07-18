@@ -37,30 +37,44 @@ import java.util.List;
  * @author Min Cai
  */
 public class NoCExperimentTest {
+    private int numNodes;
+    private int maxCycles;
+    private int maxPackets;
+    private boolean noDrain;
+
     private List<NoCExperiment> experiments;
 
+    /**
+     * Setup.
+     *
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
-        NoCExperiment experimentXy = xy();
-
-        NoCExperiment experimentBufferLevel = bufferLevel();
-
-        NoCExperiment experimentAco = aco();
+        numNodes = 64;
+        maxCycles = 20000;
+        maxPackets = -1;
+        noDrain = false;
 
         experiments = Arrays.asList(
-                experimentXy,
-                experimentBufferLevel,
-                experimentAco
+                xy(),
+                bufferLevel(),
+                aco()
         );
     }
 
+    /**
+     * Create a NoC experiment using the XY routing algorithm.
+     *
+     * @return a newly created NoC experiment using the XY routing algorithm
+     */
     private NoCExperiment xy() {
         NoCExperiment experimentXy = new NoCExperiment(
                 "test_results/synthetic/xy",
-                64,
-                20000,
-                -1,
-                false
+                numNodes,
+                maxCycles,
+                maxPackets,
+                noDrain
         );
 
         experimentXy.getConfig().setRouting("xy");
@@ -72,13 +86,18 @@ public class NoCExperimentTest {
         return experimentXy;
     }
 
+    /**
+     * Create a NoC experiment using odd even routing + buffer level selection algorithms.
+     *
+     * @return a newly created NoC experiment using odd even routing + buffer level selection algorithms
+     */
     private NoCExperiment bufferLevel() {
         NoCExperiment experimentBufferLevel = new NoCExperiment(
                 "test_results/synthetic/bufferLevel",
-                64,
-                20000,
-                -1,
-                false
+                numNodes,
+                maxCycles,
+                maxPackets,
+                noDrain
         );
 
         experimentBufferLevel.getConfig().setRouting("oddEven");
@@ -90,13 +109,18 @@ public class NoCExperimentTest {
         return experimentBufferLevel;
     }
 
+    /**
+     * Create a NoC experiment using odd even routing + ACO selection algorithms.
+     *
+     * @return a newly created NoC experiment using odd even routing + buffer level selection algorithms
+     */
     private NoCExperiment aco() {
         NoCExperiment experimentAco = new NoCExperiment(
                 "test_results/synthetic/aco",
-                64,
-                20000,
-                -1,
-                false
+                numNodes,
+                maxCycles,
+                maxPackets,
+                noDrain
         );
 
         experimentAco.getConfig().setRouting("oddEven");
@@ -113,11 +137,17 @@ public class NoCExperimentTest {
         return experimentAco;
     }
 
+    /**
+     * Run experiments.
+     */
     @Test
     public void run() {
         Experiment.runExperiments(experiments, true);
     }
 
+    /**
+     * Analyze experiments.
+     */
     @Test
     public void analyze() {
         experiments.forEach(Experiment::loadStats);
