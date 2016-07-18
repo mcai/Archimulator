@@ -87,8 +87,8 @@ public class NoCExperimentViewer {
                 noDrain
         );
 
-        experimentAco.getConfig().setRouting("xy");
-        experimentAco.getConfig().setSelection("random");
+        experimentAco.getConfig().setRouting("oddEven");
+        experimentAco.getConfig().setSelection("bufferLevel");
 
         experimentAco.getConfig().setDataPacketTraffic("transpose");
         experimentAco.getConfig().setDataPacketInjectionRate(0.06);

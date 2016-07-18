@@ -3,7 +3,7 @@ graph {
     fill-color: white;
 }
 node {
-    size: 30px, 30px;
+    size: 50px, 50px;
     shape: circle;
     fill-mode: dyn-plain;
     fill-color: gray, yellow, red;
