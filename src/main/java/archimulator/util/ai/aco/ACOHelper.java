@@ -287,7 +287,7 @@ public class ACOHelper {
         BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher = new BlockingEventDispatcher<>();
         CycleAccurateEventQueue cycleAccurateEventQueue = new CycleAccurateEventQueue();
 
-        ACOHelper acoHelper = read(blockingEventDispatcher, cycleAccurateEventQueue, "/home/itecgo/Archimulator/src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
+        ACOHelper acoHelper = read(blockingEventDispatcher, cycleAccurateEventQueue, "src/main/java/archimulator/util/ai/aco/berlin52.tsp", 0.1, 0.5, 1, 0.5, 0.5);
 
         cycleAccurateEventQueue.getPerCycleEvents().add(() -> acoHelper.getEdges().forEach(Edge::evaporate));
 

@@ -20,10 +20,7 @@
  */
 package archimulator.uncore.noc;
 
-import archimulator.common.Experiment;
-import archimulator.common.ExperimentStat;
-import archimulator.common.Logger;
-import archimulator.common.NoCEnvironment;
+import archimulator.common.*;
 import archimulator.common.report.ReportNode;
 import archimulator.common.report.Reportable;
 import archimulator.uncore.noc.prediction.RouterCongestionStatusPredictionHelper;
@@ -34,6 +31,8 @@ import archimulator.uncore.noc.traffics.HotspotTrafficGenerator;
 import archimulator.uncore.noc.traffics.TransposeTrafficGenerator;
 import archimulator.uncore.noc.traffics.UniformTrafficGenerator;
 import archimulator.util.dateTime.DateHelper;
+import archimulator.util.event.BlockingEvent;
+import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
 import org.apache.commons.lang.time.DurationFormatUtils;
 
@@ -48,6 +47,24 @@ import java.util.Random;
  * @author Min Cai
  */
 public class NoCExperiment extends Experiment<NoCExperimentConfig> implements NoCEnvironment, Reportable {
+    /**
+     * NoC experiment started event.
+     */
+    public class NoCExperimentStartedEvent implements BlockingEvent {
+    }
+
+    /**
+     * NoC experiment advance one cycle event.
+     */
+    public class NoCExperimentAdvanceOneCycleEvent implements BlockingEvent {
+    }
+
+    /**
+     * NoC experiment ended event.
+     */
+    public class NoCExperimentEndedEvent implements BlockingEvent {
+    }
+
     private String outputDirectory;
 
     private Random random;
@@ -65,6 +82,8 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
     private long endTime;
 
     private CycleAccurateEventQueue cycleAccurateEventQueue;
+
+    private BlockingEventDispatcher<BlockingEvent> blockingEventDispatcher;
 
     private Network network;
 
@@ -85,6 +104,8 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
         this.random = this.getConfig().getRandSeed() != -1 ? new Random(this.getConfig().getRandSeed()) : new Random();
 
         this.cycleAccurateEventQueue = new CycleAccurateEventQueue();
+
+        this.blockingEventDispatcher = new BlockingEventDispatcher<>();
     }
 
     /**
@@ -128,11 +149,14 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
         this.routerCongestionStatusPredictionHelper = new RouterCongestionStatusPredictionHelper(this.network);
 
+        this.blockingEventDispatcher.dispatch(new NoCExperimentStartedEvent());
+
         this.beginTime = DateHelper.toTick(new Date());
 
         while ((this.getMaxCycles() == -1 || cycleAccurateEventQueue.getCurrentCycle() < this.getMaxCycles())
                 && (this.getMaxPackets() == -1 || network.getNumPacketsReceived() < this.getMaxPackets())) {
             cycleAccurateEventQueue.advanceOneCycle();
+            this.blockingEventDispatcher.dispatch(new NoCExperimentAdvanceOneCycleEvent());
         }
 
         if (!this.isNoDrain()) {
@@ -140,6 +164,7 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
 
             while (network.getNumPacketsReceived() != network.getNumPacketsTransmitted()) {
                 cycleAccurateEventQueue.advanceOneCycle();
+                this.blockingEventDispatcher.dispatch(new NoCExperimentAdvanceOneCycleEvent());
             }
         }
 
@@ -148,6 +173,8 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
         this.collectStats();
 
         Logger.info(Logger.SIMULATION, "Simulation completed successfully.", this.getCycleAccurateEventQueue().getCurrentCycle());
+
+        this.blockingEventDispatcher.dispatch(new NoCExperimentEndedEvent());
     }
 
     /**
@@ -459,6 +486,15 @@ public class NoCExperiment extends Experiment<NoCExperimentConfig> implements No
      */
     public CycleAccurateEventQueue getCycleAccurateEventQueue() {
         return cycleAccurateEventQueue;
+    }
+
+    /**
+     * Get the blocking event dispatcher.
+     *
+     * @return the blocking event dispatcher
+     */
+    public BlockingEventDispatcher<BlockingEvent> getBlockingEventDispatcher() {
+        return blockingEventDispatcher;
     }
 
     /**
