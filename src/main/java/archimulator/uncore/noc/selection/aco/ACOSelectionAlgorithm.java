@@ -1,3 +1,23 @@
+/**
+ * ****************************************************************************
+ * Copyright (c) 2010-2016 by Min Cai (min.cai.china@gmail.com).
+ * <p>
+ * This file is part of the Archimulator multicore architectural simulator.
+ * <p>
+ * Archimulator is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * Archimulator is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with Archimulator. If not, see <http://www.gnu.org/licenses/>.
+ * ****************************************************************************
+ */
 package archimulator.uncore.noc.selection.aco;
 
 import archimulator.uncore.noc.Direction;
@@ -11,11 +31,18 @@ import archimulator.util.Pair;
 import java.util.List;
 
 /**
- * TODO...
+ * Ant colony optimization (ACO) based selection algorithm.
+ *
+ * @author Min Cai
  */
 public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
     private PheromoneTable pheromoneTable;
 
+    /**
+     * Create an ant colony optimization (ACO) based selection algorithm.
+     *
+     * @param node the parent node
+     */
     public ACOSelectionAlgorithm(Node node) {
         super(node);
 
@@ -32,6 +59,12 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         }
     }
 
+    /**
+     * Handle the event when a packet has arrived at its destination node.
+     *
+     * @param packet the packet
+     * @param inputVirtualChannel the input virtual channel
+     */
     @Override
     public void handleDestArrived(Packet packet, InputVirtualChannel inputVirtualChannel) {
         if (packet instanceof AntPacket) {
@@ -40,7 +73,7 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
 
                 this.createAndSendBackwardAntPacket((ForwardAntPacket) packet);
             } else {
-                this.updateRoutingTable((BackwardAntPacket) packet, inputVirtualChannel);
+                this.updatePheromoneTable((BackwardAntPacket) packet, inputVirtualChannel);
             }
 
             packet.setEndCycle(this.getNode().getNetwork().getCycleAccurateEventQueue().getCurrentCycle());
@@ -56,6 +89,13 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         }
     }
 
+    /**
+     * Do route calculation for a packet.
+     *
+     * @param packet the packet
+     * @param inputVirtualChannel input virtual channel
+     * @return the newly calculated output direction for routing the packet
+     */
     @Override
     public Direction doRouteCalculation(Packet packet, InputVirtualChannel inputVirtualChannel) {
         if (packet instanceof AntPacket) {
@@ -63,7 +103,7 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
                 return super.doRouteCalculation(packet, inputVirtualChannel);
             } else {
                 if (this.getNode().getId() != packet.getSrc()) {
-                    this.updateRoutingTable((BackwardAntPacket) packet, inputVirtualChannel);
+                    this.updatePheromoneTable((BackwardAntPacket) packet, inputVirtualChannel);
                 }
 
                 return this.backwardAntPacket((BackwardAntPacket) packet);
@@ -73,6 +113,11 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         }
     }
 
+    /**
+     * Create and send a backward ant packet for the forward ant packet.
+     *
+     * @param packet the forward ant packet
+     */
     private void createAndSendBackwardAntPacket(ForwardAntPacket packet) {
         BackwardAntPacket newPacket = new BackwardAntPacket(
                 packet.getNetwork(),
@@ -88,6 +133,12 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         );
     }
 
+    /**
+     * Send the backward ant packet to the next hop.
+     *
+     * @param packet the backward ant packet
+     * @return the next hop that is calculated for the backward ant packet
+     */
     private Direction backwardAntPacket(BackwardAntPacket packet) {
         int i;
 
@@ -110,7 +161,13 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         throw new IllegalArgumentException();
     }
 
-    private void updateRoutingTable(BackwardAntPacket packet, InputVirtualChannel inputVirtualChannel) {
+    /**
+     * Update the pheromone table for the specified backward ant packet.
+     *
+     * @param packet the backward ant packet
+     * @param inputVirtualChannel the input virtual channel
+     */
+    private void updatePheromoneTable(BackwardAntPacket packet, InputVirtualChannel inputVirtualChannel) {
         int i;
 
         for(i = 0; i < packet.getMemory().size() ; i++) {
@@ -126,6 +183,15 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         }
     }
 
+    /**
+     * Select the best output direction from a list of candidate output directions.
+     *
+     * @param src the source node ID
+     * @param dest the destination node ID
+     * @param ivc the input virtual channel ID
+     * @param directions the list of candidate output directions
+     * @return the best output direction selected from a list of candidate output directions
+     */
     @Override
     public Direction select(int src, int dest, int ivc, List<Direction> directions) {
         double maxProbability = -1.0;
@@ -150,6 +216,11 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         return bestDirection;
     }
 
+    /**
+     * Get the pheromone table.
+     *
+     * @return the pheromone table
+     */
     public PheromoneTable getPheromoneTable() {
         return pheromoneTable;
     }

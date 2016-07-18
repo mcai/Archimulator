@@ -99,11 +99,26 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
         this.random = this.getExperiment().getConfig().getRandSeed() != -1 ? new Random(this.getExperiment().getConfig().getRandSeed()) : new Random();
     }
 
+    /**
+     * Get the net for the specified source and destination devices.
+     *
+     * @param from the source device
+     * @param to   the destination device
+     * @return the net for the specified source and destination devices
+     */
     @Override
     public Net getNet(MemoryDevice from, MemoryDevice to) {
         return this;
     }
 
+    /**
+     * Transfer a message of the specified size from the source device to the destination device.
+     *
+     * @param deviceFrom        the source device
+     * @param deviceTo   the destination device
+     * @param size                the size
+     * @param onCompletedCallback the callback action performed when the transfer is completed
+     */
     @Override
     public void transfer(MemoryDevice deviceFrom, MemoryDevice deviceTo, int size, Runnable onCompletedCallback) {
         int src = this.devicesToNodeIds.get(deviceFrom);
@@ -114,6 +129,11 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
         this.getCycleAccurateEventQueue().schedule(this, () -> this.network.receive(packet), 1);
     }
 
+    /**
+     * Dump the statistics into the specified report node.
+     *
+     * @param reportNode the report node
+     */
     @Override
     public void dumpStats(ReportNode reportNode) {
         reportNode.getChildren().add(new ReportNode(reportNode, getName()) {{
@@ -253,11 +273,21 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
         }});
     }
 
+    /**
+     * Get the name of the memory hierarchy.
+     *
+     * @return the name of the memory hierarchy
+     */
     @Override
     public String getName() {
         return "net";
     }
 
+    /**
+     * Get the config.
+     *
+     * @return the config
+     */
     @Override
     public NoCConfig getConfig() {
         return getExperiment().getConfig();
@@ -273,6 +303,11 @@ public class NoCMemoryHierarchy extends AbstractMemoryHierarchy implements Net, 
         return random;
     }
 
+    /**
+     * Get a boolean value indicating whether it is currently in the detailed simulation mode or not.
+     *
+     * @return a boolean value indicating whether it is currently in the detailed simulation mode or not
+     */
     @Override
     public boolean isInDetailedSimulationMode() {
         return this.getSimulation().getType() == SimulationType.MEASUREMENT
