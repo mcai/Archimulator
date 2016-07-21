@@ -30,7 +30,6 @@ import archimulator.uncore.noc.Network;
 import archimulator.uncore.noc.Node;
 import archimulator.uncore.noc.routers.InputPort;
 import archimulator.uncore.noc.routers.InputVirtualChannel;
-import archimulator.uncore.noc.routing.RoutingAlgorithm;
 import archimulator.util.event.BlockingEvent;
 import archimulator.util.event.BlockingEventDispatcher;
 import archimulator.util.event.CycleAccurateEventQueue;
@@ -89,7 +88,7 @@ public class RouterCongestionStatusPredictionHelper implements Reportable {
 
                 for(InputPort inputPort : node.getRouter().getInputPorts().values()) {
                     for(InputVirtualChannel inputVirtualChannel : inputPort.getVirtualChannels()) {
-                        freeSlots += node.getRouter().freeSlots(inputPort.getDirection(), inputVirtualChannel.getId());
+                        freeSlots += node.getRouter().getFreeSlots(inputPort.getDirection(), inputVirtualChannel.getId());
                     }
                 }
 

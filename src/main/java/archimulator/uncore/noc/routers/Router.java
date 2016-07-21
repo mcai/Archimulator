@@ -351,9 +351,8 @@ public class Router {
      * @param ivc the input virtual channel number
      * @return the number of free slots in the specified input virtual channel
      */
-    public int freeSlots(Direction ip, int ivc) {
-        return this.node.getNetwork().getEnvironment().getConfig().getMaxInputBufferSize()
-                - this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().size();
+    public int getFreeSlots(Direction ip, int ivc) {
+        return this.inputPorts.get(ip).getVirtualChannels().get(ivc).getInputBuffer().getFreeSlots();
     }
 
     @Override

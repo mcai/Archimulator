@@ -59,7 +59,7 @@ public class BufferLevelSelectionAlgorithm extends AbstractSelectionAlgorithm {
 
         for(Direction direction : directions) {
             Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
-            int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
+            int freeSlots = neighborRouter.getFreeSlots(direction.getReflexDirection(), ivc);
 
             if(freeSlots > maxFreeSlots) {
                 maxFreeSlots = freeSlots;

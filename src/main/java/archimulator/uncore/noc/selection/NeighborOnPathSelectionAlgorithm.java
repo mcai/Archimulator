@@ -92,7 +92,7 @@ public class NeighborOnPathSelectionAlgorithm extends AbstractSelectionAlgorithm
 
         for(Direction direction : directions) {
             Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
-            score += neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
+            score += neighborRouter.getFreeSlots(direction.getReflexDirection(), ivc);
         }
 
         return score;

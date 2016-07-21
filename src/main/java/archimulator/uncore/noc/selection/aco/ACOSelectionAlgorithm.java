@@ -200,7 +200,7 @@ public class ACOSelectionAlgorithm extends AbstractSelectionAlgorithm {
         for(Direction direction : directions) {
             Pheromone pheromone = this.pheromoneTable.getPheromones().get(dest).get(direction);
             Router neighborRouter = this.getNode().getNetwork().getNodes().get(this.getNode().getNeighbors().get(direction)).getRouter();
-            int freeSlots = neighborRouter.freeSlots(direction.getReflexDirection(), ivc);
+            int freeSlots = neighborRouter.getFreeSlots(direction.getReflexDirection(), ivc);
 
             double alpha = this.getNode().getNetwork().getEnvironment().getConfig().getAcoSelectionAlpha();
             double qTotal = this.getNode().getNetwork().getEnvironment().getConfig().getMaxInputBufferSize();

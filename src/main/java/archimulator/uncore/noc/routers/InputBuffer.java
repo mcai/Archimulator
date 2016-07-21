@@ -97,6 +97,15 @@ public class InputBuffer {
     }
 
     /**
+     * Get the number of free slots.
+     *
+     * @return the number of free slots
+     */
+    public int getFreeSlots() {
+        return this.inputVirtualChannel.getInputPort().getRouter().getNode().getNetwork().getEnvironment().getConfig().getMaxInputBufferSize() - size();
+    }
+
+    /**
      * Get the input virtual channel.
      *
      * @return the input virtual channel
