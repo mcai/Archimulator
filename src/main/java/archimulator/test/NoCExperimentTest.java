@@ -47,7 +47,7 @@ public class NoCExperimentTest {
     /**
      * Setup.
      *
-     * @throws Exception
+     * @throws Exception the exception
      */
     @Before
     public void setUp() throws Exception {
