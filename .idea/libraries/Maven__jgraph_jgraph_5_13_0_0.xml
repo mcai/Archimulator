@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/jgraph/jgraph/5.13.0.0/jgraph-5.13.0.0-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/jgraph/jgraph/5.13.0.0/jgraph-5.13.0.0-sources.jar!/" />
     </SOURCES>

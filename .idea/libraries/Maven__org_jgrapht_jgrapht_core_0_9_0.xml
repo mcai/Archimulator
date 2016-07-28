@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/org/jgrapht/jgrapht-core/0.9.0/jgrapht-core-0.9.0-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/org/jgrapht/jgrapht-core/0.9.0/jgrapht-core-0.9.0-sources.jar!/" />
     </SOURCES>

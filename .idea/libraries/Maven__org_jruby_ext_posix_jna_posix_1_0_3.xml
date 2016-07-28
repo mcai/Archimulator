@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/org/jruby/ext/posix/jna-posix/1.0.3/jna-posix-1.0.3-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/org/jruby/ext/posix/jna-posix/1.0.3/jna-posix-1.0.3-sources.jar!/" />
     </SOURCES>

@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/commons-configuration/commons-configuration/1.9/commons-configuration-1.9-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/commons-configuration/commons-configuration/1.9/commons-configuration-1.9-sources.jar!/" />
     </SOURCES>

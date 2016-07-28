@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/com/lowagie/itext/2.1.5/itext-2.1.5-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/com/lowagie/itext/2.1.5/itext-2.1.5-sources.jar!/" />
     </SOURCES>

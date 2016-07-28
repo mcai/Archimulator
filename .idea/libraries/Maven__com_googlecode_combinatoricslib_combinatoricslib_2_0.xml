@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/combinatoricslib/combinatoricslib/2.0/combinatoricslib-2.0-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/com/googlecode/combinatoricslib/combinatoricslib/2.0/combinatoricslib-2.0-sources.jar!/" />
     </SOURCES>

@@ -6,6 +6,7 @@
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/org/jfree/jfreechart/1.0.14/jfreechart-1.0.14-javadoc.jar!/" />
     </JAVADOC>
+    <LIBRARY_FILE />
     <SOURCES>
       <root url="jar://$MAVEN_REPOSITORY$/org/jfree/jfreechart/1.0.14/jfreechart-1.0.14-sources.jar!/" />
     </SOURCES>
