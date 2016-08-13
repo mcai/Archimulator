@@ -163,7 +163,7 @@ public class CacheGeometry {
      * @return the line ID for the specified address and geometry
      */
     public static int getLineId(int address, CacheGeometry cacheGeometry) {
-        return (address >> cacheGeometry.getLineSizeInLog2());
+        return address >> cacheGeometry.getLineSizeInLog2();
     }
 
     /**
