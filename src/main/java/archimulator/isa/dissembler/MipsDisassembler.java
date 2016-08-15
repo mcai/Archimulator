@@ -20,6 +20,7 @@
  */
 package archimulator.isa.dissembler;
 
+import archimulator.isa.ArchitecturalRegisterFile;
 import archimulator.isa.BitField;
 import archimulator.isa.StaticInstruction;
 import archimulator.util.math.MathHelper;
@@ -30,11 +31,6 @@ import archimulator.util.math.MathHelper;
  * @author Min Cai
  */
 public class MipsDisassembler {
-    private static final String[] MIPS_GPR_NAMES = new String[]{
-            "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3", "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "t8", "t9",
-            "k0", "k1", "gp", "sp", "s8", "ra"
-    };
-
     /**
      * Get the type of the specified machine instruction.
      *
@@ -65,7 +61,7 @@ public class MipsDisassembler {
      */
     public static boolean isRMt(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func == 0x10 || func == 0x11);
+        return func == 0x10 || func == 0x11;
     }
 
     /**
@@ -76,7 +72,7 @@ public class MipsDisassembler {
      */
     public static boolean isRMf(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func == 0x12 || func == 0x13);
+        return func == 0x12 || func == 0x13;
     }
 
     /**
@@ -87,7 +83,7 @@ public class MipsDisassembler {
      */
     public static boolean isROneOp(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func == 0x08 || func == 0x09);
+        return func == 0x08 || func == 0x09;
     }
 
     /**
@@ -98,7 +94,7 @@ public class MipsDisassembler {
      */
     public static boolean isRTwoOp(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func >= 0x18 && func <= 0x1b);
+        return func >= 0x18 && func <= 0x1b;
     }
 
     /**
@@ -109,7 +105,7 @@ public class MipsDisassembler {
      */
     public static boolean isLoadStore(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
-        return (((opcode >= 0x20) && (opcode <= 0x2e)) || (opcode == 0x30) || (opcode == 0x38));
+        return opcode >= 0x20 && opcode <= 0x2e || opcode == 0x30 || opcode == 0x38;
     }
 
     /**
@@ -120,7 +116,7 @@ public class MipsDisassembler {
      */
     public static boolean isFPLoadStore(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
-        return (opcode == 0x31 || opcode == 0x39);
+        return opcode == 0x31 || opcode == 0x39;
     }
 
     /**
@@ -131,7 +127,7 @@ public class MipsDisassembler {
      */
     public static boolean isOneOpBranch(int machineInstruction) {
         int opcode = BitField.OPCODE.valueOf(machineInstruction);
-        return ((opcode == 0x00) || (opcode == 0x01) || (opcode == 0x06) || (opcode == 0x07));
+        return opcode == 0x00 || opcode == 0x01 || opcode == 0x06 || opcode == 0x07;
     }
 
     /**
@@ -142,7 +138,7 @@ public class MipsDisassembler {
      */
     public static boolean isShift(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func == 0x00 || func == 0x01 || func == 0x03);
+        return func == 0x00 || func == 0x01 || func == 0x03;
     }
 
     /**
@@ -153,7 +149,7 @@ public class MipsDisassembler {
      */
     public static boolean isCVT(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func == 32 || func == 33 || func == 36);
+        return func == 32 || func == 33 || func == 36;
     }
 
     /**
@@ -164,7 +160,7 @@ public class MipsDisassembler {
      */
     public static boolean isCompare(int machineInstruction) {
         int func = BitField.FUNC.valueOf(machineInstruction);
-        return (func >= 48);
+        return func >= 48;
     }
 
     /**
@@ -175,7 +171,7 @@ public class MipsDisassembler {
      */
     public static boolean isGprFpMove(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
-        return (rs == 0 || rs == 4);
+        return rs == 0 || rs == 4;
     }
 
     /**
@@ -186,7 +182,7 @@ public class MipsDisassembler {
      */
     public static boolean isGprFcrMove(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
-        return (rs == 2 || rs == 6);
+        return rs == 2 || rs == 6;
     }
 
     /**
@@ -197,7 +193,7 @@ public class MipsDisassembler {
      */
     public static boolean isFpBranch(int machineInstruction) {
         int rs = BitField.RS.valueOf(machineInstruction);
-        return (rs == 8);
+        return rs == 8;
     }
 
     /**
@@ -207,7 +203,10 @@ public class MipsDisassembler {
      * @return a value indicating whether the specified machine instruction is a system call or not
      */
     public static boolean isSystemCall(int machineInstruction) {
-        return (BitField.OPCODE_LO.valueOf(machineInstruction) == 0x0 && BitField.FUNC_HI.valueOf(machineInstruction) == 0x1 && BitField.FUNC_LO.valueOf(machineInstruction) == 0x4);
+        int opcodeLo = BitField.OPCODE_LO.valueOf(machineInstruction);
+        int funcHi = BitField.FUNC_HI.valueOf(machineInstruction);
+        int funcLo = BitField.FUNC_LO.valueOf(machineInstruction);
+        return opcodeLo == 0x0 && funcHi == 0x1 && funcLo == 0x4;
     }
 
     /**
@@ -249,13 +248,13 @@ public class MipsDisassembler {
                 break;
             case I:
                 if (isOneOpBranch(machineInstruction)) {
-                    sb.append(String.format("$%s, %d", MIPS_GPR_NAMES[rs], imm));
+                    sb.append(String.format("$%s, %d", ArchitecturalRegisterFile.GPR_NAMES[rs], imm));
                 } else if (isLoadStore(machineInstruction)) {
-                    sb.append(String.format("$%s, %d($%s)", MIPS_GPR_NAMES[rt], imm, MIPS_GPR_NAMES[rs]));
+                    sb.append(String.format("$%s, %d($%s)", ArchitecturalRegisterFile.GPR_NAMES[rt], imm, ArchitecturalRegisterFile.GPR_NAMES[rs]));
                 } else if (isFPLoadStore(machineInstruction)) {
-                    sb.append(String.format("$f%d, %d($%s)", ft, imm, MIPS_GPR_NAMES[rs]));
+                    sb.append(String.format("$f%d, %d($%s)", ft, imm, ArchitecturalRegisterFile.GPR_NAMES[rs]));
                 } else {
-                    sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rt], MIPS_GPR_NAMES[rs], imm));
+                    sb.append(String.format("$%s, $%s, %d", ArchitecturalRegisterFile.GPR_NAMES[rt], ArchitecturalRegisterFile.GPR_NAMES[rs], imm));
                 }
                 break;
             case F:
@@ -266,9 +265,9 @@ public class MipsDisassembler {
                 } else if (isFpBranch(machineInstruction)) {
                     sb.append(String.format("%d, %d", fd >> 2, imm));
                 } else if (isGprFpMove(machineInstruction)) {
-                    sb.append(String.format("$%s, $f%d", MIPS_GPR_NAMES[rt], fs));
+                    sb.append(String.format("$%s, $f%d", ArchitecturalRegisterFile.GPR_NAMES[rt], fs));
                 } else if (isGprFcrMove(machineInstruction)) {
-                    sb.append(String.format("$%s, $%d", MIPS_GPR_NAMES[rt], fs));
+                    sb.append(String.format("$%s, $%d", ArchitecturalRegisterFile.GPR_NAMES[rt], fs));
                 } else {
                     sb.append(String.format("$f%d, $f%d, $f%d", fd, fs, ft));
                 }
@@ -276,17 +275,17 @@ public class MipsDisassembler {
             case R:
                 if (!isSystemCall(machineInstruction)) {
                     if (isShift(machineInstruction)) {
-                        sb.append(String.format("$%s, $%s, %d", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rt], shift));
+                        sb.append(String.format("$%s, $%s, %d", ArchitecturalRegisterFile.GPR_NAMES[rd], ArchitecturalRegisterFile.GPR_NAMES[rt], shift));
                     } else if (isROneOp(machineInstruction)) {
-                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                        sb.append(String.format("$%s", ArchitecturalRegisterFile.GPR_NAMES[rs]));
                     } else if (isRTwoOp(machineInstruction)) {
-                        sb.append(String.format("$%s, $%s", MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                        sb.append(String.format("$%s, $%s", ArchitecturalRegisterFile.GPR_NAMES[rs], ArchitecturalRegisterFile.GPR_NAMES[rt]));
                     } else if (isRMt(machineInstruction)) {
-                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rs]));
+                        sb.append(String.format("$%s", ArchitecturalRegisterFile.GPR_NAMES[rs]));
                     } else if (isRMf(machineInstruction)) {
-                        sb.append(String.format("$%s", MIPS_GPR_NAMES[rd]));
+                        sb.append(String.format("$%s", ArchitecturalRegisterFile.GPR_NAMES[rd]));
                     } else {
-                        sb.append(String.format("$%s, $%s, $%s", MIPS_GPR_NAMES[rd], MIPS_GPR_NAMES[rs], MIPS_GPR_NAMES[rt]));
+                        sb.append(String.format("$%s, $%s, $%s", ArchitecturalRegisterFile.GPR_NAMES[rd], ArchitecturalRegisterFile.GPR_NAMES[rs], ArchitecturalRegisterFile.GPR_NAMES[rt]));
                     }
                 }
                 break;

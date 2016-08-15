@@ -327,7 +327,7 @@ public final class ArchitecturalRegisterFile implements Cloneable {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 32; i++) {
-            sb.append(String.format("%s = 0x%08x, \n", gprNames[i], this.gprs[i]));
+            sb.append(String.format("%s = 0x%08x, \n", GPR_NAMES[i], this.gprs[i]));
         }
 
         sb.append(String.format("pc = 0x%08x, npc = 0x%08x, nnpc = 0x%08x", this.pc, this.npc, this.nnpc));
@@ -473,7 +473,7 @@ public final class ArchitecturalRegisterFile implements Cloneable {
     /**
      * (General purpose register) GPR names.
      */
-    private static final String[] gprNames = new String[]{
+    public static final String[] GPR_NAMES = new String[]{
             "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
             "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t6",
             "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
